@@ -1,0 +1,46 @@
+# Secrets
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+.env.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database / runtime
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+data/*.db
+data/auction_agent.db
+data/auction.db
+
+# Logs
+logs/*.log
+
+# Exports (대용량 결과는 git에 올리지 않는다)
+data/exports/*.json
+data/exports/*.csv
+data/exports/*.md
+!data/exports/.gitkeep
+
+# 큰 바이너리/패키지
+*.zip
+auction-agent.zip
+
+# 로컬 작업 노트/스펙 (필요 시 git add 로 개별 추가)
+02.txt
+*.xlsx
+
+# IDE
+.idea/
+.vscode/
