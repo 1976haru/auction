@@ -80,6 +80,28 @@ function el(html) {
 }
 function clearChildren(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
+/* 모바일 스크롤 중 우발 탭을 흡수하지 않으면서, 일반 탭/클릭/키보드 모두로
+   상세를 열 수 있게 한다. pointerdown 좌표와 pointerup 좌표 차이가 크면 무시. */
+function bindTap(node, handler) {
+  let sx = 0, sy = 0, moved = false;
+  node.addEventListener("pointerdown", (e) => {
+    sx = e.clientX; sy = e.clientY; moved = false;
+  }, { passive: true });
+  node.addEventListener("pointermove", (e) => {
+    if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) moved = true;
+  }, { passive: true });
+  node.addEventListener("click", (e) => {
+    if (moved) { moved = false; return; }
+    handler(e);
+  });
+  node.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handler(e);
+    }
+  });
+}
+
 function renderGeneratedAt(iso) {
   if (!iso) return;
   const d = new Date(iso);
@@ -300,7 +322,9 @@ function renderRecs(recs) {
        </article>`
     );
     if (r.item_id) {
-      card.addEventListener("click", () => openDetailById(r.item_id));
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "button");
+      bindTap(card, () => openDetailById(r.item_id));
     }
     g.appendChild(card);
   });
@@ -394,7 +418,7 @@ function itemCardHtml(it) {
     ? `D-${it.days_left}`
     : (it.bid_date ? "기일 " + (it.bid_date.split("~")[0] || it.bid_date) : "기일 미정");
   return `
-    <article class="item-card" data-item-id="${it.id}">
+    <article class="item-card" data-item-id="${it.id}" tabindex="0" role="button" aria-label="물건 상세 보기">
       <div class="item-head">
         <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
         <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
@@ -436,7 +460,7 @@ function renderItems() {
   }
   list.forEach((it, idx) => {
     const card = el(itemCardHtml(it));
-    card.addEventListener("click", () => openDetailById(it.id));
+    bindTap(card, () => openDetailById(it.id));
     cardRoot.appendChild(card);
 
     const tr = document.createElement("tr");
@@ -458,7 +482,9 @@ function renderItems() {
       <td>${escapeHtml(it.bid_date || "-")}</td>
       <td><span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span></td>
     `;
-    tr.addEventListener("click", () => openDetailById(it.id));
+    tr.setAttribute("tabindex", "0");
+    tr.setAttribute("role", "button");
+    bindTap(tr, () => openDetailById(it.id));
     tableBody.appendChild(tr);
   });
 }
@@ -719,7 +745,7 @@ function runAgentSearch(text) {
   }
   result.forEach((it) => {
     const card = el(itemCardHtml(it));
-    card.addEventListener("click", () => openDetailById(it.id));
+    bindTap(card, () => openDetailById(it.id));
     grid.appendChild(card);
   });
 }
