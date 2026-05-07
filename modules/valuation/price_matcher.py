@@ -143,3 +143,57 @@ def get_price_analysis(item_id: int) -> dict | None:
     ).fetchone()
     conn.close()
     return dict(row) if row else None
+
+
+def get_trade_history(item_id: int, limit: int = 200) -> list[dict]:
+    """해당 item에 매칭된 실거래 기록을 시간순으로 반환."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT trade_date, trade_price, area_m2, complex_name, address_dong, source
+        FROM price_records
+        WHERE item_id = ?
+        ORDER BY trade_date ASC
+        LIMIT ?
+    """, (item_id, limit)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def monthly_aggregate(trades: list[dict]) -> list[dict]:
+    """일자별 거래 -> 월(YYYY-MM) 단위로 집계."""
+    by_ym: dict[str, list[int]] = {}
+    for t in trades:
+        d = (t.get("trade_date") or "")[:7]
+        if not d or len(d) < 7:
+            continue
+        by_ym.setdefault(d, []).append(int(t.get("trade_price") or 0))
+    out = []
+    for ym in sorted(by_ym.keys()):
+        prices = by_ym[ym]
+        if not prices:
+            continue
+        out.append({
+            "ym": ym,
+            "avg_price": int(sum(prices) / len(prices)),
+            "min_price": min(prices),
+            "max_price": max(prices),
+            "count": len(prices),
+        })
+    return out
+
+
+def get_region_trend(address_si: str, address_gu: str, item_type: str,
+                     months: int = 12) -> list[dict]:
+    """지역(si/gu) + 유형 단위 월별 트렌드. items의 price_records 를 join."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT p.trade_date, p.trade_price
+        FROM price_records p
+        JOIN items i ON i.id = p.item_id
+        WHERE i.address_si = ? AND i.address_gu = ? AND i.item_type = ?
+          AND p.trade_price > 0
+    """, (address_si, address_gu, item_type)).fetchall()
+    conn.close()
+    trades = [dict(r) for r in rows]
+    monthly = monthly_aggregate(trades)
+    return monthly[-months:] if months else monthly

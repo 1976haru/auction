@@ -34,6 +34,12 @@ from core.database import get_connection, init_db
 from core.utils import days_until, risk_emoji
 from modules.profit_calculator import calc_profit, recommend_bid_prices
 from modules.risk.keyword_analyzer import RISK_KEYWORDS, get_risk_flags
+from modules.valuation.price_matcher import (
+    get_price_analysis,
+    get_region_trend,
+    get_trade_history,
+    monthly_aggregate,
+)
 
 init_db()
 st.set_page_config(page_title="경매·공매 AI 에이전트", layout="wide")
@@ -69,6 +75,7 @@ with st.sidebar:
             "수익 계산기",
             "위험 키워드",
             "신뢰도/데이터 부족",
+            "시세 트렌드",
             "변화 감지",
             "사용자 선호 설정",
             "스트레스 테스트 결과",
@@ -249,6 +256,31 @@ elif tab_sel == "물건 상세분석":
         bid = get_bid_recommendation(it["id"])
         st.text(format_bid_report(bid))
 
+        # 시세 트렌드 차트
+        st.markdown("### 시세 트렌드")
+        trades = get_trade_history(it["id"])
+        monthly = monthly_aggregate(trades)
+        pa = get_price_analysis(it["id"]) or {}
+        if monthly:
+            df_m = pd.DataFrame(monthly).set_index("ym")
+            chart_df = df_m[["avg_price", "min_price", "max_price"]].rename(
+                columns={"avg_price": "평균", "min_price": "최저", "max_price": "최고"}
+            )
+            st.line_chart(chart_df, height=280)
+            ref_lines = pd.DataFrame({
+                "감정가": [it.get("appraisal_price", 0)] * len(df_m),
+                "최저가": [it.get("min_bid_price", 0)] * len(df_m),
+                "추정 시세": [pa.get("market_price_estimate", 0)] * len(df_m),
+                "월평균": df_m["avg_price"].values,
+            }, index=df_m.index)
+            st.caption("기준선과 월평균 비교")
+            st.line_chart(ref_lines, height=240)
+            st.caption(f"매칭된 거래 {len(trades)}건 / 월별 {len(monthly)}개월")
+            with st.expander("개별 거래 보기"):
+                st.dataframe(pd.DataFrame(trades), use_container_width=True)
+        else:
+            st.info("매칭된 실거래 데이터가 없습니다.")
+
         st.markdown("### 물건 Q&A")
         question = st.text_input("질문하기", value="이 물건 위험해?")
         if st.button("질문하기 실행"):
@@ -315,7 +347,85 @@ elif tab_sel == "신뢰도/데이터 부족":
              "address_match_confidence", "overall_confidence", "reasons_json"]
         ], use_container_width=True)
 
-# 10. 변화 감지 ----------------------------------------------------
+# 10. 시세 트렌드 ---------------------------------------------------
+elif tab_sel == "시세 트렌드":
+    st.header("시세 트렌드 차트")
+    st.caption("지역(시/구) + 물건 유형 단위 월별 평균 시세 / 단지(특정 매물) 단위 시세")
+
+    mode = st.radio("보기 단위", ["지역+유형", "특정 매물(단지)"], horizontal=True)
+
+    if mode == "지역+유형":
+        conn = get_connection()
+        rows = conn.execute("""
+            SELECT DISTINCT i.address_si, i.address_gu, i.item_type
+            FROM items i JOIN price_records p ON p.item_id=i.id
+            WHERE i.address_si IS NOT NULL AND i.address_gu IS NOT NULL
+              AND i.item_type IS NOT NULL
+            ORDER BY i.address_si, i.address_gu, i.item_type
+        """).fetchall()
+        conn.close()
+        opts = [(r["address_si"], r["address_gu"], r["item_type"]) for r in rows]
+        if not opts:
+            st.info("실거래 데이터가 없습니다. mock 데이터 생성 후 파이프라인을 실행하세요.")
+        else:
+            labels = [f"{a} {b} / {c}" for a, b, c in opts]
+            idx = st.selectbox("지역 + 유형 선택", range(len(opts)),
+                                format_func=lambda i: labels[i])
+            si, gu, itype = opts[idx]
+            months = st.slider("기간 (월)", 3, 24, 12)
+            trend = get_region_trend(si, gu, itype, months=months)
+            if not trend:
+                st.info("해당 조건에 맞는 거래가 없습니다.")
+            else:
+                df = pd.DataFrame(trend).set_index("ym")
+                c1, c2, c3 = st.columns(3)
+                latest = df["avg_price"].iloc[-1]
+                first = df["avg_price"].iloc[0]
+                delta_pct = ((latest - first) / first * 100) if first else 0
+                c1.metric("최근 월 평균", f"{int(latest):,}만원",
+                           delta=f"{delta_pct:+.1f}% (기간 시작 대비)")
+                c2.metric("기간 거래수", int(df["count"].sum()))
+                c3.metric("기간 표본 월수", len(df))
+                chart_df = df[["avg_price", "min_price", "max_price"]].rename(
+                    columns={"avg_price": "평균", "min_price": "최저", "max_price": "최고"}
+                )
+                st.line_chart(chart_df, height=320)
+                st.caption("월별 거래 건수")
+                st.bar_chart(df[["count"]].rename(columns={"count": "거래수"}), height=180)
+
+    else:
+        items = _get_items(500)
+        if not items:
+            st.info("물건이 없습니다.")
+        else:
+            labels = [f"#{it['id']} {it.get('address_full', '')[:40]}" for it in items]
+            idx = st.selectbox("매물 선택", range(len(items)),
+                                format_func=lambda i: labels[i])
+            it = items[idx]
+            trades = get_trade_history(it["id"])
+            monthly = monthly_aggregate(trades)
+            pa = get_price_analysis(it["id"]) or {}
+            if not monthly:
+                st.info("이 매물에 매칭된 실거래가가 없습니다.")
+            else:
+                df = pd.DataFrame(monthly).set_index("ym")
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("감정가", f"{it.get('appraisal_price', 0):,}만원")
+                c2.metric("최저가", f"{it.get('min_bid_price', 0):,}만원")
+                c3.metric("추정 시세", f"{pa.get('market_price_estimate', 0):,}만원")
+                c4.metric("매칭 거래수", len(trades))
+                ref_df = pd.DataFrame({
+                    "월평균": df["avg_price"].values,
+                    "감정가": [it.get("appraisal_price", 0)] * len(df),
+                    "최저가": [it.get("min_bid_price", 0)] * len(df),
+                    "추정 시세": [pa.get("market_price_estimate", 0)] * len(df),
+                }, index=df.index)
+                st.line_chart(ref_df, height=320)
+                st.caption("기준선과 월평균 비교 (감정가/최저가가 시세보다 위에 있으면 거품 의심)")
+                with st.expander("개별 거래 보기"):
+                    st.dataframe(pd.DataFrame(trades), use_container_width=True)
+
+# 11. 변화 감지 ----------------------------------------------------
 elif tab_sel == "변화 감지":
     st.header("변화 감지 이벤트")
     events = list_recent_events()
