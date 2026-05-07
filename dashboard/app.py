@@ -22,6 +22,11 @@ from agents.alert_agent import (
     dispatch_alerts,
     list_recent_alerts,
 )
+from agents.backtest_agent import (
+    backtest_all_items,
+    fetch_pred_actual_pairs,
+    grade_ordering_check,
+)
 from agents.bidding_agent import format_bid_report, get_bid_recommendation
 from agents.change_detection_agent import list_recent_events
 from agents.confidence_agent import get_confidence
@@ -84,6 +89,7 @@ with st.sidebar:
             "변화 감지",
             "사용자 선호 설정",
             "알림",
+            "백테스트",
             "스트레스 테스트 결과",
             "도움말",
         ],
@@ -537,7 +543,80 @@ elif tab_sel == "알림":
                 if c in df.columns]
         st.dataframe(df[cols], use_container_width=True)
 
-# 13. 스트레스 테스트 결과 -----------------------------------------
+# 13. 백테스트 ------------------------------------------------------
+elif tab_sel == "백테스트":
+    st.header("추천 정확도 백테스트")
+    st.caption("등급별 적중률 / 평균 수익 / 예측 오차. mock 환경에서는 outcome_simulations이 '실제'를 대신합니다.")
+
+    scenario = st.selectbox("시나리오", ["standard", "conservative", "aggressive"], index=0)
+    if st.button("백테스트 실행", type="primary"):
+        with st.spinner("전체 매물 평가 중..."):
+            report = backtest_all_items(scenario=scenario)
+        ordering = grade_ordering_check(report)
+        st.session_state["bt_report"] = report
+        st.session_state["bt_ordering"] = ordering
+        st.session_state["bt_scenario"] = scenario
+
+    report = st.session_state.get("bt_report")
+    ordering = st.session_state.get("bt_ordering")
+    if not report:
+        st.info("'백테스트 실행' 버튼을 눌러 결과를 생성하세요.")
+    else:
+        c1, c2, c3 = st.columns(3)
+        c1.metric("매칭 쌍", report["total_pairs"])
+        if report.get("overall"):
+            c2.metric("전체 승률", f"{report['overall']['win_rate']}%")
+            c3.metric("평균 실제 손익",
+                       f"{int(report['overall']['actual_profit']['mean']):+,}만원")
+
+        st.subheader("등급별 통계")
+        rows = []
+        for g in ["A", "B", "C", "D", "X"]:
+            s = report["grades"].get(g)
+            if not s or s["count"] == 0:
+                continue
+            rows.append({
+                "등급": g,
+                "건수": s["count"],
+                "승률(%)": s["win_rate"],
+                "평균 실제 손익(만원)": int(s["actual_profit"]["mean"]),
+                "중앙값 실제 손익": int(s["actual_profit"]["median"]),
+                "평균 예측 손익": int(s["pred_profit"]["mean"]),
+                "평균 절대 오차": int(s["abs_error"]["mean"]),
+                "상대 오차(%)": round(s["relative_error_pct"]["mean"], 1),
+            })
+        if rows:
+            st.dataframe(pd.DataFrame(rows), use_container_width=True)
+
+            # 등급별 평균 손익 막대 차트
+            chart_df = pd.DataFrame({
+                row["등급"]: [row["평균 실제 손익(만원)"]] for row in rows
+            }).T.rename(columns={0: "평균 실제 손익"})
+            st.bar_chart(chart_df, height=240)
+
+        if ordering:
+            st.subheader("등급 순서 검증")
+            ok = ordering["monotonic_decreasing"]
+            st.write(f"단조 감소: {'OK - 등급별 평균 손익이 A->B->C->D 순으로 떨어집니다' if ok else 'FAIL - 등급별 평균 손익이 단조 감소하지 않음 (B등급이 A보다 클 수 있음 - 표본 크기 차이)'}")
+            st.json(ordering["grade_means"])
+
+        st.subheader("예측 vs 실제 산점도")
+        pairs = fetch_pred_actual_pairs(scenario=st.session_state["bt_scenario"], limit=500)
+        if pairs:
+            sc_df = pd.DataFrame([
+                {
+                    "예측 손익": p.get("profit_estimate", 0),
+                    "실제 손익": p.get("simulated_profit", 0),
+                    "등급": p.get("grade", "?"),
+                } for p in pairs
+            ])
+            st.scatter_chart(sc_df, x="예측 손익", y="실제 손익", color="등급",
+                              height=320)
+            st.caption("대각선에 가까울수록 예측이 정확. 등급별 색상으로 구분")
+        else:
+            st.info("recommendation_results 가 충분히 쌓여야 산점도가 그려집니다.")
+
+# 14. 스트레스 테스트 결과 -----------------------------------------
 elif tab_sel == "스트레스 테스트 결과":
     st.header("스트레스 테스트 결과")
     conn = get_connection()
