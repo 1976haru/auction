@@ -4,25 +4,120 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#1f77b4" />
-  <title>경매·공매 지능형 에이전트 — 데모 대시보드</title>
-  <meta name="description" content="법원경매·공매 데이터를 mock 으로 보여주는 정적 대시보드. 실제 입찰/금전거래는 하지 않습니다." />
+  <title>경매·공매 지능형 에이전트 — 탐색형 대시보드</title>
+  <meta name="description" content="법원경매·공매 mock 데이터를 검색·필터·AI 추천으로 탐색하는 정적 대시보드. 실제 입찰/금전거래는 하지 않습니다." />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="hero">
-    <div class="container">
-      <h1>경매·공매 지능형 에이전트</h1>
-      <p class="status-line">
-        <span class="badge badge-mock">Mock API 기반 데모</span>
-        <span id="generated-at" class="caption"></span>
-      </p>
-      <p class="caption">
-        실 API 키 없이 로컬 mock 데이터로 동작하는 정적 데모입니다. 실제 입찰·금전거래·외부 전송은 하지 않습니다.
+    <div class="container hero-inner">
+      <div class="hero-title">
+        <h1>경매·공매 지능형 에이전트</h1>
+        <p class="status-line">
+          <span class="badge badge-mock">Mock API 기반 데모</span>
+          <span id="generated-at" class="caption"></span>
+        </p>
+      </div>
+      <p class="hero-caption">
+        법원경매·공매 mock 데이터에서 직접 검색·필터·AI 자연어로 탐색합니다. 실제 입찰·금전거래·외부 전송은 하지 않습니다.
       </p>
     </div>
   </header>
 
+  <!-- 검색 바 (스티키) -->
+  <section class="search-section">
+    <div class="container search-inner">
+      <div class="search-bar">
+        <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" autocomplete="off" />
+        <button class="btn btn-primary" id="q-submit">검색</button>
+        <button class="btn btn-ghost" id="q-reset">초기화</button>
+      </div>
+      <div class="quick-chips" id="quick-chips" role="tablist" aria-label="빠른 메뉴"></div>
+    </div>
+  </section>
+
   <main class="container">
+    <!-- 필터 영역 -->
+    <section class="card filter-card" id="section-filters">
+      <div class="filter-head">
+        <h2>필터</h2>
+        <button class="link-btn" id="filter-toggle" aria-expanded="true">접기</button>
+      </div>
+      <div class="filter-body" id="filter-body">
+        <div class="filter-grid">
+          <label class="f-field"><span>지역</span>
+            <select id="f-region"><option value="">전체</option></select>
+          </label>
+          <label class="f-field"><span>물건종류</span>
+            <select id="f-type"><option value="">전체</option></select>
+          </label>
+          <label class="f-field"><span>경매/공매</span>
+            <select id="f-source">
+              <option value="">전체</option>
+              <option value="auction">경매</option>
+              <option value="public_sale">공매</option>
+            </select>
+          </label>
+          <label class="f-field"><span>최저가 (만원)</span>
+            <span class="range-inputs">
+              <input type="number" id="f-price-min" placeholder="최소" min="0" />
+              <span>~</span>
+              <input type="number" id="f-price-max" placeholder="최대" min="0" />
+            </span>
+          </label>
+          <label class="f-field"><span>유찰횟수</span>
+            <select id="f-fail">
+              <option value="">전체</option>
+              <option value="0">0회</option>
+              <option value="1">1회 이상</option>
+              <option value="2">2회 이상</option>
+              <option value="3">3회 이상</option>
+            </select>
+          </label>
+          <label class="f-field"><span>입찰기일</span>
+            <select id="f-due">
+              <option value="">전체</option>
+              <option value="3">3일 이내</option>
+              <option value="7">7일 이내</option>
+              <option value="14">14일 이내</option>
+              <option value="30">30일 이내</option>
+            </select>
+          </label>
+          <label class="f-field"><span>위험도</span>
+            <select id="f-risk">
+              <option value="">전체</option>
+              <option value="low">낮음</option>
+              <option value="medium">보통</option>
+              <option value="high">높음</option>
+            </select>
+          </label>
+          <label class="f-field"><span>추천등급</span>
+            <select id="f-grade">
+              <option value="">전체</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="X">X</option>
+            </select>
+          </label>
+          <label class="f-field"><span>정렬</span>
+            <select id="f-sort">
+              <option value="score_desc">추천점수 높은순</option>
+              <option value="profit_desc">시세차익 큰순</option>
+              <option value="roi_desc">수익률 높은순</option>
+              <option value="due_asc">입찰기일 임박순</option>
+              <option value="price_asc">최저가 낮은순</option>
+              <option value="risk_asc">위험 낮은순</option>
+            </select>
+          </label>
+          <div class="f-field f-actions-row">
+            <button class="btn btn-ghost" id="f-reset">필터 초기화</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 오늘의 브리핑 -->
     <section class="card section-briefing" id="section-briefing">
       <h2>오늘의 브리핑</h2>
@@ -36,7 +131,6 @@
         <h2>위험 요약</h2>
         <div id="risk-summary"></div>
       </section>
-
       <!-- 신뢰도 요약 -->
       <section class="card" id="section-confidence">
         <h2>신뢰도 요약</h2>
@@ -56,16 +150,38 @@
       <div class="action-grid" id="action-grid"></div>
     </section>
 
+    <!-- AI 에이전트 검색 -->
+    <section class="card" id="section-agent-search">
+      <h2>AI 에이전트 검색</h2>
+      <p class="caption">자연어 한 줄로 mock 데이터를 다시 필터·정렬합니다. (rule-based 해석, 외부 API 호출 없음)</p>
+      <div class="agent-search">
+        <input type="search" id="agent-q" placeholder='예) "서울 아파트 중 위험 낮은 물건 보여줘"' />
+        <button class="btn btn-primary" id="agent-go">실행</button>
+      </div>
+      <div class="agent-examples" id="agent-examples"></div>
+      <div class="agent-result" id="agent-result"></div>
+    </section>
+
     <!-- 전체 물건 -->
     <section class="card" id="section-items">
-      <h2>전체 물건 샘플</h2>
-      <p class="caption">감정가/최저가 단위는 만원입니다. 가로 스크롤로 모든 컬럼을 확인하세요.</p>
-      <div class="table-wrap">
+      <div class="items-head">
+        <h2>전체 물건</h2>
+        <div class="items-controls">
+          <span class="caption" id="items-count"></span>
+          <div class="view-toggle" role="tablist" aria-label="보기 전환">
+            <button class="view-btn active" data-view="card" aria-pressed="true">카드</button>
+            <button class="view-btn" data-view="table" aria-pressed="false">테이블</button>
+          </div>
+        </div>
+      </div>
+      <div id="items-card-view" class="items-card-grid"></div>
+      <div id="items-table-view" class="table-wrap" hidden>
         <table id="items-table">
           <thead>
             <tr>
-              <th>#</th><th>구분</th><th>주소</th><th>유형</th>
-              <th class="num">감정가</th><th class="num">최저가</th>
+              <th>#</th><th>구분</th><th>등급</th><th>주소</th><th>유형</th>
+              <th class="num">감정가</th><th class="num">최저가</th><th class="num">시세</th>
+              <th class="num">차익</th><th class="num">ROI</th>
               <th class="num">유찰</th><th>입찰기일</th><th>위험</th>
             </tr>
           </thead>
@@ -90,6 +206,18 @@
       </ul>
     </section>
   </main>
+
+  <!-- 상세 모달 -->
+  <div class="modal" id="detail-modal" hidden role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-panel">
+      <header class="modal-head">
+        <h2 id="detail-title">물건 상세</h2>
+        <button class="icon-btn" id="detail-close" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body" id="detail-body"></div>
+    </div>
+  </div>
 
   <footer>
     <div class="container">

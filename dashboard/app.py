@@ -140,6 +140,7 @@ with st.sidebar:
     tab_sel = st.radio(
         "메뉴",
         [
+            "통합검색",
             "오늘의 브리핑",
             "오늘 할 일",
             "오늘의 추천 TOP 5",
@@ -171,6 +172,183 @@ with st.sidebar:
     st.metric("전체 물건", total)
     st.metric("오늘 신규", today_cnt)
 
+
+# 0. 통합검색 ---------------------------------------------------------
+if tab_sel == "통합검색":
+    st.header("통합검색 / 조건검색")
+    st.caption(
+        "주소·사건번호·물건명·키워드로 검색하고 지역/종류/가격/유찰/기일/위험/등급으로 좁힙니다. "
+        "표시된 물건은 mock 데이터이며 실제 거래 대상이 아닙니다."
+    )
+
+    items = _get_items(1000)
+    if not items:
+        st.info("물건이 없습니다. `python scripts/generate_mock_data.py --count 100` 실행")
+    else:
+        # 분석 결과 join (시세/위험/추천/신뢰도)
+        try:
+            analyzed_list = collect_compare_data([it["id"] for it in items])
+        except Exception:
+            analyzed_list = []
+        analyzed = {a["id"]: a for a in analyzed_list}
+        merged = []
+        for it in items:
+            a = analyzed.get(it["id"], {}) or {}
+            row = {**it, **a}
+            row["overall_confidence"] = a.get("overall_conf_num")
+            row["market_price"] = a.get("market_price_estimate")
+            row["risk_flags"] = [{"keyword": f} for f in (a.get("top_flags") or [])]
+            row["recommendation_reason"] = (
+                f"점수 {(a.get('score') or 0):.1f} ({a.get('grade') or '-'}) · "
+                f"위험 {a.get('risk_level') or '-'} · 차익 {int(a.get('profit_estimate') or 0):,}만"
+            )
+            checklist_rows = []
+            for f in (a.get("top_flags") or []):
+                checklist_rows.append(f"{f} 관련 추가 확인 필요")
+            row["checklist"] = checklist_rows or ["등기부등본 최신본 확인", "현장조사 1회"]
+            merged.append(row)
+
+        # 통합 텍스트 검색
+        q = st.text_input(
+            "통합검색 (주소 / 사건번호 / 물건명 / 키워드)",
+            value=st.session_state.get("unified_q", ""),
+            placeholder="예) 서울 강남 / 2025타경 / 아파트 / 임차인",
+        )
+        st.session_state["unified_q"] = q
+
+        # 빠른 메뉴 (chip)
+        chip_cols = st.columns(6)
+        chips = ["전체", "경매", "공매", "아파트", "오피스텔", "고수익"]
+        sel_chip = st.session_state.get("unified_chip", "전체")
+        for i, c in enumerate(chips):
+            if chip_cols[i].button(c, type="primary" if sel_chip == c else "secondary",
+                                    key=f"chip_{c}", use_container_width=True):
+                sel_chip = c
+                st.session_state["unified_chip"] = c
+
+        # 필터 그리드
+        with st.expander("상세 필터", expanded=False):
+            f1, f2, f3, f4 = st.columns(4)
+            regions = sorted({it.get("address_si") or "기타" for it in items})
+            types = sorted({it.get("item_type") or "기타" for it in items})
+            f_region = f1.selectbox("지역", ["전체"] + regions)
+            f_type = f2.selectbox("물건종류", ["전체"] + types)
+            f_source = f3.selectbox("경매/공매", ["전체", "경매", "공매"])
+            f_risk = f4.selectbox("위험도", ["전체", "low", "medium", "high"])
+            f5, f6, f7, f8 = st.columns(4)
+            f_grade = f5.selectbox("추천등급", ["전체", "A", "B", "C", "D", "X"])
+            f_fail = f6.selectbox("유찰횟수", ["전체", "0회", "1회 이상", "2회 이상", "3회 이상"])
+            f_due = f7.selectbox("입찰기일", ["전체", "3일 이내", "7일 이내", "14일 이내", "30일 이내"])
+            f_sort = f8.selectbox(
+                "정렬",
+                ["추천점수 높은순", "차익 큰순", "수익률 높은순",
+                 "기일 임박순", "최저가 낮은순", "위험 낮은순"],
+            )
+            pmin = st.number_input("최저가 하한 (만원)", value=0, step=1000)
+            pmax = st.number_input("최저가 상한 (만원, 0=제한없음)", value=0, step=1000)
+
+        from core.utils import days_until as _days_until
+        SOURCE_REVERSE = {"경매": "auction", "공매": "public_sale"}
+
+        def _passes(it):
+            t = (it.get("address_full") or "") + " " + (it.get("case_no") or "") + " " + \
+                (it.get("item_type") or "") + " " + " ".join(
+                    (fl.get("keyword", "") if isinstance(fl, dict) else str(fl))
+                    for fl in (it.get("risk_flags") or [])
+                )
+            if q and q.lower() not in t.lower():
+                return False
+            chip = sel_chip
+            if chip == "경매" and it.get("source") != "auction": return False
+            if chip == "공매" and it.get("source") != "public_sale": return False
+            if chip == "아파트" and "아파트" not in (it.get("item_type") or ""): return False
+            if chip == "오피스텔" and "오피스텔" not in (it.get("item_type") or ""): return False
+            if chip == "고수익" and (it.get("score") or 0) < 70: return False
+            if f_region != "전체" and it.get("address_si") != f_region: return False
+            if f_type != "전체" and it.get("item_type") != f_type: return False
+            if f_source != "전체" and it.get("source") != SOURCE_REVERSE[f_source]: return False
+            if f_risk != "전체" and it.get("risk_level") != f_risk: return False
+            if f_grade != "전체" and it.get("grade") != f_grade: return False
+            if f_fail != "전체":
+                n = (it.get("fail_count") or 0)
+                if f_fail == "0회" and n != 0: return False
+                if f_fail == "1회 이상" and n < 1: return False
+                if f_fail == "2회 이상" and n < 2: return False
+                if f_fail == "3회 이상" and n < 3: return False
+            if f_due != "전체":
+                d = _days_until(it.get("bid_date"))
+                limit = {"3일 이내": 3, "7일 이내": 7, "14일 이내": 14, "30일 이내": 30}[f_due]
+                if d is None or d < 0 or d > limit: return False
+            if pmin and (it.get("min_bid_price") or 0) < pmin: return False
+            if pmax and (it.get("min_bid_price") or 0) > pmax: return False
+            return True
+
+        result = [it for it in merged if _passes(it)]
+        sort_keys = {
+            "추천점수 높은순": lambda x: -(x.get("score") or 0),
+            "차익 큰순":      lambda x: -(x.get("profit_estimate") or 0),
+            "수익률 높은순":  lambda x: -(x.get("roi_estimate") or 0),
+            "기일 임박순":    lambda x: _days_until(x.get("bid_date")) or 9999,
+            "최저가 낮은순":  lambda x: x.get("min_bid_price") or 0,
+            "위험 낮은순":    lambda x: {"low":0,"medium":1,"high":2}.get(x.get("risk_level"),1),
+        }
+        result.sort(key=sort_keys.get(f_sort, sort_keys["추천점수 높은순"]))
+
+        st.caption(f"결과 {len(result)}건 / 전체 {len(items)}건")
+        view = st.radio("보기", ["카드", "테이블"], horizontal=True, key="unified_view")
+
+        if not result:
+            st.info("조건에 맞는 물건이 없습니다.")
+        elif view == "카드":
+            for it in result[:60]:
+                grade = it.get("grade") or "?"
+                color = {"A": "🟢", "B": "🟡", "C": "🟠", "D": "🔴", "X": "⚫"}.get(grade, "⬜")
+                with st.expander(
+                    f"{color} [{grade}] {it.get('address_full','')} · "
+                    f"점수 {(it.get('score') or 0):.1f} · "
+                    f"차익 {int(it.get('profit_estimate') or 0):,}만원"
+                ):
+                    cc1, cc2, cc3, cc4 = st.columns(4)
+                    cc1.metric("감정가", f"{it.get('appraisal_price', 0):,}만")
+                    cc2.metric("최저가", f"{it.get('min_bid_price', 0):,}만")
+                    cc3.metric("예상시세", f"{it.get('market_price', 0):,}만")
+                    cc4.metric("ROI", f"{(it.get('roi_estimate') or 0):.1f}%")
+                    st.caption(
+                        f"위험 {it.get('risk_level','-')} | "
+                        f"신뢰도 {(it.get('overall_confidence') or 0):.2f} | "
+                        f"입찰기일 {it.get('bid_date','미정')} | "
+                        f"유찰 {it.get('fail_count','-')}회 | "
+                        f"사건번호 {it.get('case_no','-')}"
+                    )
+                    if it.get("recommendation_reason"):
+                        st.info(it["recommendation_reason"])
+                    flags = it.get("risk_flags") or []
+                    if flags:
+                        st.markdown("**위험 키워드**")
+                        st.write(", ".join(
+                            f.get("keyword", "") for f in flags if isinstance(f, dict)
+                        ))
+                    if it.get("checklist"):
+                        st.markdown("**추가 확인사항**")
+                        for c in it["checklist"]:
+                            st.write(f"- {c}")
+        else:
+            df = pd.DataFrame([{
+                "id": it["id"], "구분": SOURCE_LABELS.get(it.get("source"), it.get("source")),
+                "등급": it.get("grade") or "-",
+                "점수": round(it.get("score") or 0, 1),
+                "주소": it.get("address_full"), "유형": it.get("item_type"),
+                "감정가": it.get("appraisal_price", 0),
+                "최저가": it.get("min_bid_price", 0),
+                "시세": it.get("market_price", 0),
+                "차익": it.get("profit_estimate", 0),
+                "ROI(%)": round(it.get("roi_estimate") or 0, 1),
+                "유찰": it.get("fail_count", 0),
+                "기일": it.get("bid_date"),
+                "위험": it.get("risk_level"),
+                "사건번호": it.get("case_no"),
+            } for it in result])
+            st.dataframe(df, use_container_width=True, hide_index=True)
 
 # 1. 오늘의 브리핑 ---------------------------------------------------
 if tab_sel == "오늘의 브리핑":

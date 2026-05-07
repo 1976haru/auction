@@ -10,12 +10,21 @@ GitHub Pages 정적 대시보드용 JSON 을 생성한다.
 
 산출:
     docs/data/mock_dashboard.json
+
+각 item 에는 검색/필터/상세보기를 위한 다음 필드를 모두 포함한다:
+    id, source, title, address, region, item_type, case_no,
+    appraisal_price, min_bid_price, minimum_price, market_price,
+    expected_profit, expected_profit_rate, risk_level, risk_flags,
+    recommendation_score, recommendation_grade, confidence_score,
+    bid_date, fail_count, recommendation_reason, warnings,
+    next_actions, checklist, detail_summary
 """
 from __future__ import annotations
 
 import json
 import os
 import random
+import re
 import sqlite3
 import sys
 from datetime import datetime, timedelta
@@ -25,8 +34,19 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "auction_agent.db"
 OUT_PATH = ROOT / "docs" / "data" / "mock_dashboard.json"
-SAMPLE_LIMIT = 30
+SAMPLE_LIMIT = 120
 TOP_LIMIT = 5
+
+
+# ── 유틸 ──────────────────────────────────────────────────────────
+_REGION_RE = re.compile(r"^(?P<si>\S+?(?:특별시|광역시|특별자치시|도|특별자치도|시|군|구))")
+
+
+def _extract_region(address: str | None) -> str:
+    if not address:
+        return "기타"
+    s = address.split()
+    return s[0] if s else "기타"
 
 
 def _connect() -> sqlite3.Connection | None:
@@ -46,7 +66,6 @@ def _has_items(conn: sqlite3.Connection) -> bool:
 
 
 def _ensure_db_seeded() -> bool:
-    """DB 가 없거나 비어 있으면 mock 파이프라인을 한 번 돌려 채운다."""
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
     try:
@@ -58,7 +77,6 @@ def _ensure_db_seeded() -> bool:
             conn.close()
             return True
         gen_mock(count=120, seed=42, reset=False)
-        # 가능하면 분석까지 한 번
         try:
             from agents.legal_risk_agent import analyze_all as analyze_risk
             from agents.price_analysis_agent import analyze_all as analyze_price
@@ -95,23 +113,138 @@ def _summarize_items(conn: sqlite3.Connection) -> dict[str, Any]:
         avg_conf = float(avg_conf_row[0]) if avg_conf_row and avg_conf_row[0] is not None else 0.0
     except sqlite3.OperationalError:
         avg_conf = 0.0
+    try:
+        auction_count = conn.execute(
+            "SELECT COUNT(*) FROM items WHERE status='active' AND source='auction'"
+        ).fetchone()[0]
+        public_count = conn.execute(
+            "SELECT COUNT(*) FROM items WHERE status='active' AND source='public_sale'"
+        ).fetchone()[0]
+    except sqlite3.OperationalError:
+        auction_count = public_count = 0
     return {
         "total_items": total,
         "analyzed_items": analyzed,
         "high_risk_items": high_risk,
         "avg_confidence": round(avg_conf, 3),
+        "auction_count": auction_count,
+        "public_sale_count": public_count,
     }
 
 
-def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT) -> list[dict]:
+# ── item-level enrichment ────────────────────────────────────────
+def _flags_for(conn: sqlite3.Connection, item_id: int) -> list[dict]:
+    try:
+        rows = conn.execute(
+            "SELECT keyword, flag_type, risk_level, severity, description "
+            "FROM risk_flags WHERE item_id=? ORDER BY "
+            "CASE risk_level WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END "
+            "LIMIT 8",
+            (item_id,),
+        ).fetchall()
+    except sqlite3.OperationalError:
+        return []
+    return [dict(r) for r in rows]
+
+
+def _price_analysis_for(conn: sqlite3.Connection, item_id: int) -> dict[str, Any] | None:
+    try:
+        row = conn.execute(
+            "SELECT market_price_estimate, transaction_count, "
+            "minimum_to_market_ratio, appraisal_to_market_ratio "
+            "FROM price_analyses WHERE item_id=? ORDER BY id DESC LIMIT 1",
+            (item_id,),
+        ).fetchone()
+        return dict(row) if row else None
+    except sqlite3.OperationalError:
+        return None
+
+
+def _confidence_for(conn: sqlite3.Connection, item_id: int) -> float | None:
+    try:
+        row = conn.execute(
+            "SELECT overall_confidence FROM confidence_scores "
+            "WHERE item_id=? ORDER BY id DESC LIMIT 1",
+            (item_id,),
+        ).fetchone()
+        return float(row[0]) if row and row[0] is not None else None
+    except sqlite3.OperationalError:
+        return None
+
+
+def _checklist_from_flags(flags: list[dict]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    rules = {
+        "전입세대": "전입세대열람으로 대항력 임차인 여부 확인",
+        "임차인": "임차인 보증금/대항력/계약일자 확인",
+        "대항력": "대항력 임차인 인수 여부 검토",
+        "유치권": "유치권 신고 내역 및 점유 사실 확인",
+        "법정지상권": "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "위반건축물": "위반건축물 등재 사실 + 시정명령 확인",
+        "점유자 미상": "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도": "명도 협의/소송 비용/기간 산정",
+        "관리비 체납": "관리비 체납액 인수 범위 확인",
+        "선순위임차인": "선순위임차인 보증금 인수 여부 확인",
+    }
+    for f in flags:
+        kw = (f.get("keyword") or "").strip()
+        for k, msg in rules.items():
+            if k in kw and msg not in seen:
+                out.append(msg)
+                seen.add(msg)
+                break
+    if not out:
+        out = ["등기부등본 최신본 확인", "현장조사 1회"]
+    return out[:6]
+
+
+def _next_actions_default(source: str | None, risk_level: str, days_left: int | None) -> list[str]:
+    actions: list[str] = []
+    if risk_level == "high":
+        actions.append("등기부등본 재확인")
+    if source == "auction":
+        actions.append("매각기일 확인")
+    else:
+        actions.append("입찰기간 확인")
+    if days_left is not None and days_left <= 7:
+        actions.append(f"입찰기일 D-{max(days_left, 0)} 임박")
+    actions.append("현장조사 1회")
+    return actions
+
+
+def _grade_from_score(score: float | None) -> str:
+    if score is None:
+        return "C"
+    if score >= 75:
+        return "A"
+    if score >= 60:
+        return "B"
+    if score >= 45:
+        return "C"
+    if score >= 30:
+        return "D"
+    return "X"
+
+
+def _days_left(bid_date: str | None) -> int | None:
+    if not bid_date:
+        return None
+    s = bid_date.split("~")[0].strip()
+    try:
+        d = datetime.fromisoformat(s).date()
+    except Exception:
+        return None
+    return (d - datetime.now().date()).days
+
+
+def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
+                  picks_by_id: dict[int, dict] | None = None) -> list[dict]:
+    """모든 분석 데이터를 합쳐서 검색/필터에 쓸 수 있는 형태로 변환."""
     rows = conn.execute(
         """
-        SELECT i.id, i.source, i.address_full, i.item_type,
-               i.appraisal_price, i.min_bid_price, i.fail_count, i.bid_date,
-               (SELECT risk_level FROM risk_flags r
-                  WHERE r.item_id=i.id ORDER BY
-                    CASE r.risk_level WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END
-                  LIMIT 1) AS risk_level
+        SELECT i.id, i.source, i.case_no, i.address_full, i.address_si, i.address_gu,
+               i.item_type, i.appraisal_price, i.min_bid_price, i.fail_count, i.bid_date
         FROM items i
         WHERE i.status='active'
         ORDER BY i.id DESC
@@ -121,76 +254,167 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT) -> list[d
     ).fetchall()
     out = []
     for r in rows:
+        item_id = r["id"]
+        flags = _flags_for(conn, item_id)
+        risk_level = "low"
+        for fl in flags:
+            if fl.get("risk_level") == "high":
+                risk_level = "high"
+                break
+            if fl.get("risk_level") == "medium" and risk_level != "high":
+                risk_level = "medium"
+
+        pa = _price_analysis_for(conn, item_id) or {}
+        market = pa.get("market_price_estimate") or 0
+        appr = r["appraisal_price"] or 0
+        minb = r["min_bid_price"] or 0
+        repair = int(appr * 0.01)
+        eviction = int(appr * 0.005) if risk_level != "low" else 0
+        expected_profit = int(market - minb - repair - eviction) if market else 0
+        expected_profit_rate = round((expected_profit / minb * 100), 1) if minb else 0.0
+
+        # 점수: 추천 결과가 있으면 그대로 사용, 없으면 차익+위험 휴리스틱
+        pick = (picks_by_id or {}).get(item_id) or {}
+        score = pick.get("score")
+        grade = pick.get("grade")
+        rec_reason = pick.get("reason")
+        if score is None:
+            base = max(min(expected_profit_rate, 80) * 0.8, 0)
+            risk_bonus = {"low": 15, "medium": 5, "high": -5}.get(risk_level, 0)
+            score = round(min(95, max(5, base + risk_bonus)), 1)
+        if grade is None:
+            grade = _grade_from_score(score)
+
+        confidence = _confidence_for(conn, item_id)
+        if confidence is None:
+            confidence = 0.7 if pa else 0.55
+
+        days_left = _days_left(r["bid_date"])
+        warnings_list = [f["keyword"] for f in flags if f.get("risk_level") == "high"][:4]
+        if rec_reason is None:
+            if expected_profit > 0 and risk_level == "low":
+                rec_reason = f"차익 {expected_profit:,}만원 추정 + 위험 낮음"
+            elif expected_profit > 0:
+                rec_reason = f"차익 {expected_profit:,}만원 추정 ({risk_level} 위험)"
+            else:
+                rec_reason = f"시세 매칭 표본 부족, {risk_level} 위험"
+
+        title = r["address_full"] or "주소 미상"
+        region = r["address_si"] or _extract_region(r["address_full"])
+        next_actions = _next_actions_default(r["source"], risk_level, days_left)
+        checklist = _checklist_from_flags(flags)
+
+        # 상세 요약 (1줄)
+        detail = (
+            f"감정가 {appr:,}만원 / 최저가 {minb:,}만원"
+            + (f" / 추정시세 {int(market):,}만원" if market else "")
+            + (f" / 차익 {expected_profit:,}만원" if expected_profit else "")
+            + f" / 위험 {risk_level} / 신뢰도 {confidence:.2f}"
+        )
+
         out.append({
-            "id": r["id"],
+            "id": item_id,
             "source": r["source"],
+            "case_no": r["case_no"],
+            "title": title,
             "address": r["address_full"],
+            "region": region,
             "item_type": r["item_type"],
-            "appraisal_price": r["appraisal_price"],
-            "min_bid_price": r["min_bid_price"],
+            "appraisal_price": appr,
+            "min_bid_price": minb,
+            "minimum_price": minb,
+            "market_price": int(market) if market else 0,
+            "expected_profit": expected_profit,
+            "expected_profit_rate": expected_profit_rate,
             "fail_count": r["fail_count"],
             "bid_date": r["bid_date"],
-            "risk_level": r["risk_level"] or "medium",
+            "days_left": days_left,
+            "risk_level": risk_level,
+            "risk_flags": [{
+                "keyword": fl.get("keyword"),
+                "flag_type": fl.get("flag_type"),
+                "risk_level": fl.get("risk_level"),
+                "severity": fl.get("severity"),
+                "description": fl.get("description"),
+            } for fl in flags],
+            "recommendation_score": float(score),
+            "recommendation_grade": grade,
+            "confidence_score": round(float(confidence), 3),
+            "recommendation_reason": rec_reason,
+            "warnings": warnings_list,
+            "next_actions": next_actions,
+            "checklist": checklist,
+            "detail_summary": detail,
         })
     return out
 
 
-def _recommendations_from_db(conn: sqlite3.Connection, limit: int = TOP_LIMIT) -> list[dict]:
-    """가장 최근 brief/recommendation_results 에서 가져온다."""
+def _picks_by_id(conn: sqlite3.Connection) -> dict[int, dict]:
     try:
         row = conn.execute(
             "SELECT top_picks_json FROM daily_briefings ORDER BY id DESC LIMIT 1"
         ).fetchone()
     except sqlite3.OperationalError:
-        row = None
-    picks: list[dict] = []
-    if row and row["top_picks_json"]:
-        try:
-            picks = json.loads(row["top_picks_json"])
-        except Exception:
-            picks = []
-
-    recs: list[dict] = []
-    for i, r in enumerate(picks[:limit], 1):
-        it = r.get("item", {}) or {}
-        score = r.get("score") or 0
-        grade = r.get("grade", "C")
-        risk_level = r.get("risk_level") or "medium"
+        return {}
+    if not row or not row["top_picks_json"]:
+        return {}
+    try:
+        picks = json.loads(row["top_picks_json"])
+    except Exception:
+        return {}
+    out: dict[int, dict] = {}
+    for r in picks:
+        it = r.get("item") or {}
+        iid = it.get("id")
+        if iid is None:
+            continue
         breakdown = r.get("score_breakdown") or {}
         critical = breakdown.get("critical_reasons") or []
-        pref_reasons = breakdown.get("preference_reasons") or []
+        pref = breakdown.get("preference_reasons") or []
+        score = r.get("score") or 0
+        grade = r.get("grade") or _grade_from_score(score)
         reason = " · ".join(filter(None, [
             f"점수 {score:.1f} ({grade}등급)",
-            "선호 매칭: " + ", ".join(pref_reasons[:2]) if pref_reasons else None,
+            "선호 매칭: " + ", ".join(pref[:2]) if pref else None,
         ])) or f"{grade} 등급 추천"
-        next_actions = []
-        if risk_level == "high":
-            next_actions.append("등기부등본 재확인")
-        if it.get("source") == "auction":
-            next_actions.append("매각기일 확인")
-        else:
-            next_actions.append("입찰기간 확인")
-        next_actions.append("현장조사 1회")
-        recs.append({
+        if critical:
+            reason = " / ".join(critical[:2])
+        out[iid] = {"score": float(score), "grade": grade, "reason": reason,
+                    "warnings": critical, "market_price": r.get("market_price"),
+                    "profit_estimate": r.get("profit_estimate"),
+                    "roi_estimate": r.get("roi_estimate")}
+    return out
+
+
+def _recommendations_from_items(items: list[dict], limit: int = TOP_LIMIT) -> list[dict]:
+    """enriched item 리스트에서 점수 기준 상위를 뽑아 일관된 추천 카드 형태로 반환."""
+    sorted_items = sorted(items, key=lambda it: it.get("recommendation_score") or 0, reverse=True)
+    out: list[dict] = []
+    for i, it in enumerate(sorted_items[:limit], 1):
+        out.append({
             "rank": i,
-            "item_id": it.get("id"),
-            "source": it.get("source"),
-            "title": it.get("address_full") or "주소 미상",
-            "address": it.get("address_full"),
-            "item_type": it.get("item_type"),
-            "min_bid_price": it.get("min_bid_price"),
-            "minimum_price": it.get("min_bid_price"),
-            "market_price": r.get("market_price"),
-            "expected_profit": r.get("profit_estimate"),
-            "expected_profit_rate": r.get("roi_estimate"),
-            "risk_level": risk_level,
-            "recommendation_score": round(score, 1),
-            "recommendation_grade": grade,
-            "recommendation_reason": reason if not critical else " / ".join(critical[:2]),
-            "next_actions": next_actions,
-            "warnings": critical,
+            "item_id": it["id"],
+            "source": it["source"],
+            "title": it["title"],
+            "address": it["address"],
+            "region": it["region"],
+            "item_type": it["item_type"],
+            "case_no": it.get("case_no"),
+            "min_bid_price": it["min_bid_price"],
+            "minimum_price": it["min_bid_price"],
+            "market_price": it["market_price"],
+            "expected_profit": it["expected_profit"],
+            "expected_profit_rate": it["expected_profit_rate"],
+            "risk_level": it["risk_level"],
+            "recommendation_score": it["recommendation_score"],
+            "recommendation_grade": it["recommendation_grade"],
+            "recommendation_reason": it["recommendation_reason"],
+            "next_actions": it["next_actions"],
+            "warnings": it["warnings"],
+            "confidence_score": it["confidence_score"],
+            "bid_date": it["bid_date"],
         })
-    return recs
+    return out
 
 
 def _action_items_from_db(conn: sqlite3.Connection, limit: int = 8) -> list[dict]:
@@ -198,7 +422,7 @@ def _action_items_from_db(conn: sqlite3.Connection, limit: int = 8) -> list[dict
         rows = conn.execute(
             """
             SELECT a.priority, a.title, a.detail, a.due_date,
-                   i.address_full, i.item_type
+                   i.address_full, i.item_type, i.id
             FROM action_items a
             LEFT JOIN items i ON i.id=a.item_id
             WHERE a.status='open'
@@ -218,46 +442,24 @@ def _action_items_from_db(conn: sqlite3.Connection, limit: int = 8) -> list[dict
             "detail": r["detail"] or "",
             "due_date": r["due_date"],
             "address": r["address_full"],
+            "item_id": r["id"],
             "item_type": r["item_type"],
         }
         for r in rows
     ]
 
 
-def _risk_summary_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
-    out = {"low": 0, "medium": 0, "high": 0, "top_flags": []}
-    try:
-        rows = conn.execute(
-            """
-            SELECT (
-              SELECT risk_level FROM risk_flags r
-                WHERE r.item_id=i.id
-                ORDER BY CASE r.risk_level
-                  WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END
-                LIMIT 1) AS top_risk
-            FROM items i
-            WHERE i.status='active'
-            """
-        ).fetchall()
-    except sqlite3.OperationalError:
-        rows = []
-    for r in rows:
-        lvl = r["top_risk"] or "low"
-        out[lvl] = out.get(lvl, 0) + 1
-    try:
-        flag_rows = conn.execute(
-            """
-            SELECT keyword, COUNT(*) AS cnt
-            FROM risk_flags
-            WHERE risk_level IN ('high','medium')
-            GROUP BY keyword
-            ORDER BY cnt DESC
-            LIMIT 8
-            """
-        ).fetchall()
-        out["top_flags"] = [{"keyword": r["keyword"], "count": r["cnt"]} for r in flag_rows]
-    except sqlite3.OperationalError:
-        pass
+def _risk_summary_from_items(items: list[dict]) -> dict[str, Any]:
+    out = {"low": 0, "medium": 0, "high": 0}
+    flag_counts: dict[str, int] = {}
+    for it in items:
+        out[it["risk_level"]] = out.get(it["risk_level"], 0) + 1
+        for fl in it.get("risk_flags") or []:
+            kw = fl.get("keyword")
+            if kw:
+                flag_counts[kw] = flag_counts.get(kw, 0) + 1
+    top_flags = sorted(flag_counts.items(), key=lambda x: -x[1])[:8]
+    out["top_flags"] = [{"keyword": k, "count": v} for k, v in top_flags]
     return out
 
 
@@ -265,7 +467,7 @@ def _confidence_summary_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     try:
         row = conn.execute(
             """
-            SELECT AVG(price_confidence) p, AVG(risk_confidence) r,
+            SELECT AVG(price_confidence) p, AVG(legal_risk_confidence) r,
                    AVG(document_confidence) d, AVG(address_match_confidence) a,
                    AVG(overall_confidence) o
             FROM confidence_scores
@@ -281,7 +483,7 @@ def _confidence_summary_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
         "document": float(row["d"] or 0),
         "address": float(row["a"] or 0),
         "overall": float(row["o"] or 0),
-        "note": "Mock 파이프라인 결과 평균 — 운영시 실거래가/문서 매칭 결과로 대체",
+        "note": "Mock 파이프라인 결과 평균 — 운영 시 실거래/문서 매칭 결과로 대체",
     }
 
 
@@ -325,141 +527,190 @@ def _agent_status() -> list[dict]:
     return [{"name": n, "status": "OK"} for n in AGENT_LIST]
 
 
-# ── Hard fallback (DB 시드 실패 시) ─────────────────────────────────────────
-FALLBACK_RECS = [
-    {
-        "rank": 1, "source": "auction", "title": "서울특별시 강서구 화곡동 396",
-        "address": "서울특별시 강서구 화곡동 396", "item_type": "아파트",
-        "min_bid_price": 19200, "minimum_price": 19200, "market_price": 28000,
-        "expected_profit": 7800, "expected_profit_rate": 35.4,
-        "risk_level": "medium", "recommendation_score": 78.5, "recommendation_grade": "A",
-        "recommendation_reason": "감정가 대비 시세 격차 큼 + 위험 키워드 보통",
-        "next_actions": ["등기부등본 재확인", "매각기일 확인", "현장조사 1회"],
-        "warnings": [],
-    },
-    {
-        "rank": 2, "source": "public_sale", "title": "경기도 안양시 만안구 33",
-        "address": "경기도 안양시 만안구 33", "item_type": "오피스텔",
-        "min_bid_price": 14500, "minimum_price": 14500, "market_price": 21500,
-        "expected_profit": 6100, "expected_profit_rate": 36.4,
-        "risk_level": "low", "recommendation_score": 73.0, "recommendation_grade": "B",
-        "recommendation_reason": "공매 + 위험 낮음 + 입찰기일 임박",
-        "next_actions": ["입찰기간 확인", "현장조사 1회"],
-        "warnings": [],
-    },
-    {
-        "rank": 3, "source": "auction", "title": "서울특별시 송파구 잠실동 70",
-        "address": "서울특별시 송파구 잠실동 70", "item_type": "아파트",
-        "min_bid_price": 47200, "minimum_price": 47200, "market_price": 62000,
-        "expected_profit": 12600, "expected_profit_rate": 24.0,
-        "risk_level": "medium", "recommendation_score": 70.5, "recommendation_grade": "B",
-        "recommendation_reason": "선호 지역 + 차익 큼",
-        "next_actions": ["등기부등본 재확인", "매각기일 확인", "전입세대열람"],
-        "warnings": ["임차인 키워드 발견"],
-    },
-    {
-        "rank": 4, "source": "public_sale", "title": "인천광역시 남동구 구월동 255",
-        "address": "인천광역시 남동구 구월동 255", "item_type": "빌라",
-        "min_bid_price": 9800, "minimum_price": 9800, "market_price": 14200,
-        "expected_profit": 3700, "expected_profit_rate": 33.0,
-        "risk_level": "low", "recommendation_score": 66.0, "recommendation_grade": "B",
-        "recommendation_reason": "수익률 높고 위험 낮음",
-        "next_actions": ["입찰기간 확인", "현장조사 1회"],
-        "warnings": [],
-    },
-    {
-        "rank": 5, "source": "auction", "title": "부산광역시 해운대구 우동 349",
-        "address": "부산광역시 해운대구 우동 349", "item_type": "상가",
-        "min_bid_price": 18500, "minimum_price": 18500, "market_price": 22000,
-        "expected_profit": 2400, "expected_profit_rate": 12.0,
-        "risk_level": "medium", "recommendation_score": 55.5, "recommendation_grade": "C",
-        "recommendation_reason": "차익은 작지만 데이터 신뢰도 양호",
-        "next_actions": ["매각기일 확인", "현장조사 1회"],
-        "warnings": [],
-    },
+# ── Hard fallback ─────────────────────────────────────────────────
+FALLBACK_REGIONS = [
+    "서울특별시", "경기도", "인천광역시", "부산광역시", "대전광역시",
+    "대구광역시", "광주광역시", "울산특별시", "세종특별자치시", "강원특별자치도",
 ]
-
-FALLBACK_ACTIONS = [
-    {"priority": "high", "title": "등기부등본 원문 확인",
-     "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
-     "address": "서울특별시 송파구 잠실동 70"},
-    {"priority": "high", "title": "전입세대열람 확인",
-     "detail": "임차인/대항력 관련 키워드 - 보증금 인수 여부 확인",
-     "address": "서울특별시 송파구 잠실동 70"},
-    {"priority": "high", "title": "입찰기일 임박",
-     "detail": "입찰기일까지 2일 남음", "address": "부산광역시 해운대구 우동 349"},
-    {"priority": "medium", "title": "현장조사", "detail": "관심 등록 물건 - 현장 점검 권장",
-     "address": "서울특별시 강서구 화곡동 396"},
-    {"priority": "medium", "title": "입찰가 재계산",
-     "detail": "시세-최저가 gap 큼 - 입찰가 시뮬레이션 권장",
-     "address": "경기도 안양시 만안구 33"},
-    {"priority": "medium", "title": "신규 공개 문서 확인",
-     "detail": "미공개 문서가 있어 공개 시 즉시 확인 필요",
-     "address": "인천광역시 남동구 구월동 255"},
-]
-
-FALLBACK_ITEMS_REGIONS = ["서울특별시", "경기도", "인천광역시", "부산광역시", "대전광역시"]
-FALLBACK_ITEMS_DONG = ["역삼동", "잠실동", "화곡동", "구월동", "우동", "둔산동", "서면", "분당동"]
+FALLBACK_GU = {
+    "서울특별시": ["강남구", "송파구", "마포구", "강서구", "관악구", "강북구", "영등포구"],
+    "경기도": ["성남시 분당구", "수원시 영통구", "안양시 동안구", "용인시 수지구"],
+    "인천광역시": ["남동구", "연수구", "부평구"],
+    "부산광역시": ["해운대구", "수영구", "남구"],
+    "대전광역시": ["서구", "유성구"],
+    "대구광역시": ["수성구", "달서구"],
+    "광주광역시": ["북구", "남구"],
+    "울산특별시": ["남구", "북구"],
+    "세종특별자치시": [""],
+    "강원특별자치도": ["춘천시", "원주시"],
+}
 FALLBACK_TYPES = ["아파트", "오피스텔", "빌라", "상가", "토지"]
+KEYWORD_POOL = [
+    "임차인", "전입세대", "대항력", "유치권", "법정지상권",
+    "위반건축물", "관리비 체납", "선순위임차인", "점유자 미상", "명도",
+]
+
+
+def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
+    today = datetime.now().date()
+    items: list[dict] = []
+    for i in range(1, n + 1):
+        region = rnd.choice(FALLBACK_REGIONS)
+        gu = rnd.choice(FALLBACK_GU.get(region) or [""])
+        addr = f"{region} {gu} {rnd.randrange(10, 999)}".strip().replace("  ", " ")
+        appr = rnd.randrange(8000, 200000)
+        ratio = rnd.uniform(0.55, 0.95)
+        minb = int(appr * ratio)
+        market = int(appr * rnd.uniform(0.85, 1.4))
+        repair = int(appr * 0.01)
+        evict = int(appr * 0.005)
+        profit = market - minb - repair - evict
+        roi = round(profit / minb * 100, 1) if minb else 0.0
+        risk = rnd.choices(["low", "medium", "high"], weights=[3, 4, 3])[0]
+        flags: list[dict] = []
+        if risk != "low":
+            for kw in rnd.sample(KEYWORD_POOL, k=rnd.randrange(1, 4)):
+                flags.append({
+                    "keyword": kw,
+                    "flag_type": kw,
+                    "risk_level": "high" if risk == "high" else "medium",
+                    "severity": rnd.randrange(3, 9),
+                    "description": f"{kw} 관련 항목 확인 필요",
+                })
+        days_offset = rnd.randrange(-2, 35)
+        bid_start = today + timedelta(days=days_offset)
+        bid_end = bid_start + timedelta(days=2)
+        bid_date = f"{bid_start.isoformat()}~{bid_end.isoformat()}"
+        score = round(min(95, max(5, min(roi, 80) * 0.8 +
+                                  {"low": 15, "medium": 5, "high": -5}[risk])), 1)
+        grade = _grade_from_score(score)
+        confidence = round(rnd.uniform(0.55, 0.92), 3)
+        warnings_list = [f["keyword"] for f in flags if f["risk_level"] == "high"][:4]
+        item_type = rnd.choice(FALLBACK_TYPES)
+        source = rnd.choice(["auction", "public_sale"])
+        case_no = (f"2025타경{rnd.randrange(1000, 9999)}" if source == "auction"
+                   else f"2025-{rnd.randrange(1000, 9999):04d}")
+        rec_reason = (
+            f"차익 {profit:,}만원 추정 ({risk} 위험)"
+            if profit > 0 else f"시세 매칭 부족, {risk} 위험"
+        )
+        next_actions = _next_actions_default(source, risk, days_offset)
+        checklist = _checklist_from_flags(flags)
+        detail = (
+            f"감정가 {appr:,}만원 / 최저가 {minb:,}만원"
+            f" / 추정시세 {market:,}만원 / 차익 {profit:,}만원"
+            f" / 위험 {risk} / 신뢰도 {confidence}"
+        )
+        items.append({
+            "id": i,
+            "source": source,
+            "case_no": case_no,
+            "title": addr,
+            "address": addr,
+            "region": region,
+            "item_type": item_type,
+            "appraisal_price": appr,
+            "min_bid_price": minb,
+            "minimum_price": minb,
+            "market_price": market,
+            "expected_profit": profit,
+            "expected_profit_rate": roi,
+            "fail_count": rnd.randrange(0, 4),
+            "bid_date": bid_date,
+            "days_left": days_offset,
+            "risk_level": risk,
+            "risk_flags": flags,
+            "recommendation_score": score,
+            "recommendation_grade": grade,
+            "confidence_score": confidence,
+            "recommendation_reason": rec_reason,
+            "warnings": warnings_list,
+            "next_actions": next_actions,
+            "checklist": checklist,
+            "detail_summary": detail,
+        })
+    return items
 
 
 def _fallback_payload() -> dict[str, Any]:
     rnd = random.Random(42)
-    items = []
-    for i in range(24):
-        appr = rnd.randrange(8000, 90000)
-        minb = int(appr * rnd.uniform(0.6, 0.95))
-        items.append({
-            "id": i + 1,
-            "source": rnd.choice(["auction", "public_sale"]),
-            "address": f"{rnd.choice(FALLBACK_ITEMS_REGIONS)} "
-                       f"{rnd.choice(FALLBACK_ITEMS_DONG)} "
-                       f"{rnd.randrange(10, 999)}",
-            "item_type": rnd.choice(FALLBACK_TYPES),
-            "appraisal_price": appr,
-            "min_bid_price": minb,
-            "fail_count": rnd.randrange(0, 4),
-            "bid_date": (datetime.now() + timedelta(days=rnd.randrange(2, 30))).date().isoformat(),
-            "risk_level": rnd.choices(["low", "medium", "high"], weights=[3, 5, 2])[0],
+    items = _fallback_items(rnd, n=100)
+    rs = _risk_summary_from_items(items)
+
+    recs = _recommendations_from_items(items, TOP_LIMIT)
+
+    actions = []
+    high_risk_items = [it for it in items if it["risk_level"] == "high"][:4]
+    for it in high_risk_items:
+        actions.append({
+            "priority": "high",
+            "title": "등기부등본 원문 확인",
+            "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
+            "due_date": None,
+            "address": it["address"],
+            "item_id": it["id"],
+            "item_type": it["item_type"],
         })
-    rs = {"low": 0, "medium": 0, "high": 0,
-          "top_flags": [
-              {"keyword": "임차인", "count": 8},
-              {"keyword": "관리비 체납", "count": 5},
-              {"keyword": "선순위임차인", "count": 3},
-              {"keyword": "유치권", "count": 2},
-              {"keyword": "법정지상권", "count": 1},
-          ]}
-    for it in items:
-        rs[it["risk_level"]] += 1
+    imminent = sorted(
+        [it for it in items if (it.get("days_left") or 999) <= 7
+         and (it.get("days_left") or -1) >= 0],
+        key=lambda x: x.get("days_left") or 0,
+    )[:3]
+    for it in imminent:
+        actions.append({
+            "priority": "high",
+            "title": "입찰기일 임박",
+            "detail": f"입찰기일까지 {it['days_left']}일 남음",
+            "due_date": it["bid_date"],
+            "address": it["address"],
+            "item_id": it["id"],
+            "item_type": it["item_type"],
+        })
+    actions.append({
+        "priority": "medium", "title": "현장조사",
+        "detail": "관심 등록 물건 - 현장 점검 권장",
+        "due_date": None,
+        "address": items[0]["address"],
+        "item_id": items[0]["id"],
+        "item_type": items[0]["item_type"],
+    })
 
     summary = {
-        "total_items": 100,
-        "analyzed_items": 100,
-        "recommended_items": len(FALLBACK_RECS),
+        "total_items": len(items),
+        "analyzed_items": len(items),
+        "recommended_items": len(recs),
         "high_risk_items": rs["high"],
-        "avg_confidence": 0.78,
+        "avg_confidence": round(sum(it["confidence_score"] for it in items) / len(items), 3),
+        "auction_count": sum(1 for it in items if it["source"] == "auction"),
+        "public_sale_count": sum(1 for it in items if it["source"] == "public_sale"),
+        "urgent_items": sum(1 for it in items
+                            if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0),
     }
     briefing = {
         "summary": (
-            "오늘 mock 데이터로 100건을 분석했습니다.\n"
-            "검토 후보(A·B·C) 5건, 주의(D·X) 0건, 고위험 키워드 보유 물건은 "
-            f"{rs['high']}건입니다.\n"
-            "오늘 우선 볼 물건은 5건이며, 등기부등본·전입세대열람·현장조사 가 권장됩니다."
+            f"오늘 mock 데이터 {len(items)}건을 분석했습니다.\n"
+            f"검토 후보(A·B·C) {sum(1 for r in recs if r['recommendation_grade'] in ('A','B','C'))}건, "
+            f"고위험 키워드 보유 물건은 {rs['high']}건입니다.\n"
+            f"입찰기일 임박(D-7 이내)은 {summary['urgent_items']}건이며, "
+            "등기부등본·전입세대열람·현장조사가 권장됩니다."
         ),
     }
     confidence = {
-        "price": 0.82, "risk": 0.71, "document": 0.78,
-        "address": 0.85, "overall": 0.78,
-        "note": "Fallback 표본 — 실제 분석 결과 대신 데모 값",
+        "price": round(sum(it["confidence_score"] for it in items if it["market_price"]) /
+                       max(1, sum(1 for it in items if it["market_price"])), 3),
+        "risk": 0.71,
+        "document": 0.78,
+        "address": 0.85,
+        "overall": summary["avg_confidence"],
+        "note": "Fallback 표본 — 운영 시 실 분석 결과로 교체",
     }
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "source": "fallback",
         "summary": summary,
         "briefing": briefing,
-        "recommendations": FALLBACK_RECS,
-        "action_items": FALLBACK_ACTIONS,
+        "recommendations": recs,
+        "action_items": actions,
         "risk_summary": rs,
         "confidence_summary": confidence,
         "items": items,
@@ -469,23 +720,21 @@ def _fallback_payload() -> dict[str, Any]:
 
 def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     summary = _summarize_items(conn)
-    recs = _recommendations_from_db(conn)
-    if len(recs) < TOP_LIMIT:
-        # 브리핑 후보가 적으면 fallback 으로 5개 채워서 데모용 그리드 유지
-        existing_ids = {r.get("item_id") for r in recs}
-        for fb in FALLBACK_RECS:
-            if len(recs) >= TOP_LIMIT:
-                break
-            r = dict(fb)
-            r["rank"] = len(recs) + 1
-            r["recommendation_reason"] = (r.get("recommendation_reason") or "") + " (샘플 보강)"
-            recs.append(r)
-    actions = _action_items_from_db(conn) or FALLBACK_ACTIONS
-    rs = _risk_summary_from_db(conn)
+    picks = _picks_by_id(conn)
+    items = _items_sample(conn, picks_by_id=picks)
+    if not items:
+        return _fallback_payload()
+
+    recs = _recommendations_from_items(items, TOP_LIMIT)
+    actions = _action_items_from_db(conn) or _fallback_payload()["action_items"]
+    rs = _risk_summary_from_items(items)
     conf = _confidence_summary_from_db(conn)
-    items = _items_sample(conn) or _fallback_payload()["items"]
 
     summary["recommended_items"] = len(recs)
+    summary["urgent_items"] = sum(
+        1 for it in items
+        if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0
+    )
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "source": "db",
@@ -516,7 +765,6 @@ def export() -> Path:
             conn.close()
 
     if payload is None:
-        # DB 가 없거나 비어 있음 → 시드 시도
         if _ensure_db_seeded():
             conn = _connect()
             if conn:

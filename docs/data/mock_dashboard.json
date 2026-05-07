@@ -1,129 +1,154 @@
 {
-  "generated_at": "2026-05-08T06:59:02",
+  "generated_at": "2026-05-08T07:44:13",
   "source": "db",
   "summary": {
     "total_items": 100,
     "analyzed_items": 100,
     "high_risk_items": 77,
-    "avg_confidence": 0.758,
-    "recommended_items": 5
+    "avg_confidence": 0.768,
+    "auction_count": 50,
+    "public_sale_count": 50,
+    "recommended_items": 5,
+    "urgent_items": 25
   },
   "briefing": {
     "run_date": "2026-05-08",
-    "summary": "오늘의 경매·공매 브리핑입니다.\n총 100건을 확인했고, 실거래가 매칭 가능 물건은 90건입니다.\n고위험 키워드 보유 물건은 77건이며, 검토 후보(A/B/C)는 4건, 주의(D/X)는 0건입니다.\n오늘 우선 볼 물건은 4건입니다.",
-    "matched_items": 90,
-    "candidate_items": 4
+    "summary": "오늘의 경매·공매 브리핑입니다.\n총 100건을 확인했고, 실거래가 매칭 가능 물건은 91건입니다.\n고위험 키워드 보유 물건은 77건이며, 검토 후보(A/B/C)는 2건, 주의(D/X)는 0건입니다.\n오늘 우선 볼 물건은 2건입니다.\n오늘 검토 후보(A/B/C 등급)가 3건 미만입니다 - 추천 후보 부족",
+    "matched_items": 91,
+    "candidate_items": 2
   },
   "recommendations": [
     {
       "rank": 1,
-      "item_id": 91,
+      "item_id": 59,
       "source": "public_sale",
-      "title": "서울특별시 강북구 수유동 440",
-      "address": "서울특별시 강북구 수유동 440",
+      "title": "광주광역시 북구 운암동 377",
+      "address": "광주광역시 북구 운암동 377",
+      "region": "광주광역시",
       "item_type": "아파트",
+      "case_no": null,
       "min_bid_price": 22080,
       "minimum_price": 22080,
-      "market_price": 122869,
-      "expected_profit": 99328,
-      "expected_profit_rate": 421.94,
-      "risk_level": "medium",
-      "recommendation_score": 79.8,
+      "market_price": 124479,
+      "expected_profit": 102159,
+      "expected_profit_rate": 462.7,
+      "risk_level": "low",
+      "recommendation_score": 79.0,
       "recommendation_grade": "A",
-      "recommendation_reason": "점수 79.8 (A등급) · 선호 매칭: 선호 유형 일치",
+      "recommendation_reason": "차익 102,159만원 추정 + 위험 낮음",
       "next_actions": [
         "입찰기간 확인",
         "현장조사 1회"
       ],
-      "warnings": []
+      "warnings": [],
+      "confidence_score": 0.692,
+      "bid_date": "2026-05-22~2026-05-24"
     },
     {
       "rank": 2,
-      "item_id": 53,
+      "item_id": 54,
       "source": "public_sale",
-      "title": "서울특별시 영등포구 여의도동 396",
-      "address": "서울특별시 영등포구 여의도동 396",
+      "title": "부산광역시 남구 대연동 430",
+      "address": "부산광역시 남구 대연동 430",
+      "region": "부산광역시",
       "item_type": "아파트",
-      "min_bid_price": 19200,
-      "minimum_price": 19200,
-      "market_price": 71202,
-      "expected_profit": 50626,
-      "expected_profit_rate": 246.04,
-      "risk_level": "medium",
-      "recommendation_score": 65.9,
-      "recommendation_grade": "B",
-      "recommendation_reason": "점수 65.9 (B등급) · 선호 매칭: 선호 유형 일치",
+      "case_no": null,
+      "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 126132,
+      "expected_profit": 116412,
+      "expected_profit_rate": 1212.6,
+      "risk_level": "low",
+      "recommendation_score": 79.0,
+      "recommendation_grade": "A",
+      "recommendation_reason": "차익 116,412만원 추정 + 위험 낮음",
       "next_actions": [
         "입찰기간 확인",
+        "입찰기일 D-4 임박",
         "현장조사 1회"
       ],
-      "warnings": []
+      "warnings": [],
+      "confidence_score": 0.532,
+      "bid_date": "2026-05-12~2026-05-14"
     },
     {
       "rank": 3,
-      "item_id": 63,
+      "item_id": 77,
       "source": "public_sale",
-      "title": "서울특별시 강북구 수유동 441",
-      "address": "서울특별시 강북구 수유동 441",
-      "item_type": "아파트",
-      "min_bid_price": 54400,
-      "minimum_price": 54400,
-      "market_price": 121231,
-      "expected_profit": 64399,
-      "expected_profit_rate": 113.31,
-      "risk_level": "medium",
-      "recommendation_score": 64.2,
+      "title": "대전광역시 서구 둔산동 170",
+      "address": "대전광역시 서구 둔산동 170",
+      "region": "대전광역시",
+      "item_type": "오피스텔",
+      "case_no": null,
+      "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 38431,
+      "expected_profit": 16111,
+      "expected_profit_rate": 73.0,
+      "risk_level": "low",
+      "recommendation_score": 73.4,
       "recommendation_grade": "B",
-      "recommendation_reason": "점수 64.2 (B등급) · 선호 매칭: 선호 유형 일치",
+      "recommendation_reason": "차익 16,111만원 추정 + 위험 낮음",
       "next_actions": [
         "입찰기간 확인",
         "현장조사 1회"
       ],
-      "warnings": []
+      "warnings": [],
+      "confidence_score": 0.557,
+      "bid_date": "2026-05-17~2026-05-19"
     },
     {
       "rank": 4,
-      "item_id": 70,
+      "item_id": 85,
       "source": "public_sale",
-      "title": "경기도 안양시 동안구 33",
-      "address": "경기도 안양시 동안구 33",
-      "item_type": "오피스텔",
-      "min_bid_price": 34000,
-      "minimum_price": 34000,
-      "market_price": 44300,
-      "expected_profit": 8480,
-      "expected_profit_rate": 23.67,
+      "title": "인천광역시 남동구 구월동 279",
+      "address": "인천광역시 남동구 구월동 279",
+      "region": "인천광역시",
+      "item_type": "토지",
+      "case_no": null,
+      "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 61154,
+      "expected_profit": 27494,
+      "expected_profit_rate": 83.0,
       "risk_level": "medium",
-      "recommendation_score": 45.7,
-      "recommendation_grade": "C",
-      "recommendation_reason": "점수 45.7 (C등급) · 선호 매칭: 선호 유형 일치",
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "recommendation_reason": "차익 27,494만원 추정 (medium 위험)",
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "warnings": [],
+      "confidence_score": 0.805,
+      "bid_date": "2026-05-06~2026-05-08"
+    },
+    {
+      "rank": 5,
+      "item_id": 81,
+      "source": "public_sale",
+      "title": "인천광역시 남동구 구월동 224",
+      "address": "인천광역시 남동구 구월동 224",
+      "region": "인천광역시",
+      "item_type": "상가",
+      "case_no": null,
+      "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 124466,
+      "expected_profit": 95126,
+      "expected_profit_rate": 330.3,
+      "risk_level": "medium",
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "recommendation_reason": "차익 95,126만원 추정 (medium 위험)",
       "next_actions": [
         "입찰기간 확인",
         "현장조사 1회"
       ],
-      "warnings": []
-    },
-    {
-      "rank": 5,
-      "source": "auction",
-      "title": "서울특별시 강서구 화곡동 396",
-      "address": "서울특별시 강서구 화곡동 396",
-      "item_type": "아파트",
-      "min_bid_price": 19200,
-      "minimum_price": 19200,
-      "market_price": 28000,
-      "expected_profit": 7800,
-      "expected_profit_rate": 35.4,
-      "risk_level": "medium",
-      "recommendation_score": 78.5,
-      "recommendation_grade": "A",
-      "recommendation_reason": "감정가 대비 시세 격차 큼 + 위험 키워드 보통 (샘플 보강)",
-      "next_actions": [
-        "등기부등본 재확인",
-        "매각기일 확인",
-        "현장조사 1회"
-      ],
-      "warnings": []
+      "warnings": [],
+      "confidence_score": 0.603,
+      "bid_date": "2026-06-03~2026-06-05"
     }
   ],
   "action_items": [
@@ -133,6 +158,7 @@
       "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
       "due_date": null,
       "address": "부산광역시 남구 대연동 145",
+      "item_id": 100,
       "item_type": "아파트"
     },
     {
@@ -141,6 +167,7 @@
       "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
       "due_date": null,
       "address": "경기도 용인시 수지구 164",
+      "item_id": 99,
       "item_type": "빌라"
     },
     {
@@ -149,6 +176,7 @@
       "detail": "임차인/대항력 관련 키워드 발견 - 전입세대열람 후 보증금 인수 여부 확인",
       "due_date": null,
       "address": "경기도 용인시 수지구 164",
+      "item_id": 99,
       "item_type": "빌라"
     },
     {
@@ -157,6 +185,7 @@
       "detail": "입찰기일까지 5일 남음",
       "due_date": "2026-05-13~2026-05-15",
       "address": "경기도 용인시 수지구 164",
+      "item_id": 99,
       "item_type": "빌라"
     },
     {
@@ -165,6 +194,7 @@
       "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
       "due_date": null,
       "address": "인천광역시 남동구 구월동 459",
+      "item_id": 97,
       "item_type": "토지"
     },
     {
@@ -173,6 +203,7 @@
       "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
       "due_date": null,
       "address": "서울특별시 관악구 봉천동 140",
+      "item_id": 96,
       "item_type": "오피스텔"
     },
     {
@@ -181,6 +212,7 @@
       "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
       "due_date": null,
       "address": "대구광역시 수성구 범어동 230",
+      "item_id": 95,
       "item_type": "빌라"
     },
     {
@@ -189,6 +221,7 @@
       "detail": "입찰기일까지 2일 남음",
       "due_date": "2026-05-10~2026-05-12",
       "address": "대구광역시 수성구 범어동 230",
+      "item_id": 95,
       "item_type": "빌라"
     }
   ],
@@ -198,7 +231,7 @@
     "high": 77,
     "top_flags": [
       {
-        "keyword": "전입세대",
+        "keyword": "대항력",
         "count": 30
       },
       {
@@ -206,7 +239,7 @@
         "count": 30
       },
       {
-        "keyword": "대항력",
+        "keyword": "전입세대",
         "count": 30
       },
       {
@@ -214,11 +247,11 @@
         "count": 23
       },
       {
-        "keyword": "점유자 미상",
+        "keyword": "법정지상권",
         "count": 21
       },
       {
-        "keyword": "법정지상권",
+        "keyword": "점유자 미상",
         "count": 21
       },
       {
@@ -232,342 +265,5671 @@
     ]
   },
   "confidence_summary": {
-    "price": 0,
-    "risk": 0,
-    "document": 0,
-    "address": 0,
-    "overall": 0
+    "price": 0.8145,
+    "risk": 0.8275,
+    "document": 0.59,
+    "address": 0.85,
+    "overall": 0.7676999999999999,
+    "note": "Mock 파이프라인 결과 평균 — 운영 시 실거래/문서 매칭 결과로 대체"
   },
   "items": [
     {
       "id": 100,
       "source": "public_sale",
+      "case_no": null,
+      "title": "부산광역시 남구 대연동 145",
       "address": "부산광역시 남구 대연동 145",
+      "region": "부산광역시",
       "item_type": "아파트",
       "appraisal_price": 12000,
       "min_bid_price": 11040,
+      "minimum_price": 11040,
+      "market_price": 67520,
+      "expected_profit": 56300,
+      "expected_profit_rate": 510.0,
       "fail_count": 0,
       "bid_date": "2026-05-26~2026-05-28",
-      "risk_level": "high"
+      "days_left": 18,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 56,300만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 12,000만원 / 최저가 11,040만원 / 추정시세 67,520만원 / 차익 56,300만원 / 위험 high / 신뢰도 0.77"
     },
     {
       "id": 99,
       "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 164",
       "address": "경기도 용인시 수지구 164",
+      "region": "경기도",
       "item_type": "빌라",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 31092,
+      "expected_profit": 8652,
+      "expected_profit_rate": 39.2,
       "fail_count": 0,
       "bid_date": "2026-05-13~2026-05-15",
-      "risk_level": "high"
+      "days_left": 5,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 26.4,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 8,652만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력",
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-5 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 31,092만원 / 차익 8,652만원 / 위험 high / 신뢰도 0.82"
     },
     {
       "id": 98,
       "source": "public_sale",
+      "case_no": null,
+      "title": "부산광역시 남구 대연동 220",
       "address": "부산광역시 남구 대연동 220",
+      "region": "부산광역시",
       "item_type": "빌라",
       "appraisal_price": 36000,
       "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 28946,
+      "expected_profit": -394,
+      "expected_profit_rate": -1.4,
       "fail_count": 1,
       "bid_date": "2026-05-20~2026-05-22",
-      "risk_level": "medium"
+      "days_left": 12,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.88,
+      "recommendation_reason": "시세 매칭 표본 부족, medium 위험",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 28,800만원 / 추정시세 28,946만원 / 차익 -394만원 / 위험 medium / 신뢰도 0.88"
     },
     {
       "id": 97,
       "source": "public_sale",
+      "case_no": null,
+      "title": "인천광역시 남동구 구월동 459",
       "address": "인천광역시 남동구 구월동 459",
+      "region": "인천광역시",
       "item_type": "토지",
       "appraisal_price": 12000,
       "min_bid_price": 11040,
+      "minimum_price": 11040,
+      "market_price": 32283,
+      "expected_profit": 21063,
+      "expected_profit_rate": 190.8,
       "fail_count": 0,
       "bid_date": "2026-05-06~2026-05-08",
-      "risk_level": "high"
+      "days_left": -2,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 21,063만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 12,000만원 / 최저가 11,040만원 / 추정시세 32,283만원 / 차익 21,063만원 / 위험 high / 신뢰도 0.83"
     },
     {
       "id": 96,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 관악구 봉천동 140",
       "address": "서울특별시 관악구 봉천동 140",
+      "region": "서울특별시",
       "item_type": "오피스텔",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 25188,
+      "expected_profit": 2748,
+      "expected_profit_rate": 12.4,
       "fail_count": 0,
       "bid_date": "2026-05-28~2026-05-30",
-      "risk_level": "high"
+      "days_left": 20,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.867,
+      "recommendation_reason": "차익 2,748만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권",
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 25,188만원 / 차익 2,748만원 / 위험 high / 신뢰도 0.87"
     },
     {
       "id": 95,
       "source": "public_sale",
+      "case_no": null,
+      "title": "대구광역시 수성구 범어동 230",
       "address": "대구광역시 수성구 범어동 230",
+      "region": "대구광역시",
       "item_type": "빌라",
       "appraisal_price": 150000,
       "min_bid_price": 102000,
+      "minimum_price": 102000,
+      "market_price": 17898,
+      "expected_profit": -86352,
+      "expected_profit_rate": -84.7,
       "fail_count": 2,
       "bid_date": "2026-05-10~2026-05-12",
-      "risk_level": "high"
+      "days_left": 2,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.855,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-2 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 150,000만원 / 최저가 102,000만원 / 추정시세 17,898만원 / 차익 -86,352만원 / 위험 high / 신뢰도 0.85"
     },
     {
       "id": 94,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 관악구 봉천동 443",
       "address": "서울특별시 관악구 봉천동 443",
+      "region": "서울특별시",
       "item_type": "빌라",
       "appraisal_price": 36000,
       "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 21632,
+      "expected_profit": -12028,
+      "expected_profit_rate": -36.3,
       "fail_count": 0,
       "bid_date": "2026-05-14~2026-05-16",
-      "risk_level": "high"
+      "days_left": 6,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-6 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 33,120만원 / 추정시세 21,632만원 / 차익 -12,028만원 / 위험 high / 신뢰도 0.82"
     },
     {
       "id": 93,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 영등포구 여의도동 232",
       "address": "서울특별시 영등포구 여의도동 232",
+      "region": "서울특별시",
       "item_type": "아파트",
       "appraisal_price": 36000,
       "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 82376,
+      "expected_profit": 53036,
+      "expected_profit_rate": 184.2,
       "fail_count": 1,
       "bid_date": "2026-05-07~2026-05-09",
-      "risk_level": "high"
+      "days_left": -1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 53,036만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 28,800만원 / 추정시세 82,376만원 / 차익 53,036만원 / 위험 high / 신뢰도 0.82"
     },
     {
       "id": 92,
       "source": "public_sale",
+      "case_no": null,
+      "title": "대전광역시 서구 둔산동 285",
       "address": "대전광역시 서구 둔산동 285",
+      "region": "대전광역시",
       "item_type": "상가",
       "appraisal_price": 80000,
       "min_bid_price": 73600,
+      "minimum_price": 73600,
+      "market_price": 169340,
+      "expected_profit": 94540,
+      "expected_profit_rate": 128.5,
       "fail_count": 0,
       "bid_date": "2026-06-07~2026-06-09",
-      "risk_level": "high"
+      "days_left": 30,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.88,
+      "recommendation_reason": "차익 94,540만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 80,000만원 / 최저가 73,600만원 / 추정시세 169,340만원 / 차익 94,540만원 / 위험 high / 신뢰도 0.88"
     },
     {
       "id": 91,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 440",
       "address": "서울특별시 강북구 수유동 440",
+      "region": "서울특별시",
       "item_type": "아파트",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 53509,
+      "expected_profit": 31069,
+      "expected_profit_rate": 140.7,
       "fail_count": 0,
       "bid_date": "2026-06-07~2026-06-09",
-      "risk_level": "medium"
+      "days_left": 30,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 54.28,
+      "recommendation_grade": "C",
+      "confidence_score": 0.805,
+      "recommendation_reason": "점수 54.3 (C등급) · 선호 매칭: 선호 유형 일치",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 53,509만원 / 차익 31,069만원 / 위험 medium / 신뢰도 0.81"
     },
     {
       "id": 90,
       "source": "public_sale",
+      "case_no": null,
+      "title": "대구광역시 수성구 범어동 398",
       "address": "대구광역시 수성구 범어동 398",
+      "region": "대구광역시",
       "item_type": "상가",
       "appraisal_price": 150000,
       "min_bid_price": 120000,
+      "minimum_price": 120000,
+      "market_price": 106868,
+      "expected_profit": -15382,
+      "expected_profit_rate": -12.8,
       "fail_count": 1,
       "bid_date": "2026-05-08~2026-05-10",
-      "risk_level": "high"
+      "days_left": 0,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 150,000만원 / 최저가 120,000만원 / 추정시세 106,868만원 / 차익 -15,382만원 / 위험 high / 신뢰도 0.81"
     },
     {
       "id": 89,
       "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 209",
       "address": "경기도 용인시 수지구 209",
+      "region": "경기도",
       "item_type": "토지",
       "appraisal_price": 110000,
       "min_bid_price": 101200,
+      "minimum_price": 101200,
+      "market_price": 104500,
+      "expected_profit": 1650,
+      "expected_profit_rate": 1.6,
       "fail_count": 0,
       "bid_date": "2026-06-07~2026-06-09",
-      "risk_level": "high"
+      "days_left": 30,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.58,
+      "recommendation_reason": "차익 1,650만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권",
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 110,000만원 / 최저가 101,200만원 / 추정시세 104,500만원 / 차익 1,650만원 / 위험 high / 신뢰도 0.58"
     },
     {
       "id": 88,
       "source": "public_sale",
+      "case_no": null,
+      "title": "광주광역시 북구 운암동 258",
       "address": "광주광역시 북구 운암동 258",
+      "region": "광주광역시",
       "item_type": "상가",
       "appraisal_price": 36000,
       "min_bid_price": 24480,
+      "minimum_price": 24480,
+      "market_price": 155473,
+      "expected_profit": 130453,
+      "expected_profit_rate": 532.9,
       "fail_count": 2,
       "bid_date": "2026-05-17~2026-05-19",
-      "risk_level": "high"
+      "days_left": 9,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.805,
+      "recommendation_reason": "차익 130,453만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 24,480만원 / 추정시세 155,473만원 / 차익 130,453만원 / 위험 high / 신뢰도 0.81"
     },
     {
       "id": 87,
       "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 안양시 동안구 407",
       "address": "경기도 안양시 동안구 407",
+      "region": "경기도",
       "item_type": "빌라",
       "appraisal_price": 150000,
       "min_bid_price": 138000,
+      "minimum_price": 138000,
+      "market_price": 30078,
+      "expected_profit": -110172,
+      "expected_profit_rate": -79.8,
       "fail_count": 0,
       "bid_date": "2026-05-29~2026-05-31",
-      "risk_level": "medium"
+      "days_left": 21,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.768,
+      "recommendation_reason": "시세 매칭 표본 부족, medium 위험",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 150,000만원 / 최저가 138,000만원 / 추정시세 30,078만원 / 차익 -110,172만원 / 위험 medium / 신뢰도 0.77"
     },
     {
       "id": 86,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 14",
       "address": "서울특별시 강북구 수유동 14",
+      "region": "서울특별시",
       "item_type": "아파트",
       "appraisal_price": 50000,
       "min_bid_price": 46000,
+      "minimum_price": 46000,
+      "market_price": 52603,
+      "expected_profit": 5853,
+      "expected_profit_rate": 12.7,
       "fail_count": 0,
       "bid_date": "2026-05-31~2026-06-02",
-      "risk_level": "high"
+      "days_left": 23,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.2,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "차익 5,853만원 추정 (high 위험)",
+      "warnings": [
+        "대항력",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 50,000만원 / 최저가 46,000만원 / 추정시세 52,603만원 / 차익 5,853만원 / 위험 high / 신뢰도 0.81"
     },
     {
       "id": 85,
       "source": "public_sale",
+      "case_no": null,
+      "title": "인천광역시 남동구 구월동 279",
       "address": "인천광역시 남동구 구월동 279",
+      "region": "인천광역시",
       "item_type": "토지",
       "appraisal_price": 36000,
       "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 61154,
+      "expected_profit": 27494,
+      "expected_profit_rate": 83.0,
       "fail_count": 0,
       "bid_date": "2026-05-06~2026-05-08",
-      "risk_level": "medium"
+      "days_left": -2,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.805,
+      "recommendation_reason": "차익 27,494만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 33,120만원 / 추정시세 61,154만원 / 차익 27,494만원 / 위험 medium / 신뢰도 0.81"
     },
     {
       "id": 84,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 관악구 봉천동 53",
       "address": "서울특별시 관악구 봉천동 53",
+      "region": "서울특별시",
       "item_type": "상가",
       "appraisal_price": 12000,
       "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 85009,
+      "expected_profit": 75229,
+      "expected_profit_rate": 783.6,
       "fail_count": 1,
       "bid_date": "2026-05-07~2026-05-09",
-      "risk_level": "high"
+      "days_left": -1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 75,229만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 12,000만원 / 최저가 9,600만원 / 추정시세 85,009만원 / 차익 75,229만원 / 위험 high / 신뢰도 0.83"
     },
     {
       "id": 83,
       "source": "public_sale",
+      "case_no": null,
+      "title": "대구광역시 수성구 범어동 161",
       "address": "대구광역시 수성구 범어동 161",
+      "region": "대구광역시",
       "item_type": "토지",
       "appraisal_price": 50000,
       "min_bid_price": 46000,
+      "minimum_price": 46000,
+      "market_price": 11278,
+      "expected_profit": -35472,
+      "expected_profit_rate": -77.1,
       "fail_count": 0,
       "bid_date": "2026-05-10~2026-05-12",
-      "risk_level": "high"
+      "days_left": 2,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.653,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "대항력",
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-2 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 50,000만원 / 최저가 46,000만원 / 추정시세 11,278만원 / 차익 -35,472만원 / 위험 high / 신뢰도 0.65"
     },
     {
       "id": 82,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 228",
       "address": "서울특별시 강북구 수유동 228",
+      "region": "서울특별시",
       "item_type": "토지",
       "appraisal_price": 24000,
       "min_bid_price": 19200,
+      "minimum_price": 19200,
+      "market_price": 54153,
+      "expected_profit": 34593,
+      "expected_profit_rate": 180.2,
       "fail_count": 1,
       "bid_date": "2026-05-22~2026-05-24",
-      "risk_level": "high"
+      "days_left": 14,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.755,
+      "recommendation_reason": "차익 34,593만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 19,200만원 / 추정시세 54,153만원 / 차익 34,593만원 / 위험 high / 신뢰도 0.76"
     },
     {
       "id": 81,
       "source": "public_sale",
+      "case_no": null,
+      "title": "인천광역시 남동구 구월동 224",
       "address": "인천광역시 남동구 구월동 224",
+      "region": "인천광역시",
       "item_type": "상가",
       "appraisal_price": 36000,
       "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 124466,
+      "expected_profit": 95126,
+      "expected_profit_rate": 330.3,
       "fail_count": 1,
       "bid_date": "2026-06-03~2026-06-05",
-      "risk_level": "medium"
+      "days_left": 26,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.603,
+      "recommendation_reason": "차익 95,126만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 28,800만원 / 추정시세 124,466만원 / 차익 95,126만원 / 위험 medium / 신뢰도 0.60"
     },
     {
       "id": 80,
       "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 321",
       "address": "경기도 용인시 수지구 321",
+      "region": "경기도",
       "item_type": "빌라",
       "appraisal_price": 36000,
       "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 22217,
+      "expected_profit": -11443,
+      "expected_profit_rate": -34.6,
       "fail_count": 0,
       "bid_date": "2026-06-01~2026-06-03",
-      "risk_level": "high"
+      "days_left": 24,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 33,120만원 / 추정시세 22,217만원 / 차익 -11,443만원 / 위험 high / 신뢰도 0.82"
     },
     {
       "id": 79,
       "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 458",
       "address": "경기도 용인시 수지구 458",
+      "region": "경기도",
       "item_type": "토지",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 22800,
+      "expected_profit": 360,
+      "expected_profit_rate": 1.6,
       "fail_count": 0,
       "bid_date": "2026-06-07~2026-06-09",
-      "risk_level": "medium"
+      "days_left": 30,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 6.3,
+      "recommendation_grade": "X",
+      "confidence_score": 0.593,
+      "recommendation_reason": "차익 360만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인",
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 22,800만원 / 차익 360만원 / 위험 medium / 신뢰도 0.59"
     },
     {
       "id": 78,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 238",
       "address": "서울특별시 강북구 수유동 238",
+      "region": "서울특별시",
       "item_type": "빌라",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 29460,
+      "expected_profit": 7020,
+      "expected_profit_rate": 31.8,
       "fail_count": 0,
       "bid_date": "2026-05-12~2026-05-14",
-      "risk_level": "high"
+      "days_left": 4,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 20.4,
+      "recommendation_grade": "X",
+      "confidence_score": 0.855,
+      "recommendation_reason": "차익 7,020만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 29,460만원 / 차익 7,020만원 / 위험 high / 신뢰도 0.85"
     },
     {
       "id": 77,
       "source": "public_sale",
+      "case_no": null,
+      "title": "대전광역시 서구 둔산동 170",
       "address": "대전광역시 서구 둔산동 170",
+      "region": "대전광역시",
       "item_type": "오피스텔",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 38431,
+      "expected_profit": 16111,
+      "expected_profit_rate": 73.0,
       "fail_count": 0,
       "bid_date": "2026-05-17~2026-05-19",
-      "risk_level": "medium"
+      "days_left": 9,
+      "risk_level": "low",
+      "risk_flags": [],
+      "recommendation_score": 73.4,
+      "recommendation_grade": "B",
+      "confidence_score": 0.557,
+      "recommendation_reason": "차익 16,111만원 추정 + 위험 낮음",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 38,431만원 / 차익 16,111만원 / 위험 low / 신뢰도 0.56"
     },
     {
       "id": 76,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 342",
       "address": "서울특별시 강북구 수유동 342",
+      "region": "서울특별시",
       "item_type": "상가",
       "appraisal_price": 50000,
       "min_bid_price": 34000,
+      "minimum_price": 34000,
+      "market_price": 110390,
+      "expected_profit": 75640,
+      "expected_profit_rate": 222.5,
       "fail_count": 2,
       "bid_date": "2026-06-02~2026-06-04",
-      "risk_level": "high"
+      "days_left": 25,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.867,
+      "recommendation_reason": "차익 75,640만원 추정 (high 위험)",
+      "warnings": [
+        "유치권",
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 50,000만원 / 최저가 34,000만원 / 추정시세 110,390만원 / 차익 75,640만원 / 위험 high / 신뢰도 0.87"
     },
     {
       "id": 75,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 영등포구 여의도동 295",
       "address": "서울특별시 영등포구 여의도동 295",
+      "region": "서울특별시",
       "item_type": "토지",
       "appraisal_price": 110000,
       "min_bid_price": 88000,
+      "minimum_price": 88000,
+      "market_price": 10555,
+      "expected_profit": -79095,
+      "expected_profit_rate": -89.9,
       "fail_count": 1,
       "bid_date": "2026-05-12~2026-05-14",
-      "risk_level": "high"
+      "days_left": 4,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.768,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 110,000만원 / 최저가 88,000만원 / 추정시세 10,555만원 / 차익 -79,095만원 / 위험 high / 신뢰도 0.77"
     },
     {
       "id": 74,
       "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 안양시 동안구 53",
       "address": "경기도 안양시 동안구 53",
+      "region": "경기도",
       "item_type": "아파트",
       "appraisal_price": 150000,
       "min_bid_price": 120000,
+      "minimum_price": 120000,
+      "market_price": 91354,
+      "expected_profit": -30896,
+      "expected_profit_rate": -25.7,
       "fail_count": 1,
       "bid_date": "2026-05-12~2026-05-14",
-      "risk_level": "high"
+      "days_left": 4,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.768,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 150,000만원 / 최저가 120,000만원 / 추정시세 91,354만원 / 차익 -30,896만원 / 위험 high / 신뢰도 0.77"
     },
     {
       "id": 73,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 영등포구 여의도동 302",
       "address": "서울특별시 영등포구 여의도동 302",
+      "region": "서울특별시",
       "item_type": "오피스텔",
       "appraisal_price": 24000,
       "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 34593,
+      "expected_profit": 12153,
+      "expected_profit_rate": 55.0,
       "fail_count": 0,
       "bid_date": "2026-05-17~2026-05-19",
-      "risk_level": "high"
+      "days_left": 9,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 39.0,
+      "recommendation_grade": "D",
+      "confidence_score": 0.88,
+      "recommendation_reason": "차익 12,153만원 추정 (high 위험)",
+      "warnings": [
+        "대항력",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 34,593만원 / 차익 12,153만원 / 위험 high / 신뢰도 0.88"
     },
     {
       "id": 72,
       "source": "public_sale",
+      "case_no": null,
+      "title": "대전광역시 서구 둔산동 425",
       "address": "대전광역시 서구 둔산동 425",
+      "region": "대전광역시",
       "item_type": "오피스텔",
       "appraisal_price": 36000,
       "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 36593,
+      "expected_profit": 2933,
+      "expected_profit_rate": 8.9,
       "fail_count": 0,
       "bid_date": "2026-05-25~2026-05-27",
-      "risk_level": "high"
+      "days_left": 17,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 2,933만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 33,120만원 / 추정시세 36,593만원 / 차익 2,933만원 / 위험 high / 신뢰도 0.82"
     },
     {
       "id": 71,
       "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 관악구 봉천동 358",
       "address": "서울특별시 관악구 봉천동 358",
+      "region": "서울특별시",
       "item_type": "빌라",
       "appraisal_price": 36000,
       "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 34200,
+      "expected_profit": 540,
+      "expected_profit_rate": 1.6,
       "fail_count": 0,
       "bid_date": "2026-05-21~2026-05-23",
-      "risk_level": "high"
+      "days_left": 13,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.593,
+      "recommendation_reason": "차익 540만원 추정 (high 위험)",
+      "warnings": [
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 33,120만원 / 추정시세 34,200만원 / 차익 540만원 / 위험 high / 신뢰도 0.59"
+    },
+    {
+      "id": 70,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 안양시 동안구 33",
+      "address": "경기도 안양시 동안구 33",
+      "region": "경기도",
+      "item_type": "오피스텔",
+      "appraisal_price": 50000,
+      "min_bid_price": 34000,
+      "minimum_price": 34000,
+      "market_price": 35505,
+      "expected_profit": 755,
+      "expected_profit_rate": 2.2,
+      "fail_count": 2,
+      "bid_date": "2026-05-14~2026-05-16",
+      "days_left": 6,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 6.8,
+      "recommendation_grade": "X",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 755만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-6 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 50,000만원 / 최저가 34,000만원 / 추정시세 35,505만원 / 차익 755만원 / 위험 medium / 신뢰도 0.77"
+    },
+    {
+      "id": 69,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "광주광역시 북구 운암동 464",
+      "address": "광주광역시 북구 운암동 464",
+      "region": "광주광역시",
+      "item_type": "아파트",
+      "appraisal_price": 110000,
+      "min_bid_price": 101200,
+      "minimum_price": 101200,
+      "market_price": 67180,
+      "expected_profit": -35670,
+      "expected_profit_rate": -35.2,
+      "fail_count": 0,
+      "bid_date": "2026-05-09~2026-05-11",
+      "days_left": 1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.83,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권",
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-1 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 110,000만원 / 최저가 101,200만원 / 추정시세 67,180만원 / 차익 -35,670만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 68,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 안양시 동안구 371",
+      "address": "경기도 안양시 동안구 371",
+      "region": "경기도",
+      "item_type": "토지",
+      "appraisal_price": 50000,
+      "min_bid_price": 34000,
+      "minimum_price": 34000,
+      "market_price": 47500,
+      "expected_profit": 12750,
+      "expected_profit_rate": 37.5,
+      "fail_count": 2,
+      "bid_date": "2026-05-15~2026-05-17",
+      "days_left": 7,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        }
+      ],
+      "recommendation_score": 25.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.542,
+      "recommendation_reason": "차익 12,750만원 추정 (high 위험)",
+      "warnings": [
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-7 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 50,000만원 / 최저가 34,000만원 / 추정시세 47,500만원 / 차익 12,750만원 / 위험 high / 신뢰도 0.54"
+    },
+    {
+      "id": 67,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 147",
+      "address": "경기도 용인시 수지구 147",
+      "region": "경기도",
+      "item_type": "아파트",
+      "appraisal_price": 110000,
+      "min_bid_price": 101200,
+      "minimum_price": 101200,
+      "market_price": 69625,
+      "expected_profit": -33225,
+      "expected_profit_rate": -32.8,
+      "fail_count": 0,
+      "bid_date": "2026-06-03~2026-06-05",
+      "days_left": 26,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 110,000만원 / 최저가 101,200만원 / 추정시세 69,625만원 / 차익 -33,225만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 66,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 429",
+      "address": "경기도 용인시 수지구 429",
+      "region": "경기도",
+      "item_type": "아파트",
+      "appraisal_price": 12000,
+      "min_bid_price": 11040,
+      "minimum_price": 11040,
+      "market_price": 49254,
+      "expected_profit": 38034,
+      "expected_profit_rate": 344.5,
+      "fail_count": 0,
+      "bid_date": "2026-05-26~2026-05-28",
+      "days_left": 18,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 38,034만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 12,000만원 / 최저가 11,040만원 / 추정시세 49,254만원 / 차익 38,034만원 / 위험 high / 신뢰도 0.77"
+    },
+    {
+      "id": 65,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 276",
+      "address": "서울특별시 강북구 수유동 276",
+      "region": "서울특별시",
+      "item_type": "오피스텔",
+      "appraisal_price": 50000,
+      "min_bid_price": 46000,
+      "minimum_price": 46000,
+      "market_price": 22945,
+      "expected_profit": -23805,
+      "expected_profit_rate": -51.7,
+      "fail_count": 0,
+      "bid_date": "2026-05-18~2026-05-20",
+      "days_left": 10,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.742,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 50,000만원 / 최저가 46,000만원 / 추정시세 22,945만원 / 차익 -23,805만원 / 위험 high / 신뢰도 0.74"
+    },
+    {
+      "id": 64,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "대전광역시 서구 둔산동 64",
+      "address": "대전광역시 서구 둔산동 64",
+      "region": "대전광역시",
+      "item_type": "상가",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 83933,
+      "expected_profit": 61493,
+      "expected_profit_rate": 278.5,
+      "fail_count": 0,
+      "bid_date": "2026-05-12~2026-05-14",
+      "days_left": 4,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 61,493만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권",
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 83,933만원 / 차익 61,493만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 63,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 441",
+      "address": "서울특별시 강북구 수유동 441",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 80000,
+      "min_bid_price": 54400,
+      "minimum_price": 54400,
+      "market_price": 46645,
+      "expected_profit": -8955,
+      "expected_profit_rate": -16.5,
+      "fail_count": 2,
+      "bid_date": "2026-05-14~2026-05-16",
+      "days_left": 6,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "시세 매칭 표본 부족, medium 위험",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-6 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 80,000만원 / 최저가 54,400만원 / 추정시세 46,645만원 / 차익 -8,955만원 / 위험 medium / 신뢰도 0.82"
+    },
+    {
+      "id": 62,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "경기도 용인시 수지구 422",
+      "address": "경기도 용인시 수지구 422",
+      "region": "경기도",
+      "item_type": "빌라",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 21161,
+      "expected_profit": -1279,
+      "expected_profit_rate": -5.8,
+      "fail_count": 0,
+      "bid_date": "2026-05-12~2026-05-14",
+      "days_left": 4,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.78,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권",
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 21,161만원 / 차익 -1,279만원 / 위험 high / 신뢰도 0.78"
+    },
+    {
+      "id": 61,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "광주광역시 북구 운암동 204",
+      "address": "광주광역시 북구 운암동 204",
+      "region": "광주광역시",
+      "item_type": "상가",
+      "appraisal_price": 36000,
+      "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 161195,
+      "expected_profit": 131855,
+      "expected_profit_rate": 457.8,
+      "fail_count": 1,
+      "bid_date": "2026-05-09~2026-05-11",
+      "days_left": 1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.755,
+      "recommendation_reason": "차익 131,855만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권",
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-1 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 28,800만원 / 추정시세 161,195만원 / 차익 131,855만원 / 위험 high / 신뢰도 0.76"
+    },
+    {
+      "id": 60,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "대전광역시 서구 둔산동 48",
+      "address": "대전광역시 서구 둔산동 48",
+      "region": "대전광역시",
+      "item_type": "빌라",
+      "appraisal_price": 150000,
+      "min_bid_price": 102000,
+      "minimum_price": 102000,
+      "market_price": 17502,
+      "expected_profit": -86748,
+      "expected_profit_rate": -85.0,
+      "fail_count": 2,
+      "bid_date": "2026-05-18~2026-05-20",
+      "days_left": 10,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 150,000만원 / 최저가 102,000만원 / 추정시세 17,502만원 / 차익 -86,748만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 59,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "광주광역시 북구 운암동 377",
+      "address": "광주광역시 북구 운암동 377",
+      "region": "광주광역시",
+      "item_type": "아파트",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 124479,
+      "expected_profit": 102159,
+      "expected_profit_rate": 462.7,
+      "fail_count": 0,
+      "bid_date": "2026-05-22~2026-05-24",
+      "days_left": 14,
+      "risk_level": "low",
+      "risk_flags": [
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 79.0,
+      "recommendation_grade": "A",
+      "confidence_score": 0.692,
+      "recommendation_reason": "차익 102,159만원 추정 + 위험 낮음",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 22,080만원 / 추정시세 124,479만원 / 차익 102,159만원 / 위험 low / 신뢰도 0.69"
+    },
+    {
+      "id": 58,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "인천광역시 남동구 구월동 294",
+      "address": "인천광역시 남동구 구월동 294",
+      "region": "인천광역시",
+      "item_type": "오피스텔",
+      "appraisal_price": 110000,
+      "min_bid_price": 101200,
+      "minimum_price": 101200,
+      "market_price": 33938,
+      "expected_profit": -68912,
+      "expected_profit_rate": -68.1,
+      "fail_count": 0,
+      "bid_date": "2026-06-03~2026-06-05",
+      "days_left": 26,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.83,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 110,000만원 / 최저가 101,200만원 / 추정시세 33,938만원 / 차익 -68,912만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 57,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "대구광역시 수성구 범어동 367",
+      "address": "대구광역시 수성구 범어동 367",
+      "region": "대구광역시",
+      "item_type": "아파트",
+      "appraisal_price": 36000,
+      "min_bid_price": 33120,
+      "minimum_price": 33120,
+      "market_price": 49770,
+      "expected_profit": 16110,
+      "expected_profit_rate": 48.6,
+      "fail_count": 0,
+      "bid_date": "2026-05-11~2026-05-13",
+      "days_left": 3,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 43.9,
+      "recommendation_grade": "D",
+      "confidence_score": 0.805,
+      "recommendation_reason": "차익 16,110만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-3 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 36,000만원 / 최저가 33,120만원 / 추정시세 49,770만원 / 차익 16,110만원 / 위험 medium / 신뢰도 0.81"
+    },
+    {
+      "id": 56,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 영등포구 여의도동 449",
+      "address": "서울특별시 영등포구 여의도동 449",
+      "region": "서울특별시",
+      "item_type": "오피스텔",
+      "appraisal_price": 150000,
+      "min_bid_price": 138000,
+      "minimum_price": 138000,
+      "market_price": 22209,
+      "expected_profit": -117291,
+      "expected_profit_rate": -85.0,
+      "fail_count": 0,
+      "bid_date": "2026-05-10~2026-05-12",
+      "days_left": 2,
+      "risk_level": "low",
+      "risk_flags": [],
+      "recommendation_score": 15.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.443,
+      "recommendation_reason": "시세 매칭 표본 부족, low 위험",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-2 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 150,000만원 / 최저가 138,000만원 / 추정시세 22,209만원 / 차익 -117,291만원 / 위험 low / 신뢰도 0.44"
+    },
+    {
+      "id": 55,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "광주광역시 북구 운암동 461",
+      "address": "광주광역시 북구 운암동 461",
+      "region": "광주광역시",
+      "item_type": "아파트",
+      "appraisal_price": 12000,
+      "min_bid_price": 8160,
+      "minimum_price": 8160,
+      "market_price": 71704,
+      "expected_profit": 63364,
+      "expected_profit_rate": 776.5,
+      "fail_count": 2,
+      "bid_date": "2026-06-03~2026-06-05",
+      "days_left": 26,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.653,
+      "recommendation_reason": "차익 63,364만원 추정 (high 위험)",
+      "warnings": [
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 12,000만원 / 최저가 8,160만원 / 추정시세 71,704만원 / 차익 63,364만원 / 위험 high / 신뢰도 0.65"
+    },
+    {
+      "id": 54,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "부산광역시 남구 대연동 430",
+      "address": "부산광역시 남구 대연동 430",
+      "region": "부산광역시",
+      "item_type": "아파트",
+      "appraisal_price": 12000,
+      "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 126132,
+      "expected_profit": 116412,
+      "expected_profit_rate": 1212.6,
+      "fail_count": 1,
+      "bid_date": "2026-05-12~2026-05-14",
+      "days_left": 4,
+      "risk_level": "low",
+      "risk_flags": [],
+      "recommendation_score": 79.0,
+      "recommendation_grade": "A",
+      "confidence_score": 0.532,
+      "recommendation_reason": "차익 116,412만원 추정 + 위험 낮음",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 12,000만원 / 최저가 9,600만원 / 추정시세 126,132만원 / 차익 116,412만원 / 위험 low / 신뢰도 0.53"
+    },
+    {
+      "id": 53,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 영등포구 여의도동 396",
+      "address": "서울특별시 영등포구 여의도동 396",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 24000,
+      "min_bid_price": 19200,
+      "minimum_price": 19200,
+      "market_price": 52422,
+      "expected_profit": 32862,
+      "expected_profit_rate": 171.2,
+      "fail_count": 1,
+      "bid_date": "2026-05-17~2026-05-19",
+      "days_left": 9,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 56.47,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "점수 56.5 (C등급) · 선호 매칭: 선호 유형 일치",
+      "warnings": [],
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 24,000만원 / 최저가 19,200만원 / 추정시세 52,422만원 / 차익 32,862만원 / 위험 medium / 신뢰도 0.83"
+    },
+    {
+      "id": 52,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "대구광역시 수성구 범어동 202",
+      "address": "대구광역시 수성구 범어동 202",
+      "region": "대구광역시",
+      "item_type": "상가",
+      "appraisal_price": 80000,
+      "min_bid_price": 73600,
+      "minimum_price": 73600,
+      "market_price": 161431,
+      "expected_profit": 86631,
+      "expected_profit_rate": 117.7,
+      "fail_count": 0,
+      "bid_date": "2026-05-30~2026-06-01",
+      "days_left": 22,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 86,631만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 80,000만원 / 최저가 73,600만원 / 추정시세 161,431만원 / 차익 86,631만원 / 위험 high / 신뢰도 0.82"
+    },
+    {
+      "id": 51,
+      "source": "public_sale",
+      "case_no": null,
+      "title": "서울특별시 강북구 수유동 344",
+      "address": "서울특별시 강북구 수유동 344",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 110000,
+      "min_bid_price": 88000,
+      "minimum_price": 88000,
+      "market_price": 28606,
+      "expected_profit": -61044,
+      "expected_profit_rate": -69.4,
+      "fail_count": 1,
+      "bid_date": "2026-05-07~2026-05-09",
+      "days_left": -1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.88,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "대항력",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "입찰기간 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 110,000만원 / 최저가 88,000만원 / 추정시세 28,606만원 / 차익 -61,044만원 / 위험 high / 신뢰도 0.88"
+    },
+    {
+      "id": 50,
+      "source": "auction",
+      "case_no": "2023타경76317",
+      "title": "경기도 수원시 매탄동 664-22",
+      "address": "경기도 수원시 매탄동 664-22",
+      "region": "경기도",
+      "item_type": "토지",
+      "appraisal_price": 120000,
+      "min_bid_price": 92400,
+      "minimum_price": 92400,
+      "market_price": 31989,
+      "expected_profit": -62211,
+      "expected_profit_rate": -67.3,
+      "fail_count": 1,
+      "bid_date": "2026-05-28",
+      "days_left": 20,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 120,000만원 / 최저가 92,400만원 / 추정시세 31,989만원 / 차익 -62,211만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 49,
+      "source": "auction",
+      "case_no": "2025타경41830",
+      "title": "경기도 성남시 정자동 105-45",
+      "address": "경기도 성남시 정자동 105-45",
+      "region": "경기도",
+      "item_type": "오피스텔",
+      "appraisal_price": 22000,
+      "min_bid_price": 16940,
+      "minimum_price": 16940,
+      "market_price": 37011,
+      "expected_profit": 19741,
+      "expected_profit_rate": 116.5,
+      "fail_count": 1,
+      "bid_date": "2026-06-10",
+      "days_left": 33,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.653,
+      "recommendation_reason": "차익 19,741만원 추정 (high 위험)",
+      "warnings": [
+        "유치권",
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 22,000만원 / 최저가 16,940만원 / 추정시세 37,011만원 / 차익 19,741만원 / 위험 high / 신뢰도 0.65"
+    },
+    {
+      "id": 48,
+      "source": "auction",
+      "case_no": "2025타경25012",
+      "title": "서울특별시 성동구 성수동 797-11",
+      "address": "서울특별시 성동구 성수동 797-11",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 30000,
+      "min_bid_price": 23100,
+      "minimum_price": 23100,
+      "market_price": 23008,
+      "expected_profit": -542,
+      "expected_profit_rate": -2.3,
+      "fail_count": 1,
+      "bid_date": "2026-06-17",
+      "days_left": 40,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.755,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 30,000만원 / 최저가 23,100만원 / 추정시세 23,008만원 / 차익 -542만원 / 위험 high / 신뢰도 0.76"
+    },
+    {
+      "id": 47,
+      "source": "auction",
+      "case_no": "2023타경12671",
+      "title": "대전광역시 유성구 관평동 637-10",
+      "address": "대전광역시 유성구 관평동 637-10",
+      "region": "대전광역시",
+      "item_type": "아파트",
+      "appraisal_price": 15000,
+      "min_bid_price": 8250,
+      "minimum_price": 8250,
+      "market_price": 54722,
+      "expected_profit": 46247,
+      "expected_profit_rate": 560.6,
+      "fail_count": 3,
+      "bid_date": "2026-05-18",
+      "days_left": 10,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.88,
+      "recommendation_reason": "차익 46,247만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 8,250만원 / 추정시세 54,722만원 / 차익 46,247만원 / 위험 high / 신뢰도 0.88"
+    },
+    {
+      "id": 46,
+      "source": "auction",
+      "case_no": "2024타경43065",
+      "title": "경기도 수원시 매탄동 855-6",
+      "address": "경기도 수원시 매탄동 855-6",
+      "region": "경기도",
+      "item_type": "상가",
+      "appraisal_price": 65000,
+      "min_bid_price": 41600,
+      "minimum_price": 41600,
+      "market_price": 80973,
+      "expected_profit": 38398,
+      "expected_profit_rate": 92.3,
+      "fail_count": 2,
+      "bid_date": "2026-05-19",
+      "days_left": 11,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.755,
+      "recommendation_reason": "차익 38,398만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 65,000만원 / 최저가 41,600만원 / 추정시세 80,973만원 / 차익 38,398만원 / 위험 high / 신뢰도 0.76"
+    },
+    {
+      "id": 45,
+      "source": "auction",
+      "case_no": "2024타경27786",
+      "title": "서울특별시 강남구 역삼동 888-30",
+      "address": "서울특별시 강남구 역삼동 888-30",
+      "region": "서울특별시",
+      "item_type": "상가",
+      "appraisal_price": 15000,
+      "min_bid_price": 13500,
+      "minimum_price": 13500,
+      "market_price": 81593,
+      "expected_profit": 67868,
+      "expected_profit_rate": 502.7,
+      "fail_count": 0,
+      "bid_date": "2026-06-03",
+      "days_left": 26,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 67,868만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 13,500만원 / 추정시세 81,593만원 / 차익 67,868만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 44,
+      "source": "auction",
+      "case_no": "2023타경60968",
+      "title": "경기도 고양시 행신동 345-43",
+      "address": "경기도 고양시 행신동 345-43",
+      "region": "경기도",
+      "item_type": "오피스텔",
+      "appraisal_price": 65000,
+      "min_bid_price": 50050,
+      "minimum_price": 50050,
+      "market_price": 45225,
+      "expected_profit": -5800,
+      "expected_profit_rate": -11.6,
+      "fail_count": 1,
+      "bid_date": "2026-06-13",
+      "days_left": 36,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.768,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 65,000만원 / 최저가 50,050만원 / 추정시세 45,225만원 / 차익 -5,800만원 / 위험 high / 신뢰도 0.77"
+    },
+    {
+      "id": 43,
+      "source": "auction",
+      "case_no": "2024타경49139",
+      "title": "부산광역시 해운대구 우동 772-25",
+      "address": "부산광역시 해운대구 우동 772-25",
+      "region": "부산광역시",
+      "item_type": "상가",
+      "appraisal_price": 180000,
+      "min_bid_price": 162000,
+      "minimum_price": 162000,
+      "market_price": 112108,
+      "expected_profit": -52592,
+      "expected_profit_rate": -32.5,
+      "fail_count": 0,
+      "bid_date": "2026-06-12",
+      "days_left": 35,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.768,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "위반건축물 등재 사실 + 시정명령 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 180,000만원 / 최저가 162,000만원 / 추정시세 112,108만원 / 차익 -52,592만원 / 위험 high / 신뢰도 0.77"
+    },
+    {
+      "id": 42,
+      "source": "auction",
+      "case_no": "2024타경53369",
+      "title": "경기도 성남시 정자동 556-30",
+      "address": "경기도 성남시 정자동 556-30",
+      "region": "경기도",
+      "item_type": "오피스텔",
+      "appraisal_price": 45000,
+      "min_bid_price": 40500,
+      "minimum_price": 40500,
+      "market_price": 42750,
+      "expected_profit": 1575,
+      "expected_profit_rate": 3.9,
+      "fail_count": 0,
+      "bid_date": "2026-06-11",
+      "days_left": 34,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.605,
+      "recommendation_reason": "차익 1,575만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 40,500만원 / 추정시세 42,750만원 / 차익 1,575만원 / 위험 high / 신뢰도 0.60"
+    },
+    {
+      "id": 41,
+      "source": "auction",
+      "case_no": "2025타경47450",
+      "title": "경기도 고양시 행신동 241-18",
+      "address": "경기도 고양시 행신동 241-18",
+      "region": "경기도",
+      "item_type": "오피스텔",
+      "appraisal_price": 65000,
+      "min_bid_price": 50050,
+      "minimum_price": 50050,
+      "market_price": 47920,
+      "expected_profit": -3105,
+      "expected_profit_rate": -6.2,
+      "fail_count": 1,
+      "bid_date": "2026-05-14",
+      "days_left": 6,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.692,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "입찰기일 D-6 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 65,000만원 / 최저가 50,050만원 / 추정시세 47,920만원 / 차익 -3,105만원 / 위험 high / 신뢰도 0.69"
+    },
+    {
+      "id": 40,
+      "source": "auction",
+      "case_no": "2025타경68446",
+      "title": "부산광역시 해운대구 우동 919-11",
+      "address": "부산광역시 해운대구 우동 919-11",
+      "region": "부산광역시",
+      "item_type": "토지",
+      "appraisal_price": 120000,
+      "min_bid_price": 76800,
+      "minimum_price": 76800,
+      "market_price": 59568,
+      "expected_profit": -19032,
+      "expected_profit_rate": -24.8,
+      "fail_count": 2,
+      "bid_date": "2026-05-22",
+      "days_left": 14,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "유치권",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 120,000만원 / 최저가 76,800만원 / 추정시세 59,568만원 / 차익 -19,032만원 / 위험 high / 신뢰도 0.82"
+    },
+    {
+      "id": 39,
+      "source": "auction",
+      "case_no": "2023타경25906",
+      "title": "서울특별시 노원구 상계동 468-9",
+      "address": "서울특별시 노원구 상계동 468-9",
+      "region": "서울특별시",
+      "item_type": "토지",
+      "appraisal_price": 180000,
+      "min_bid_price": 162000,
+      "minimum_price": 162000,
+      "market_price": 171000,
+      "expected_profit": 6300,
+      "expected_profit_rate": 3.9,
+      "fail_count": 0,
+      "bid_date": "2026-05-25",
+      "days_left": 17,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.542,
+      "recommendation_reason": "차익 6,300만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 180,000만원 / 최저가 162,000만원 / 추정시세 171,000만원 / 차익 6,300만원 / 위험 high / 신뢰도 0.54"
+    },
+    {
+      "id": 38,
+      "source": "auction",
+      "case_no": "2024타경74799",
+      "title": "경기도 성남시 정자동 410-16",
+      "address": "경기도 성남시 정자동 410-16",
+      "region": "경기도",
+      "item_type": "토지",
+      "appraisal_price": 45000,
+      "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 32037,
+      "expected_profit": 2562,
+      "expected_profit_rate": 8.9,
+      "fail_count": 2,
+      "bid_date": "2026-06-01",
+      "days_left": 24,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.88,
+      "recommendation_reason": "차익 2,562만원 추정 (high 위험)",
+      "warnings": [
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 28,800만원 / 추정시세 32,037만원 / 차익 2,562만원 / 위험 high / 신뢰도 0.88"
+    },
+    {
+      "id": 37,
+      "source": "auction",
+      "case_no": "2023타경36100",
+      "title": "경기도 수원시 매탄동 151-2",
+      "address": "경기도 수원시 매탄동 151-2",
+      "region": "경기도",
+      "item_type": "아파트",
+      "appraisal_price": 45000,
+      "min_bid_price": 34650,
+      "minimum_price": 34650,
+      "market_price": 71365,
+      "expected_profit": 36040,
+      "expected_profit_rate": 104.0,
+      "fail_count": 1,
+      "bid_date": "2026-05-09",
+      "days_left": 1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 36,040만원 추정 (high 위험)",
+      "warnings": [
+        "유치권",
+        "공유지분",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "입찰기일 D-1 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 34,650만원 / 추정시세 71,365만원 / 차익 36,040만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 36,
+      "source": "auction",
+      "case_no": "2025타경72021",
+      "title": "경기도 고양시 행신동 813-48",
+      "address": "경기도 고양시 행신동 813-48",
+      "region": "경기도",
+      "item_type": "상가",
+      "appraisal_price": 180000,
+      "min_bid_price": 138600,
+      "minimum_price": 138600,
+      "market_price": 104349,
+      "expected_profit": -36951,
+      "expected_profit_rate": -26.7,
+      "fail_count": 1,
+      "bid_date": "2026-06-14",
+      "days_left": 37,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.692,
+      "recommendation_reason": "시세 매칭 표본 부족, medium 위험",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 180,000만원 / 최저가 138,600만원 / 추정시세 104,349만원 / 차익 -36,951만원 / 위험 medium / 신뢰도 0.69"
+    },
+    {
+      "id": 35,
+      "source": "auction",
+      "case_no": "2024타경63225",
+      "title": "경기도 성남시 정자동 562-1",
+      "address": "경기도 성남시 정자동 562-1",
+      "region": "경기도",
+      "item_type": "상가",
+      "appraisal_price": 30000,
+      "min_bid_price": 23100,
+      "minimum_price": 23100,
+      "market_price": 140410,
+      "expected_profit": 116860,
+      "expected_profit_rate": 505.9,
+      "fail_count": 1,
+      "bid_date": "2026-06-15",
+      "days_left": 38,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.805,
+      "recommendation_reason": "차익 116,860만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 30,000만원 / 최저가 23,100만원 / 추정시세 140,410만원 / 차익 116,860만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 34,
+      "source": "auction",
+      "case_no": "2023타경49363",
+      "title": "대전광역시 유성구 관평동 520-20",
+      "address": "대전광역시 유성구 관평동 520-20",
+      "region": "대전광역시",
+      "item_type": "빌라",
+      "appraisal_price": 85000,
+      "min_bid_price": 65450,
+      "minimum_price": 65450,
+      "market_price": 17379,
+      "expected_profit": -49346,
+      "expected_profit_rate": -75.4,
+      "fail_count": 1,
+      "bid_date": "2026-05-13",
+      "days_left": 5,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.83,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "입찰기일 D-5 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 85,000만원 / 최저가 65,450만원 / 추정시세 17,379만원 / 차익 -49,346만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 33,
+      "source": "auction",
+      "case_no": "2025타경67154",
+      "title": "서울특별시 마포구 망원동 2-34",
+      "address": "서울특별시 마포구 망원동 2-34",
+      "region": "서울특별시",
+      "item_type": "상가",
+      "appraisal_price": 45000,
+      "min_bid_price": 40500,
+      "minimum_price": 40500,
+      "market_price": 76446,
+      "expected_profit": 35271,
+      "expected_profit_rate": 87.1,
+      "fail_count": 0,
+      "bid_date": "2026-06-01",
+      "days_left": 24,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.692,
+      "recommendation_reason": "차익 35,271만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 40,500만원 / 추정시세 76,446만원 / 차익 35,271만원 / 위험 medium / 신뢰도 0.69"
+    },
+    {
+      "id": 32,
+      "source": "auction",
+      "case_no": "2024타경15014",
+      "title": "서울특별시 강남구 역삼동 112-39",
+      "address": "서울특별시 강남구 역삼동 112-39",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 65000,
+      "min_bid_price": 58500,
+      "minimum_price": 58500,
+      "market_price": 72766,
+      "expected_profit": 13291,
+      "expected_profit_rate": 22.7,
+      "fail_count": 0,
+      "bid_date": "2026-06-12",
+      "days_left": 35,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 13.2,
+      "recommendation_grade": "X",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 13,291만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 65,000만원 / 최저가 58,500만원 / 추정시세 72,766만원 / 차익 13,291만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 31,
+      "source": "auction",
+      "case_no": "2024타경19099",
+      "title": "서울특별시 송파구 잠실동 991-50",
+      "address": "서울특별시 송파구 잠실동 991-50",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 45000,
+      "min_bid_price": 34650,
+      "minimum_price": 34650,
+      "market_price": 42750,
+      "expected_profit": 7425,
+      "expected_profit_rate": 21.4,
+      "fail_count": 1,
+      "bid_date": "2026-06-08",
+      "days_left": 31,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 12.1,
+      "recommendation_grade": "X",
+      "confidence_score": 0.542,
+      "recommendation_reason": "차익 7,425만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 34,650만원 / 추정시세 42,750만원 / 차익 7,425만원 / 위험 high / 신뢰도 0.54"
+    },
+    {
+      "id": 30,
+      "source": "auction",
+      "case_no": "2025타경24168",
+      "title": "경기도 수원시 매탄동 392-3",
+      "address": "경기도 수원시 매탄동 392-3",
+      "region": "경기도",
+      "item_type": "상가",
+      "appraisal_price": 45000,
+      "min_bid_price": 40500,
+      "minimum_price": 40500,
+      "market_price": 168034,
+      "expected_profit": 126859,
+      "expected_profit_rate": 313.2,
+      "fail_count": 0,
+      "bid_date": "2026-05-24",
+      "days_left": 16,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.88,
+      "recommendation_reason": "차익 126,859만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권",
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 40,500만원 / 추정시세 168,034만원 / 차익 126,859만원 / 위험 high / 신뢰도 0.88"
+    },
+    {
+      "id": 29,
+      "source": "auction",
+      "case_no": "2024타경91351",
+      "title": "대전광역시 유성구 관평동 768-10",
+      "address": "대전광역시 유성구 관평동 768-10",
+      "region": "대전광역시",
+      "item_type": "아파트",
+      "appraisal_price": 85000,
+      "min_bid_price": 54400,
+      "minimum_price": 54400,
+      "market_price": 117095,
+      "expected_profit": 61420,
+      "expected_profit_rate": 112.9,
+      "fail_count": 2,
+      "bid_date": "2026-05-06",
+      "days_left": -2,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 61,420만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "입찰기일 D-0 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 85,000만원 / 최저가 54,400만원 / 추정시세 117,095만원 / 차익 61,420만원 / 위험 medium / 신뢰도 0.83"
+    },
+    {
+      "id": 28,
+      "source": "auction",
+      "case_no": "2025타경82420",
+      "title": "서울특별시 노원구 상계동 152-28",
+      "address": "서울특별시 노원구 상계동 152-28",
+      "region": "서울특별시",
+      "item_type": "토지",
+      "appraisal_price": 15000,
+      "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 14250,
+      "expected_profit": 4425,
+      "expected_profit_rate": 46.1,
+      "fail_count": 2,
+      "bid_date": "2026-05-18",
+      "days_left": 10,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 31.9,
+      "recommendation_grade": "D",
+      "confidence_score": 0.605,
+      "recommendation_reason": "차익 4,425만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 9,600만원 / 추정시세 14,250만원 / 차익 4,425만원 / 위험 high / 신뢰도 0.60"
+    },
+    {
+      "id": 27,
+      "source": "auction",
+      "case_no": "2023타경93507",
+      "title": "서울특별시 성동구 성수동 269-11",
+      "address": "서울특별시 성동구 성수동 269-11",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 15000,
+      "min_bid_price": 11550,
+      "minimum_price": 11550,
+      "market_price": 14250,
+      "expected_profit": 2475,
+      "expected_profit_rate": 21.4,
+      "fail_count": 1,
+      "bid_date": "2026-05-12",
+      "days_left": 4,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 12.1,
+      "recommendation_grade": "X",
+      "confidence_score": 0.593,
+      "recommendation_reason": "차익 2,475만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 11,550만원 / 추정시세 14,250만원 / 차익 2,475만원 / 위험 high / 신뢰도 0.59"
+    },
+    {
+      "id": 26,
+      "source": "auction",
+      "case_no": "2023타경93130",
+      "title": "서울특별시 성동구 성수동 874-17",
+      "address": "서울특별시 성동구 성수동 874-17",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 45000,
+      "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 31076,
+      "expected_profit": 1601,
+      "expected_profit_rate": 5.6,
+      "fail_count": 2,
+      "bid_date": "2026-06-14",
+      "days_left": 37,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.855,
+      "recommendation_reason": "차익 1,601만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 28,800만원 / 추정시세 31,076만원 / 차익 1,601만원 / 위험 high / 신뢰도 0.85"
+    },
+    {
+      "id": 25,
+      "source": "auction",
+      "case_no": "2025타경49240",
+      "title": "대전광역시 유성구 관평동 955-43",
+      "address": "대전광역시 유성구 관평동 955-43",
+      "region": "대전광역시",
+      "item_type": "토지",
+      "appraisal_price": 15000,
+      "min_bid_price": 11550,
+      "minimum_price": 11550,
+      "market_price": 9989,
+      "expected_profit": -1786,
+      "expected_profit_rate": -15.5,
+      "fail_count": 1,
+      "bid_date": "2026-06-09",
+      "days_left": 32,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "선순위임차인",
+        "대항력",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 11,550만원 / 추정시세 9,989만원 / 차익 -1,786만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 24,
+      "source": "auction",
+      "case_no": "2024타경19016",
+      "title": "서울특별시 송파구 잠실동 901-16",
+      "address": "서울특별시 송파구 잠실동 901-16",
+      "region": "서울특별시",
+      "item_type": "토지",
+      "appraisal_price": 65000,
+      "min_bid_price": 58500,
+      "minimum_price": 58500,
+      "market_price": 61537,
+      "expected_profit": 2062,
+      "expected_profit_rate": 3.5,
+      "fail_count": 0,
+      "bid_date": "2026-05-24",
+      "days_left": 16,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "공유지분",
+          "flag_type": "지분매각",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "지분 매각 - 단독 처분 제약 가능성"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.855,
+      "recommendation_reason": "차익 2,062만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력",
+        "공유지분"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 65,000만원 / 최저가 58,500만원 / 추정시세 61,537만원 / 차익 2,062만원 / 위험 high / 신뢰도 0.85"
+    },
+    {
+      "id": 23,
+      "source": "auction",
+      "case_no": "2025타경49321",
+      "title": "서울특별시 송파구 잠실동 469-21",
+      "address": "서울특별시 송파구 잠실동 469-21",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 120000,
+      "min_bid_price": 108000,
+      "minimum_price": 108000,
+      "market_price": 18413,
+      "expected_profit": -91387,
+      "expected_profit_rate": -84.6,
+      "fail_count": 0,
+      "bid_date": "2026-05-09",
+      "days_left": 1,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "입찰기일 D-1 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 120,000만원 / 최저가 108,000만원 / 추정시세 18,413만원 / 차익 -91,387만원 / 위험 high / 신뢰도 0.82"
+    },
+    {
+      "id": 22,
+      "source": "auction",
+      "case_no": "2024타경96163",
+      "title": "서울특별시 송파구 잠실동 598-37",
+      "address": "서울특별시 송파구 잠실동 598-37",
+      "region": "서울특별시",
+      "item_type": "토지",
+      "appraisal_price": 15000,
+      "min_bid_price": 11550,
+      "minimum_price": 11550,
+      "market_price": 60257,
+      "expected_profit": 48482,
+      "expected_profit_rate": 419.8,
+      "fail_count": 1,
+      "bid_date": "2026-06-19",
+      "days_left": 42,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.855,
+      "recommendation_reason": "차익 48,482만원 추정 (high 위험)",
+      "warnings": [
+        "유치권",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인",
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 11,550만원 / 추정시세 60,257만원 / 차익 48,482만원 / 위험 high / 신뢰도 0.85"
+    },
+    {
+      "id": 21,
+      "source": "auction",
+      "case_no": "2025타경20500",
+      "title": "인천광역시 연수구 송도동 872-12",
+      "address": "인천광역시 연수구 송도동 872-12",
+      "region": "인천광역시",
+      "item_type": "토지",
+      "appraisal_price": 30000,
+      "min_bid_price": 27000,
+      "minimum_price": 27000,
+      "market_price": 10080,
+      "expected_profit": -17370,
+      "expected_profit_rate": -64.3,
+      "fail_count": 0,
+      "bid_date": "2026-05-12",
+      "days_left": 4,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "시세 매칭 표본 부족, medium 위험",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "입찰기일 D-4 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "위반건축물 등재 사실 + 시정명령 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 30,000만원 / 최저가 27,000만원 / 추정시세 10,080만원 / 차익 -17,370만원 / 위험 medium / 신뢰도 0.82"
+    },
+    {
+      "id": 20,
+      "source": "auction",
+      "case_no": "2023타경17665",
+      "title": "대전광역시 유성구 관평동 594-48",
+      "address": "대전광역시 유성구 관평동 594-48",
+      "region": "대전광역시",
+      "item_type": "상가",
+      "appraisal_price": 30000,
+      "min_bid_price": 27000,
+      "minimum_price": 27000,
+      "market_price": 160575,
+      "expected_profit": 133125,
+      "expected_profit_rate": 493.1,
+      "fail_count": 0,
+      "bid_date": "2026-06-11",
+      "days_left": 34,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 133,125만원 추정 (high 위험)",
+      "warnings": [
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 30,000만원 / 최저가 27,000만원 / 추정시세 160,575만원 / 차익 133,125만원 / 위험 high / 신뢰도 0.77"
+    },
+    {
+      "id": 19,
+      "source": "auction",
+      "case_no": "2024타경17685",
+      "title": "경기도 성남시 정자동 169-25",
+      "address": "경기도 성남시 정자동 169-25",
+      "region": "경기도",
+      "item_type": "상가",
+      "appraisal_price": 180000,
+      "min_bid_price": 162000,
+      "minimum_price": 162000,
+      "market_price": 109092,
+      "expected_profit": -54708,
+      "expected_profit_rate": -33.8,
+      "fail_count": 0,
+      "bid_date": "2026-06-01",
+      "days_left": 24,
+      "risk_level": "low",
+      "risk_flags": [],
+      "recommendation_score": 15.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.532,
+      "recommendation_reason": "시세 매칭 표본 부족, low 위험",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 180,000만원 / 최저가 162,000만원 / 추정시세 109,092만원 / 차익 -54,708만원 / 위험 low / 신뢰도 0.53"
+    },
+    {
+      "id": 18,
+      "source": "auction",
+      "case_no": "2025타경22833",
+      "title": "서울특별시 송파구 잠실동 52-42",
+      "address": "서울특별시 송파구 잠실동 52-42",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 180000,
+      "min_bid_price": 115200,
+      "minimum_price": 115200,
+      "market_price": 55777,
+      "expected_profit": -62123,
+      "expected_profit_rate": -53.9,
+      "fail_count": 2,
+      "bid_date": "2026-05-20",
+      "days_left": 12,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.83,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 180,000만원 / 최저가 115,200만원 / 추정시세 55,777만원 / 차익 -62,123만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 17,
+      "source": "auction",
+      "case_no": "2024타경24322",
+      "title": "대전광역시 유성구 관평동 255-13",
+      "address": "대전광역시 유성구 관평동 255-13",
+      "region": "대전광역시",
+      "item_type": "아파트",
+      "appraisal_price": 15000,
+      "min_bid_price": 11550,
+      "minimum_price": 11550,
+      "market_price": 95465,
+      "expected_profit": 83690,
+      "expected_profit_rate": 724.6,
+      "fail_count": 1,
+      "bid_date": "2026-05-22",
+      "days_left": 14,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 83,690만원 추정 (high 위험)",
+      "warnings": [
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 11,550만원 / 추정시세 95,465만원 / 차익 83,690만원 / 위험 high / 신뢰도 0.82"
+    },
+    {
+      "id": 16,
+      "source": "auction",
+      "case_no": "2024타경63354",
+      "title": "인천광역시 연수구 송도동 195-7",
+      "address": "인천광역시 연수구 송도동 195-7",
+      "region": "인천광역시",
+      "item_type": "오피스텔",
+      "appraisal_price": 180000,
+      "min_bid_price": 162000,
+      "minimum_price": 162000,
+      "market_price": 26533,
+      "expected_profit": -137267,
+      "expected_profit_rate": -84.7,
+      "fail_count": 0,
+      "bid_date": "2026-06-03",
+      "days_left": 26,
+      "risk_level": "low",
+      "risk_flags": [],
+      "recommendation_score": 15.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.607,
+      "recommendation_reason": "시세 매칭 표본 부족, low 위험",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "등기부등본 최신본 확인",
+        "현장조사 1회"
+      ],
+      "detail_summary": "감정가 180,000만원 / 최저가 162,000만원 / 추정시세 26,533만원 / 차익 -137,267만원 / 위험 low / 신뢰도 0.61"
+    },
+    {
+      "id": 15,
+      "source": "auction",
+      "case_no": "2023타경40007",
+      "title": "서울특별시 송파구 잠실동 70-3",
+      "address": "서울특별시 송파구 잠실동 70-3",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 22000,
+      "min_bid_price": 14080,
+      "minimum_price": 14080,
+      "market_price": 45101,
+      "expected_profit": 30691,
+      "expected_profit_rate": 218.0,
+      "fail_count": 2,
+      "bid_date": "2026-06-05",
+      "days_left": 28,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 30,691만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 22,000만원 / 최저가 14,080만원 / 추정시세 45,101만원 / 차익 30,691만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 14,
+      "source": "auction",
+      "case_no": "2025타경69177",
+      "title": "서울특별시 성동구 성수동 124-16",
+      "address": "서울특별시 성동구 성수동 124-16",
+      "region": "서울특별시",
+      "item_type": "상가",
+      "appraisal_price": 85000,
+      "min_bid_price": 65450,
+      "minimum_price": 65450,
+      "market_price": 79477,
+      "expected_profit": 12752,
+      "expected_profit_rate": 19.5,
+      "fail_count": 1,
+      "bid_date": "2026-05-19",
+      "days_left": 11,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 10.6,
+      "recommendation_grade": "X",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 12,752만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인",
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 85,000만원 / 최저가 65,450만원 / 추정시세 79,477만원 / 차익 12,752만원 / 위험 high / 신뢰도 0.82"
+    },
+    {
+      "id": 13,
+      "source": "auction",
+      "case_no": "2024타경82063",
+      "title": "서울특별시 마포구 망원동 170-17",
+      "address": "서울특별시 마포구 망원동 170-17",
+      "region": "서울특별시",
+      "item_type": "토지",
+      "appraisal_price": 30000,
+      "min_bid_price": 27000,
+      "minimum_price": 27000,
+      "market_price": 52667,
+      "expected_profit": 25217,
+      "expected_profit_rate": 93.4,
+      "fail_count": 0,
+      "bid_date": "2026-06-22",
+      "days_left": 45,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "농지취득자격증명",
+          "flag_type": "농지취득자격증명",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "농지취득자격증명 필요 - 자격 충족 여부 확인 필요"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.752,
+      "recommendation_reason": "차익 25,217만원 추정 (high 위험)",
+      "warnings": [
+        "농지취득자격증명"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인",
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 30,000만원 / 최저가 27,000만원 / 추정시세 52,667만원 / 차익 25,217만원 / 위험 high / 신뢰도 0.75"
+    },
+    {
+      "id": 12,
+      "source": "auction",
+      "case_no": "2024타경12552",
+      "title": "인천광역시 연수구 송도동 115-24",
+      "address": "인천광역시 연수구 송도동 115-24",
+      "region": "인천광역시",
+      "item_type": "토지",
+      "appraisal_price": 15000,
+      "min_bid_price": 11550,
+      "minimum_price": 11550,
+      "market_price": 31306,
+      "expected_profit": 19531,
+      "expected_profit_rate": 169.1,
+      "fail_count": 1,
+      "bid_date": "2026-05-10",
+      "days_left": 2,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.88,
+      "recommendation_reason": "차익 19,531만원 추정 (high 위험)",
+      "warnings": [
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "입찰기일 D-2 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "위반건축물 등재 사실 + 시정명령 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 11,550만원 / 추정시세 31,306만원 / 차익 19,531만원 / 위험 high / 신뢰도 0.88"
+    },
+    {
+      "id": 11,
+      "source": "auction",
+      "case_no": "2023타경76542",
+      "title": "경기도 고양시 행신동 935-7",
+      "address": "경기도 고양시 행신동 935-7",
+      "region": "경기도",
+      "item_type": "아파트",
+      "appraisal_price": 65000,
+      "min_bid_price": 35750,
+      "minimum_price": 35750,
+      "market_price": 111830,
+      "expected_profit": 75105,
+      "expected_profit_rate": 210.1,
+      "fail_count": 3,
+      "bid_date": "2026-05-28",
+      "days_left": 20,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 75,105만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 65,000만원 / 최저가 35,750만원 / 추정시세 111,830만원 / 차익 75,105만원 / 위험 high / 신뢰도 0.77"
+    },
+    {
+      "id": 10,
+      "source": "auction",
+      "case_no": "2023타경99353",
+      "title": "서울특별시 성동구 성수동 907-35",
+      "address": "서울특별시 성동구 성수동 907-35",
+      "region": "서울특별시",
+      "item_type": "토지",
+      "appraisal_price": 15000,
+      "min_bid_price": 11550,
+      "minimum_price": 11550,
+      "market_price": 29211,
+      "expected_profit": 17436,
+      "expected_profit_rate": 151.0,
+      "fail_count": 1,
+      "bid_date": "2026-06-01",
+      "days_left": 24,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 17,436만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 11,550만원 / 추정시세 29,211만원 / 차익 17,436만원 / 위험 medium / 신뢰도 0.77"
+    },
+    {
+      "id": 9,
+      "source": "auction",
+      "case_no": "2023타경30033",
+      "title": "인천광역시 연수구 송도동 643-11",
+      "address": "인천광역시 연수구 송도동 643-11",
+      "region": "인천광역시",
+      "item_type": "상가",
+      "appraisal_price": 22000,
+      "min_bid_price": 14080,
+      "minimum_price": 14080,
+      "market_price": 107652,
+      "expected_profit": 93242,
+      "expected_profit_rate": 662.2,
+      "fail_count": 2,
+      "bid_date": "2026-06-03",
+      "days_left": 26,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.805,
+      "recommendation_reason": "차익 93,242만원 추정 (high 위험)",
+      "warnings": [
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "대항력 임차인 인수 여부 검토",
+        "임차인 보증금/대항력/계약일자 확인",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 22,000만원 / 최저가 14,080만원 / 추정시세 107,652만원 / 차익 93,242만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 8,
+      "source": "auction",
+      "case_no": "2025타경80644",
+      "title": "서울특별시 노원구 상계동 270-48",
+      "address": "서울특별시 노원구 상계동 270-48",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 30000,
+      "min_bid_price": 27000,
+      "minimum_price": 27000,
+      "market_price": 20905,
+      "expected_profit": -6545,
+      "expected_profit_rate": -24.2,
+      "fail_count": 0,
+      "bid_date": "2026-05-19",
+      "days_left": 11,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.855,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 30,000만원 / 최저가 27,000만원 / 추정시세 20,905만원 / 차익 -6,545만원 / 위험 high / 신뢰도 0.85"
+    },
+    {
+      "id": 7,
+      "source": "auction",
+      "case_no": "2024타경45093",
+      "title": "서울특별시 강남구 역삼동 68-14",
+      "address": "서울특별시 강남구 역삼동 68-14",
+      "region": "서울특별시",
+      "item_type": "오피스텔",
+      "appraisal_price": 15000,
+      "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 25817,
+      "expected_profit": 15992,
+      "expected_profit_rate": 166.6,
+      "fail_count": 2,
+      "bid_date": "2026-06-15",
+      "days_left": 38,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "위반건축물",
+          "flag_type": "위반건축물",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.855,
+      "recommendation_reason": "차익 15,992만원 추정 (high 위험)",
+      "warnings": [
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "위반건축물 등재 사실 + 시정명령 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 9,600만원 / 추정시세 25,817만원 / 차익 15,992만원 / 위험 high / 신뢰도 0.85"
+    },
+    {
+      "id": 6,
+      "source": "auction",
+      "case_no": "2023타경80010",
+      "title": "서울특별시 송파구 잠실동 747-16",
+      "address": "서울특별시 송파구 잠실동 747-16",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 22000,
+      "min_bid_price": 16940,
+      "minimum_price": 16940,
+      "market_price": 32536,
+      "expected_profit": 15266,
+      "expected_profit_rate": 90.1,
+      "fail_count": 1,
+      "bid_date": "2026-06-17",
+      "days_left": 40,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "선순위임차인",
+          "flag_type": "선순위임차인",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "선순위 임차인 존재 시 보증금 인수 가능성"
+        },
+        {
+          "keyword": "대항력",
+          "flag_type": "대항력",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "대항력 있는 임차인 가능성 - 보증금 인수 검토 필요"
+        },
+        {
+          "keyword": "임차인",
+          "flag_type": "임차인",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "임차인 존재 - 전입/확정/배당요구 확인 필요"
+        },
+        {
+          "keyword": "전입세대",
+          "flag_type": "전입세대",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "전입세대 존재 - 임차 관계 확인 필요"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 15,266만원 추정 (high 위험)",
+      "warnings": [
+        "선순위임차인",
+        "대항력"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "임차인 보증금/대항력/계약일자 확인",
+        "대항력 임차인 인수 여부 검토",
+        "전입세대열람으로 대항력 임차인 여부 확인"
+      ],
+      "detail_summary": "감정가 22,000만원 / 최저가 16,940만원 / 추정시세 32,536만원 / 차익 15,266만원 / 위험 high / 신뢰도 0.77"
+    },
+    {
+      "id": 5,
+      "source": "auction",
+      "case_no": "2023타경40512",
+      "title": "서울특별시 마포구 망원동 888-7",
+      "address": "서울특별시 마포구 망원동 888-7",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 45000,
+      "min_bid_price": 28800,
+      "minimum_price": 28800,
+      "market_price": 47324,
+      "expected_profit": 17849,
+      "expected_profit_rate": 62.0,
+      "fail_count": 2,
+      "bid_date": "2026-05-28",
+      "days_left": 20,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "유치권",
+          "flag_type": "유치권",
+          "risk_level": "high",
+          "severity": 9,
+          "description": "유치권 신고 가능성 - 권리 성립 여부 확인 필요"
+        }
+      ],
+      "recommendation_score": 44.6,
+      "recommendation_grade": "D",
+      "confidence_score": 0.83,
+      "recommendation_reason": "차익 17,849만원 추정 (high 위험)",
+      "warnings": [
+        "유치권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "유치권 신고 내역 및 점유 사실 확인"
+      ],
+      "detail_summary": "감정가 45,000만원 / 최저가 28,800만원 / 추정시세 47,324만원 / 차익 17,849만원 / 위험 high / 신뢰도 0.83"
+    },
+    {
+      "id": 4,
+      "source": "auction",
+      "case_no": "2023타경70217",
+      "title": "서울특별시 마포구 망원동 550-8",
+      "address": "서울특별시 마포구 망원동 550-8",
+      "region": "서울특별시",
+      "item_type": "빌라",
+      "appraisal_price": 85000,
+      "min_bid_price": 65450,
+      "minimum_price": 65450,
+      "market_price": 28380,
+      "expected_profit": -38345,
+      "expected_profit_rate": -58.6,
+      "fail_count": 1,
+      "bid_date": "2026-06-10",
+      "days_left": 33,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "분묘기지권",
+          "flag_type": "분묘기지권",
+          "risk_level": "high",
+          "severity": 7,
+          "description": "분묘기지권 가능성 - 처분/이용 제약 가능성"
+        },
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        }
+      ],
+      "recommendation_score": 5.0,
+      "recommendation_grade": "X",
+      "confidence_score": 0.805,
+      "recommendation_reason": "시세 매칭 표본 부족, high 위험",
+      "warnings": [
+        "법정지상권",
+        "분묘기지권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인",
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 85,000만원 / 최저가 65,450만원 / 추정시세 28,380만원 / 차익 -38,345만원 / 위험 high / 신뢰도 0.81"
+    },
+    {
+      "id": 3,
+      "source": "auction",
+      "case_no": "2023타경65392",
+      "title": "부산광역시 해운대구 우동 349-18",
+      "address": "부산광역시 해운대구 우동 349-18",
+      "region": "부산광역시",
+      "item_type": "빌라",
+      "appraisal_price": 15000,
+      "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 18383,
+      "expected_profit": 8558,
+      "expected_profit_rate": 89.1,
+      "fail_count": 2,
+      "bid_date": "2026-05-10",
+      "days_left": 2,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "점유자 미상",
+          "flag_type": "점유자 미상",
+          "risk_level": "medium",
+          "severity": 5,
+          "description": "점유자 미상 - 명도 협의 어려울 수 있음"
+        },
+        {
+          "keyword": "명도",
+          "flag_type": "명도",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.768,
+      "recommendation_reason": "차익 8,558만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "입찰기일 D-2 임박",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "현장 방문으로 점유자 신원·점유 형태 확인",
+        "명도 협의/소송 비용/기간 산정"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 9,600만원 / 추정시세 18,383만원 / 차익 8,558만원 / 위험 medium / 신뢰도 0.77"
+    },
+    {
+      "id": 2,
+      "source": "auction",
+      "case_no": "2025타경88907",
+      "title": "서울특별시 강남구 역삼동 28-36",
+      "address": "서울특별시 강남구 역삼동 28-36",
+      "region": "서울특별시",
+      "item_type": "아파트",
+      "appraisal_price": 22000,
+      "min_bid_price": 19800,
+      "minimum_price": 19800,
+      "market_price": 86091,
+      "expected_profit": 65961,
+      "expected_profit_rate": 333.1,
+      "fail_count": 0,
+      "bid_date": "2026-05-19",
+      "days_left": 11,
+      "risk_level": "high",
+      "risk_flags": [
+        {
+          "keyword": "법정지상권",
+          "flag_type": "법정지상권",
+          "risk_level": "high",
+          "severity": 8,
+          "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 59.0,
+      "recommendation_grade": "C",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 65,961만원 추정 (high 위험)",
+      "warnings": [
+        "법정지상권"
+      ],
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "법정지상권 성립 여부와 토지/건물 분리 확인"
+      ],
+      "detail_summary": "감정가 22,000만원 / 최저가 19,800만원 / 추정시세 86,091만원 / 차익 65,961만원 / 위험 high / 신뢰도 0.82"
+    },
+    {
+      "id": 1,
+      "source": "auction",
+      "case_no": "2023타경39256",
+      "title": "대전광역시 유성구 관평동 143-48",
+      "address": "대전광역시 유성구 관평동 143-48",
+      "region": "대전광역시",
+      "item_type": "아파트",
+      "appraisal_price": 15000,
+      "min_bid_price": 9600,
+      "minimum_price": 9600,
+      "market_price": 47919,
+      "expected_profit": 38094,
+      "expected_profit_rate": 396.8,
+      "fail_count": 2,
+      "bid_date": "2026-06-11",
+      "days_left": 34,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "관리비 체납",
+          "flag_type": "관리비 체납",
+          "risk_level": "medium",
+          "severity": 4,
+          "description": "관리비 체납 - 인수 부담 발생 가능"
+        },
+        {
+          "keyword": "특이사항 없음",
+          "flag_type": "특이사항 없음",
+          "risk_level": "low",
+          "severity": 1,
+          "description": "특이사항 미발견 - 일반적 진행"
+        }
+      ],
+      "recommendation_score": 69.0,
+      "recommendation_grade": "B",
+      "confidence_score": 0.818,
+      "recommendation_reason": "차익 38,094만원 추정 (medium 위험)",
+      "warnings": [],
+      "next_actions": [
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "checklist": [
+        "관리비 체납액 인수 범위 확인"
+      ],
+      "detail_summary": "감정가 15,000만원 / 최저가 9,600만원 / 추정시세 47,919만원 / 차익 38,094만원 / 위험 medium / 신뢰도 0.82"
     }
   ],
   "agent_status": [
