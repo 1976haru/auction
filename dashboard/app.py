@@ -32,6 +32,7 @@ from dashboard.charts import (
     trend_line_chart,
     trend_with_reference,
 )
+from agents.pdf_report_agent import generate_item_report_pdf, generate_top_picks_pdf
 from agents.action_planner_agent import list_today_actions
 from agents.alert_agent import (
     collect_pending_alerts,
@@ -224,6 +225,10 @@ elif tab_sel == "오늘의 추천 TOP 5":
     if st.button("추천 실행", type="primary"):
         with st.spinner("분석 중..."):
             res = recommend(q)
+        st.session_state["top5_results"] = res
+
+    res = st.session_state.get("top5_results")
+    if res:
         st.success(f"총 {res['total_found']}건 중 상위 {len(res['results'])}건")
         for i, r in enumerate(res["results"], 1):
             it = r["item"]
@@ -233,6 +238,19 @@ elif tab_sel == "오늘의 추천 TOP 5":
                 f"- 위험 {r['risk_level']} {risk_emoji(r['risk_level'])} / 점수 {r['score']:.1f}\n"
                 f"- 매각기일 {it.get('bid_date', '미정')}"
             )
+        # 묶음 PDF 다운로드
+        ids = [r["item"]["id"] for r in res["results"]]
+        if ids:
+            try:
+                pdf_bytes = generate_top_picks_pdf(ids)
+                st.download_button(
+                    label=f"TOP {len(ids)} 묶음 PDF 다운로드",
+                    data=pdf_bytes,
+                    file_name=f"report_top_{len(ids)}.pdf",
+                    mime="application/pdf",
+                )
+            except Exception as e:
+                st.error(f"PDF 생성 실패: {e}")
 
 # 4. 전체 물건 -----------------------------------------------------
 elif tab_sel == "전체 물건":
@@ -338,6 +356,20 @@ elif tab_sel == "물건 상세분석":
         if st.button("질문하기 실행"):
             ans = ask(it["id"], question)
             st.write(ans["answer"])
+
+        st.markdown("### PDF 리포트")
+        try:
+            pdf_bytes = generate_item_report_pdf(it["id"])
+            st.download_button(
+                label="이 매물 PDF 리포트 다운로드",
+                data=pdf_bytes,
+                file_name=f"report_item_{it['id']}.pdf",
+                mime="application/pdf",
+                key=f"pdf_dl_{it['id']}",
+            )
+            st.caption(f"PDF 크기: {len(pdf_bytes):,} bytes")
+        except Exception as e:
+            st.error(f"PDF 생성 실패: {e}")
 
 # 7. 물건 비교 -----------------------------------------------------
 elif tab_sel == "물건 비교":
