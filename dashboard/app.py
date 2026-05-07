@@ -28,6 +28,11 @@ from agents.backtest_agent import (
     grade_ordering_check,
 )
 from agents.bidding_agent import format_bid_report, get_bid_recommendation
+from agents.compare_agent import (
+    annotate_best_worst,
+    collect_compare_data,
+    summarize_compare,
+)
 from agents.change_detection_agent import list_recent_events
 from agents.confidence_agent import get_confidence
 from agents.daily_briefing_agent import generate_briefing, get_latest_briefing
@@ -82,6 +87,7 @@ with st.sidebar:
             "전체 물건",
             "AI 에이전트 검색",
             "물건 상세분석",
+            "물건 비교",
             "수익 계산기",
             "위험 키워드",
             "신뢰도/데이터 부족",
@@ -299,7 +305,149 @@ elif tab_sel == "물건 상세분석":
             ans = ask(it["id"], question)
             st.write(ans["answer"])
 
-# 7. 수익 계산기 ---------------------------------------------------
+# 7. 물건 비교 -----------------------------------------------------
+elif tab_sel == "물건 비교":
+    st.header("물건 비교")
+    st.caption("2~5개 매물을 나란히 비교해서 어느 매물이 어떤 면에서 더 좋은지 한눈에 확인합니다.")
+
+    items = _get_items(500)
+    if not items:
+        st.info("물건이 없습니다. mock 데이터를 먼저 생성하세요.")
+    else:
+        labels = {it["id"]: f"#{it['id']} {it.get('address_full', '')[:40]}" for it in items}
+        selected_ids = st.multiselect(
+            "매물 선택 (2~5개)",
+            options=list(labels.keys()),
+            default=list(labels.keys())[:3] if len(labels) >= 3 else list(labels.keys())[:2],
+            format_func=lambda i: labels[i],
+            max_selections=5,
+        )
+        if len(selected_ids) < 2:
+            st.warning("2개 이상 선택해 주세요.")
+        else:
+            data = collect_compare_data(selected_ids)
+            best_worst = annotate_best_worst(data)
+            summary = summarize_compare(data)
+
+            # 종합 요약
+            st.subheader("종합 요약")
+            c1, c2, c3 = st.columns(3)
+            bs = summary.get("best_score", {})
+            bp = summary.get("best_profit", {})
+            lr = summary.get("lowest_risk", {})
+            c1.metric("종합 점수 1위", f"#{bs.get('id', '-')} ({bs.get('grade', '-')})",
+                       delta=f"{bs.get('score', 0):.1f}점")
+            c2.metric("예상 차익 1위", f"#{bp.get('id', '-')}",
+                       delta=f"{bp.get('profit', 0):,}만원")
+            c3.metric("최저 위험", f"#{lr.get('id', '-')}",
+                       delta=f"severity {lr.get('max_severity', 0)}")
+
+            # 카드 뷰
+            st.subheader("개별 매물 카드")
+            cols = st.columns(len(data))
+            for i, d in enumerate(data):
+                with cols[i]:
+                    grade = d.get("grade") or "?"
+                    color = {"A": "🟢", "B": "🟡", "C": "🟠", "D": "🔴", "X": "⚫"}.get(grade, "⬜")
+                    st.markdown(f"**{color} #{d['id']} [{grade}]**")
+                    st.caption(d.get("address_full", "")[:40])
+                    st.metric("종합 점수", f"{(d.get('score') or 0):.1f}")
+                    st.metric("예상 차익", f"{(d.get('profit_estimate') or 0):,}만")
+                    st.metric("ROI", f"{(d.get('roi_estimate') or 0):.1f}%")
+                    st.caption(
+                        f"위험 {d.get('risk_level', '-')} / "
+                        f"신뢰도 {(d.get('overall_conf_num') or 0):.2f}"
+                    )
+                    if d.get("appraisal_inflated"):
+                        st.error("감정가 거품 의심")
+                    if d.get("is_watched"):
+                        st.info("관심 등록됨")
+                    bd = d.get("bid_days_left")
+                    if bd is not None and bd >= 0:
+                        if bd <= 3:
+                            st.warning(f"입찰기일 D-{bd}")
+                        else:
+                            st.caption(f"매각기일 {d.get('bid_date')} (D-{bd})")
+
+            # 비교 테이블
+            st.subheader("비교 테이블")
+            st.caption("✅ 이 비교에서 가장 좋은 값 / ❌ 가장 나쁜 값")
+            sections = [
+                ("기본 정보", [
+                    ("주소", "address_full"),
+                    ("종류", "item_type"),
+                    ("면적(㎡)", "area_m2"),
+                    ("층", "floor"),
+                    ("매각기일", "bid_date"),
+                    ("D-N (남은 일)", "bid_days_left"),
+                    ("유찰", "fail_count"),
+                ]),
+                ("가격", [
+                    ("감정가", "appraisal_price"),
+                    ("최저가", "min_bid_price"),
+                    ("추정 시세", "market_price_estimate"),
+                    ("최저가/시세", "minimum_to_market_ratio"),
+                    ("감정가/시세", "appraisal_to_market_ratio"),
+                    ("거래 표본", "transaction_count"),
+                    ("시세 신뢰도", "price_confidence"),
+                ]),
+                ("위험", [
+                    ("등급", "risk_level"),
+                    ("키워드 수", "risk_flag_count"),
+                    ("최고 severity", "max_severity"),
+                    ("주요 키워드", "top_flags"),
+                ]),
+                ("신뢰도 (0~1)", [
+                    ("시세", "price_conf_num"),
+                    ("권리", "legal_conf_num"),
+                    ("문서", "doc_conf_num"),
+                    ("주소", "addr_conf_num"),
+                    ("종합", "overall_conf_num"),
+                ]),
+                ("예상 손익", [
+                    ("예상 차익", "profit_estimate"),
+                    ("예상 ROI(%)", "roi_estimate"),
+                    ("총 비용", "total_cost"),
+                    ("보수 입찰가", "bid_conservative"),
+                    ("기준 입찰가", "bid_standard"),
+                    ("공격 입찰가", "bid_aggressive"),
+                ]),
+                ("추천 / 액션", [
+                    ("종합 점수", "score"),
+                    ("등급", "grade"),
+                    ("오늘 액션 수", "action_count"),
+                    ("추가 확인사항 수", "checklist_count"),
+                ]),
+            ]
+            id_labels = [f"#{d['id']}" for d in data]
+            for section_name, fields in sections:
+                st.markdown(f"**{section_name}**")
+                rows = []
+                for label, key in fields:
+                    row = {"항목": label}
+                    bw = best_worst.get(key, {})
+                    for d, hdr in zip(data, id_labels):
+                        val = d.get(key)
+                        if isinstance(val, list):
+                            display = ", ".join(str(x) for x in val) or "-"
+                        elif isinstance(val, float):
+                            display = f"{val:.3f}" if val < 10 else f"{val:,.0f}"
+                        elif isinstance(val, int):
+                            display = f"{val:,}"
+                        elif val is None:
+                            display = "-"
+                        else:
+                            display = str(val)
+                        mark = bw.get(d["id"])
+                        if mark == "best":
+                            display = f"✅ {display}"
+                        elif mark == "worst":
+                            display = f"❌ {display}"
+                        row[hdr] = display
+                    rows.append(row)
+                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+# 8. 수익 계산기 ---------------------------------------------------
 elif tab_sel == "수익 계산기":
     st.header("수익 계산기")
     c1, c2 = st.columns(2)
