@@ -45,6 +45,12 @@ from agents.compare_agent import (
     collect_compare_data,
     summarize_compare,
 )
+from agents.watchlist_agent import (
+    bulk_set_watch,
+    list_watched_items,
+    toggle_watch as wl_toggle_watch,
+    watch_summary,
+)
 from agents.change_detection_agent import list_recent_events
 from agents.confidence_agent import get_confidence
 from agents.daily_briefing_agent import generate_briefing, get_latest_briefing
@@ -100,6 +106,7 @@ with st.sidebar:
             "AI 에이전트 검색",
             "물건 상세분석",
             "물건 비교",
+            "워치리스트",
             "수익 계산기",
             "위험 키워드",
             "신뢰도/데이터 부족",
@@ -453,7 +460,158 @@ elif tab_sel == "물건 비교":
                     rows.append(row)
                 st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-# 8. 수익 계산기 ---------------------------------------------------
+# 8. 워치리스트 ----------------------------------------------------
+elif tab_sel == "워치리스트":
+    st.header("워치리스트")
+    st.caption("관심 등록한 매물만 모아 보고 일괄 관리합니다.")
+
+    summary = watch_summary()
+    if summary["count"] == 0:
+        st.info(
+            "관심 등록된 매물이 없습니다. '전체 물건' 또는 '오늘의 추천 TOP 5' "
+            "탭에서 매물을 클릭한 후 ☆ 관심 등록 버튼을 누르세요."
+        )
+
+        # 관심 등록 빠른 추가
+        st.subheader("빠른 관심 등록")
+        items_all = _get_items(500)
+        labels = {it["id"]: f"#{it['id']} {it.get('address_full', '')[:40]}" for it in items_all}
+        if labels:
+            picks = st.multiselect("매물 선택", options=list(labels.keys()),
+                                    format_func=lambda i: labels[i], max_selections=20)
+            if picks and st.button("선택 매물 관심 등록"):
+                n = bulk_set_watch(picks, watched=True)
+                st.success(f"{n}건 관심 등록 완료")
+                st.rerun()
+    else:
+        # 요약 메트릭
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("총 매물 수", summary["count"])
+        c2.metric("총 예상 차익", f"{int(summary['total_profit_estimate']):+,}만")
+        c3.metric("입찰기일 임박", summary["imminent_count"], delta="D-7 이내")
+        c4.metric("열린 액션", summary["open_actions_total"])
+
+        # 등급 분포
+        if summary["by_grade"]:
+            st.caption(
+                "등급 분포: " +
+                " / ".join(f"{g} {n}" for g, n in summary["by_grade"].items())
+            )
+        warns = []
+        if summary["high_risk_count"]:
+            warns.append(f"고위험 매물 {summary['high_risk_count']}건")
+        if summary["inflated_count"]:
+            warns.append(f"감정가 거품 의심 {summary['inflated_count']}건")
+        if warns:
+            st.warning(" / ".join(warns))
+
+        items = list_watched_items()
+        st.subheader(f"관심 매물 ({len(items)}건)")
+
+        # 컨트롤
+        sort_by = st.selectbox(
+            "정렬",
+            ["입찰기일 임박순", "예상 차익 높은순", "점수 높은순", "위험 낮은순", "최근 변경순"],
+        )
+        sort_key = {
+            "입찰기일 임박순": lambda it: it.get("bid_days_left") or 9999,
+            "예상 차익 높은순": lambda it: -(it.get("profit_estimate") or 0),
+            "점수 높은순": lambda it: -(it.get("score") or 0),
+            "위험 낮은순": lambda it: it.get("max_severity") or 0,
+            "최근 변경순": lambda it: -(it.get("recent_changes_7d") or 0),
+        }[sort_by]
+        items_sorted = sorted(items, key=sort_key)
+
+        # 일괄 처리 컨트롤
+        with st.expander("일괄 처리"):
+            ids_for_bulk = [it["id"] for it in items_sorted]
+            select_all = st.checkbox("전체 선택")
+            default_picks = ids_for_bulk if select_all else []
+            picked = st.multiselect(
+                "대상 매물",
+                options=ids_for_bulk,
+                default=default_picks,
+                format_func=lambda i: next(
+                    f"#{i} {x.get('address_full', '')[:35]}"
+                    for x in items_sorted if x["id"] == i
+                ),
+            )
+            cb1, cb2, cb3 = st.columns(3)
+            with cb1:
+                if st.button("선택 매물 관심 해제", type="secondary"):
+                    if picked:
+                        n = bulk_set_watch(picked, watched=False)
+                        st.success(f"{n}건 관심 해제")
+                        st.rerun()
+                    else:
+                        st.warning("선택된 매물이 없습니다")
+            with cb2:
+                if st.button("선택 매물 알림 발송"):
+                    if picked:
+                        from agents.alert_agent import dispatch_alerts
+                        # only_watched 모드로 발송
+                        from agents.preference_learning_agent import get_preferences
+                        pref = get_preferences()
+                        pref_force = {**pref, "alert_only_watched": True}
+                        res = dispatch_alerts(pref=pref_force, dry_run=False)
+                        st.success(f"발송 {res['sent']} / 스킵 {res['skipped']}건")
+                    else:
+                        st.warning("선택된 매물이 없습니다")
+            with cb3:
+                if st.button("선택 매물 비교 화면으로"):
+                    if 2 <= len(picked) <= 5:
+                        st.session_state["compare_ids"] = picked
+                        st.info("'물건 비교' 탭으로 이동하세요. 선택이 자동 적용됩니다.")
+                    else:
+                        st.warning("2~5개 선택해야 비교 가능합니다")
+
+        # 매물 카드
+        for it in items_sorted:
+            grade = it.get("grade") or "?"
+            color = {"A": "🟢", "B": "🟡", "C": "🟠", "D": "🔴", "X": "⚫"}.get(grade, "⬜")
+            bd = it.get("bid_days_left")
+            badges = []
+            if bd is not None and 0 <= bd <= 3:
+                badges.append(f"D-{bd} 임박")
+            if it.get("appraisal_inflated"):
+                badges.append("감정가 거품")
+            if it.get("recent_changes_7d", 0) > 0:
+                badges.append(f"7일 내 {it['recent_changes_7d']}건 변경")
+            if it.get("open_actions", 0) > 0:
+                badges.append(f"열린 액션 {it['open_actions']}건")
+            badge_str = " · ".join(f"`{b}`" for b in badges) if badges else ""
+            with st.expander(
+                f"{color} [{grade}] #{it['id']} {it.get('address_full', '')} "
+                f"| 차익 {int(it.get('profit_estimate') or 0):+,}만 | "
+                f"점수 {(it.get('score') or 0):.1f}"
+            ):
+                if badge_str:
+                    st.markdown(badge_str)
+                cc1, cc2, cc3, cc4 = st.columns(4)
+                cc1.metric("감정가", f"{it.get('appraisal_price', 0):,}만")
+                cc2.metric("최저가", f"{it.get('min_bid_price', 0):,}만")
+                cc3.metric("추정 시세", f"{it.get('market_price', 0):,}만")
+                cc4.metric("ROI", f"{(it.get('roi_estimate') or 0):.1f}%")
+                st.caption(
+                    f"위험 {it.get('risk_level', '-')} (severity {it.get('max_severity', 0)}) | "
+                    f"키워드 {it.get('flag_count', 0)}개 | 거래 {it.get('transaction_count', 0)}건 | "
+                    f"매각기일 {it.get('bid_date', '미정')} (D-{bd if bd is not None else '?'})"
+                )
+                ac1, ac2, ac3 = st.columns(3)
+                with ac1:
+                    if st.button("관심 해제", key=f"unwatch_{it['id']}"):
+                        wl_toggle_watch(it["id"], False)
+                        st.rerun()
+                with ac2:
+                    if st.button("입찰가 시뮬", key=f"bidrec_{it['id']}"):
+                        rec = get_bid_recommendation(it["id"])
+                        st.text(format_bid_report(rec))
+                with ac3:
+                    if st.button("Q&A 열기", key=f"qa_{it['id']}"):
+                        ans = ask(it["id"], "이 물건 위험한가? 추가로 확인할 사항은?")
+                        st.write(ans["answer"])
+
+# 9. 수익 계산기 ---------------------------------------------------
 elif tab_sel == "수익 계산기":
     st.header("수익 계산기")
     c1, c2 = st.columns(2)
