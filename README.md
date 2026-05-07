@@ -123,6 +123,9 @@ pytest tests/ -v
 # 7) 빠른 스트레스 테스트
 python scripts/run_stress_test.py --count 1000 --queries 20
 
+# 7-2) 대규모 스트레스 테스트 (장시간 - 1시간 내외)
+python scripts/run_stress_test.py --count 5000 --queries 50
+
 # 8) 결과 내보내기
 python scripts/export_results.py --target all
 
@@ -150,6 +153,19 @@ python scripts/export_report.py --item-id 63
 사용자가 프로그램 실행 → mock 데이터 자동 생성/수집 → 시세 매칭 → 위험 분석 →
 신뢰도 산정 → 추천 점수화/등급 → 오늘 우선 볼 5건 + 오늘 할 일 출력
 ```
+
+### 스트레스 테스트 벤치마크
+
+본 저장소에서 실측한 mock-first end-to-end 성능 (단일 머신 / Python 3.14 / 로컬 SQLite 기준):
+
+| 시나리오 | 총 소요 | 생성 | 시세 | 위험 | 신뢰 | 쿼리 (avg/회) |
+|---|---:|---:|---:|---:|---:|---:|
+| `--count 500 --queries 5` | **46.72s** | 7.69s | 4.52s | 7.45s | 6.80s | 4.04s |
+| `--count 5000 --queries 50` | **3437.35s (≈ 57분)** | 90.38s | 51.01s | 106.88s | 98.14s | 61.82s |
+
+- 5000-건 환경에서는 추천 쿼리 phase 가 전체의 **89.9%** 를 차지 (item lookup 횟수가 N×3 으로 누적)
+- 결과는 `stress_test_results` 테이블 + `data/exports/stress_test_report.json` 으로 저장됨
+- 운영 단계에서 추천 응답 시간이 중요해지면 `_enrich()` 의 row-by-row lookup 을 batch JOIN 으로 묶거나 분석 결과를 in-memory 캐시 하는 최적화가 의미 있음
 
 ## GitHub 업로드 전 체크리스트
 
