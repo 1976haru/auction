@@ -341,6 +341,7 @@ function applyFilters() {
   STATE.filtered = out;
   renderItems();
   renderItemsHead();
+  renderCharts();
   pushUrlState();
 }
 
@@ -669,6 +670,188 @@ function wireFavoriteButtons(root) {
     btn.addEventListener("click", handler);
     btn.addEventListener("pointerdown", (e) => e.stopPropagation());
   });
+}
+
+// ── Mini charts (pure SVG, no deps) ───────────────
+const GRADE_ORDER = ["A", "B", "C", "D", "X"];
+const GRADE_COLOR = {
+  A: "#2ca02c", B: "#1f77b4", C: "#f0a500", D: "#888", X: "#d62728",
+};
+const RISK_COLOR = { low: "#2ca02c", medium: "#f0a500", high: "#d62728" };
+
+function svgEl(tag, attrs, parent) {
+  const NS = "http://www.w3.org/2000/svg";
+  const node = document.createElementNS(NS, tag);
+  Object.entries(attrs || {}).forEach(([k, v]) => {
+    if (v !== null && v !== undefined) node.setAttribute(k, String(v));
+  });
+  if (parent) parent.appendChild(node);
+  return node;
+}
+
+function renderGradeProfitChart(items) {
+  const host = $("chart-grade-profit");
+  if (!host) return;
+  host.innerHTML = "";
+  if (!items.length) {
+    host.appendChild(el(`<p class="chart-empty">표시할 데이터가 없습니다.</p>`));
+    return;
+  }
+  // 그룹 평균
+  const groups = {};
+  GRADE_ORDER.forEach((g) => groups[g] = []);
+  items.forEach((it) => {
+    const g = it.recommendation_grade || "C";
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(it.expected_profit || 0);
+  });
+  const stats = GRADE_ORDER.map((g) => {
+    const arr = groups[g];
+    const sum = arr.reduce((a, b) => a + b, 0);
+    return {
+      grade: g,
+      count: arr.length,
+      mean: arr.length ? sum / arr.length : 0,
+    };
+  });
+  const maxAbs = Math.max(1, ...stats.map((s) => Math.abs(s.mean)));
+
+  // 좌표계
+  const W = 360, H = 180;
+  const padL = 40, padR = 14, padT = 14, padB = 30;
+  const bw = (W - padL - padR) / GRADE_ORDER.length;
+  const innerH = H - padT - padB;
+  const yZero = padT + innerH / 2;
+
+  const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "등급별 평균 예상차익" });
+
+  // 0 축
+  svgEl("line", { x1: padL, y1: yZero, x2: W - padR, y2: yZero, class: "axis-line" }, svg);
+  svgEl("text", {
+    x: padL - 4, y: yZero + 3, "text-anchor": "end", class: "axis-label",
+  }, svg).textContent = "0";
+
+  // 최대값 라벨
+  svgEl("text", {
+    x: padL - 4, y: padT + 9, "text-anchor": "end", class: "axis-label",
+  }, svg).textContent = `+${Math.round(maxAbs).toLocaleString("ko-KR")}`;
+  svgEl("text", {
+    x: padL - 4, y: H - padB - 1, "text-anchor": "end", class: "axis-label",
+  }, svg).textContent = `-${Math.round(maxAbs).toLocaleString("ko-KR")}`;
+
+  stats.forEach((s, i) => {
+    const x = padL + bw * i + bw * 0.18;
+    const w = bw * 0.64;
+    const ratio = maxAbs ? s.mean / maxAbs : 0;
+    const half = innerH / 2;
+    let y, h;
+    if (ratio >= 0) {
+      h = ratio * half;
+      y = yZero - h;
+    } else {
+      h = -ratio * half;
+      y = yZero;
+    }
+    const rect = svgEl("rect", {
+      x, y, width: w, height: Math.max(1, h),
+      fill: GRADE_COLOR[s.grade] || "#999",
+      rx: 3, ry: 3,
+    }, svg);
+    rect.appendChild(svgEl("title", {}));
+    rect.lastChild.textContent = `${s.grade} 등급 · ${s.count}건 · 평균 ${Math.round(s.mean).toLocaleString("ko-KR")} 만원`;
+
+    svgEl("text", {
+      x: x + w / 2, y: H - padB + 13, "text-anchor": "middle", class: "axis-label",
+    }, svg).textContent = `${s.grade} (${s.count})`;
+
+    if (s.count > 0) {
+      const labelY = ratio >= 0 ? Math.max(padT + 10, y - 3) : Math.min(H - padB - 2, y + h + 11);
+      svgEl("text", {
+        x: x + w / 2, y: labelY, "text-anchor": "middle", class: "bar-label",
+      }, svg).textContent = Math.round(s.mean).toLocaleString("ko-KR");
+    }
+  });
+
+  host.appendChild(svg);
+}
+
+function renderRegionRiskChart(items) {
+  const host = $("chart-region-risk");
+  if (!host) return;
+  host.innerHTML = "";
+  if (!items.length) {
+    host.appendChild(el(`<p class="chart-empty">표시할 데이터가 없습니다.</p>`));
+    return;
+  }
+  // 지역별 위험 카운트
+  const byRegion = new Map();
+  items.forEach((it) => {
+    const r = it.region || "기타";
+    if (!byRegion.has(r)) byRegion.set(r, { low: 0, medium: 0, high: 0, total: 0 });
+    const slot = byRegion.get(r);
+    const lvl = it.risk_level || "medium";
+    slot[lvl] = (slot[lvl] || 0) + 1;
+    slot.total += 1;
+  });
+  const sorted = Array.from(byRegion.entries())
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 8);
+  if (!sorted.length) {
+    host.appendChild(el(`<p class="chart-empty">표시할 데이터가 없습니다.</p>`));
+    return;
+  }
+  const maxTotal = Math.max(...sorted.map(([, v]) => v.total));
+
+  // 가로 스택 막대 (지역명 좌측, 막대 우측)
+  const W = 360;
+  const rowH = 22;
+  const padT = 6, padB = 6;
+  const labelW = 96;
+  const padR = 36;
+  const innerW = W - labelW - padR;
+  const H = padT + padB + sorted.length * rowH;
+
+  const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "지역별 위험 분포" });
+
+  sorted.forEach(([region, v], i) => {
+    const y = padT + i * rowH + 4;
+    const bh = rowH - 8;
+    const barW = (v.total / maxTotal) * innerW;
+    let x = labelW;
+    const segs = [
+      ["low", v.low], ["medium", v.medium], ["high", v.high],
+    ];
+    segs.forEach(([key, count]) => {
+      if (!count) return;
+      const segW = (count / v.total) * barW;
+      const rect = svgEl("rect", {
+        x, y, width: segW, height: bh,
+        fill: RISK_COLOR[key], rx: 2, ry: 2,
+      }, svg);
+      rect.appendChild(svgEl("title", {}));
+      rect.lastChild.textContent =
+        `${region} · ${({low:"낮음",medium:"보통",high:"높음"}[key])} ${count}건`;
+      x += segW;
+    });
+    // 지역명
+    svgEl("text", {
+      x: labelW - 6, y: y + bh / 2 + 3.5, "text-anchor": "end", class: "axis-label",
+    }, svg).textContent = region.length > 7 ? region.slice(0, 7) + "…" : region;
+    // 합계
+    svgEl("text", {
+      x: labelW + barW + 4, y: y + bh / 2 + 3.5, class: "bar-label",
+    }, svg).textContent = String(v.total);
+  });
+
+  host.appendChild(svg);
+}
+
+function renderCharts() {
+  const items = STATE.filtered;
+  renderGradeProfitChart(items);
+  renderRegionRiskChart(items);
+  const cap = $("charts-caption");
+  if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
 }
 
 // ── CSV/JSON download ─────────────────────────────
