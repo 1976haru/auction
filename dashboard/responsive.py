@@ -36,38 +36,85 @@ def inject_mobile_css() -> None:
     st.markdown(
         """
         <style>
-        /* 좁은 화면에서 메인 컨테이너 패딩 축소 */
+        /* PC: wide layout 의 좌우 여백을 적당히 유지 (너무 좁지도 넓지도 않게) */
+        @media (min-width: 1200px) {
+            .block-container {
+                max-width: 1400px;
+                padding-left: 2rem !important;
+                padding-right: 2rem !important;
+            }
+        }
+        /* 태블릿/노트북 */
+        @media (min-width: 769px) and (max-width: 1199px) {
+            .block-container {
+                padding-left: 1.25rem !important;
+                padding-right: 1.25rem !important;
+            }
+        }
+        /* 모바일: 패딩 최소화 + 가독성 보강 */
         @media (max-width: 768px) {
             .block-container {
-                padding-left: 0.75rem !important;
-                padding-right: 0.75rem !important;
-                padding-top: 1rem !important;
+                padding-left: 0.6rem !important;
+                padding-right: 0.6rem !important;
+                padding-top: 0.75rem !important;
             }
-            /* 사이드바 자동 collapse 시에도 토글 버튼 잘 보이게 */
             section[data-testid="stSidebar"] {
                 min-width: 0 !important;
             }
-            /* 표 폰트 살짝 축소 */
-            div[data-testid="stDataFrame"] {
-                font-size: 0.85rem;
+            /* 표는 좌우 스크롤 허용해서 안 깨지게 */
+            div[data-testid="stDataFrame"],
+            div[data-testid="stTable"] {
+                font-size: 0.82rem;
+                overflow-x: auto !important;
             }
-            /* 메트릭 라벨/값 살짝 축소 */
+            /* 메트릭 라벨/값 모바일 가독성 */
             div[data-testid="stMetric"] label {
-                font-size: 0.8rem !important;
+                font-size: 0.78rem !important;
+                white-space: normal !important;
             }
             div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-                font-size: 1.2rem !important;
+                font-size: 1.15rem !important;
             }
+            /* 다중 컬럼 모바일에서 줄간격 축소 */
+            div[data-testid="stHorizontalBlock"] {
+                gap: 0.35rem !important;
+            }
+            /* 탭이 좁으면 줄바꿈 + 스크롤 */
+            div[data-testid="stTabs"] button[role="tab"] {
+                font-size: 0.85rem !important;
+                padding: 0.4rem 0.6rem !important;
+            }
+            div[data-testid="stTabs"] [role="tablist"] {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+            /* 버튼 터치 타겟 최소 44px */
+            .stButton > button,
+            .stDownloadButton > button {
+                min-height: 42px;
+                font-size: 0.9rem;
+            }
+            /* expander 헤더 가독성 */
+            div[data-testid="stExpander"] summary {
+                font-size: 0.92rem;
+            }
+            /* 헤딩 사이즈 모바일 */
+            h1 { font-size: 1.4rem !important; }
+            h2 { font-size: 1.2rem !important; }
+            h3 { font-size: 1.05rem !important; }
         }
         /* 컴팩트 모드 - viewport 와 무관하게 강제 좁게 표시 */
         .compact-mode div[data-testid="stMetric"] label {
-            font-size: 0.8rem !important;
+            font-size: 0.78rem !important;
         }
         .compact-mode div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-            font-size: 1.1rem !important;
+            font-size: 1.05rem !important;
         }
         .compact-mode div[data-testid="stHorizontalBlock"] {
-            gap: 0.4rem !important;
+            gap: 0.35rem !important;
+        }
+        .compact-mode div[data-testid="stDataFrame"] {
+            font-size: 0.82rem;
         }
         </style>
         """,

@@ -202,6 +202,32 @@ TELEGRAM_CHAT_ID = ""
 - 외부 API key 는 secrets 으로 관리 (절대 코드에 하드코딩 금지)
 - 무료 티어는 동시 1 visitor + 1 GB 메모리 제한
 
+## 브라우저 / 스마트폰 접속 방법
+
+### PC 웹브라우저
+- 로컬: `streamlit run dashboard/app.py` → 자동으로 `http://localhost:8501` 열림
+- 0.0.0.0 바인딩 (Replit / Codespaces / Docker):
+  ```
+  streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8080
+  ```
+  → `http://localhost:8080` 접속
+- Streamlit Cloud: 위 배포 단계 완료 후 `https://<app-name>.streamlit.app`
+
+### 스마트폰
+1. **Streamlit Cloud / Replit 사용 시 (가장 쉬움)**
+   - 위 방법으로 배포 후 받은 URL 을 그대로 스마트폰 브라우저에서 열기
+   - 좌측 상단 햄버거 아이콘 → "메뉴" 라디오로 13개 탭 전환
+   - 사이드바의 "컴팩트 모드 (모바일)" 토글을 켜면 카드/표가 세로로 좁게 정렬되어 가독성 향상
+2. **로컬 PC 에서 같은 Wi-Fi 의 폰으로 보기**
+   - PC 에서 `streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8080`
+   - PC 의 로컬 IP 확인 (Windows: `ipconfig`, macOS/Linux: `ifconfig` 또는 `ip a`)
+   - 폰 브라우저에서 `http://<PC_IP>:8080` (예: `http://192.168.0.5:8080`)
+   - 방화벽이 8080 포트를 막고 있으면 인바운드 허용 필요
+3. **모바일 표시 팁**
+   - 사이드바의 컴팩트 모드는 다중 컬럼을 1~2열로 줄여 줍니다
+   - 표가 너무 넓으면 좌우 스크롤로 확인 (CSS 로 자동 처리)
+   - 탭/버튼 터치 영역은 최소 42px 로 확대됨
+
 ## 외부 영구 DB (Turso, 선택)
 
 Streamlit Cloud 의 파일시스템은 ephemeral 이라 앱 재시작 시 SQLite DB 가 초기화됩니다. 자동 부트스트랩이 mock 데이터를 다시 시드하지만 **사용자 설정 / 워치리스트 / 알림 로그 / 백테스트 기록 / 튜닝 결과** 같은 영구 데이터는 사라집니다. 이를 해결하려면 Turso (libSQL Cloud) 를 사용하세요.
