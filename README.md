@@ -218,7 +218,45 @@ TELEGRAM_CHAT_ID = ""
 - 외부 API key 는 secrets 으로 관리 (절대 코드에 하드코딩 금지)
 - 무료 티어는 동시 1 visitor + 1 GB 메모리 제한
 
-## 브라우저 / 스마트폰 접속 방법
+## GitHub Pages 정적 대시보드 (별도 가입 없이 접속)
+
+서버 없이 GitHub URL 만으로 데스크탑·스마트폰 모두 확인 가능한 정적 데모입니다. Streamlit 앱과 별개로 동시에 운영합니다.
+
+**최종 접속 주소**: https://1976haru.github.io/auction/
+
+### 1) 한 번만 설정
+GitHub 저장소에서:
+1. **Settings** → **Pages**
+2. **Build and deployment** → **Source**: `Deploy from a branch`
+3. **Branch**: `main` / **Folder**: `/docs`
+4. **Save** → 1~2분 후 위 URL 에서 접속 가능
+
+(Actions 워크플로 없이 branch `/docs` 방식이면 충분합니다.)
+
+### 2) 정적 데이터 갱신
+```
+python scripts/export_static_dashboard.py
+```
+- 기존 SQLite DB 가 있으면 → DB 에서 추출 (recommendations / action_items / risk_summary / confidence)
+- DB 가 비어 있으면 → mock 파이프라인을 한 번 돌려서 시드 후 추출
+- 그래도 실패하면 → 자체 hard-coded 샘플 fallback
+- 결과: `docs/data/mock_dashboard.json` 갱신
+
+push 후 GitHub Pages 가 자동 재배포됩니다.
+
+### 3) 로컬 미리보기
+```
+python -m http.server 8000 -d docs
+```
+→ 브라우저: `http://localhost:8000`
+
+### 4) 스마트폰 확인
+- 가장 쉬운 방법: 위 GitHub Pages URL 을 폰 브라우저에서 열기
+- 로컬 미리보기일 때: PC 와 같은 Wi-Fi 에서 폰 브라우저로 `http://<PC_IP>:8000` (예: `http://192.168.0.5:8000`)
+
+정적 대시보드는 `docs/styles.css` 의 `@media (max-width: 640px)` 분기로 모바일에서 1열 카드 + 표 가로 스크롤로 자동 전환됩니다.
+
+## 브라우저 / 스마트폰 접속 방법 (Streamlit 풀버전)
 
 ### PC 웹브라우저
 - 로컬: `streamlit run dashboard/app.py` → 자동으로 `http://localhost:8501` 열림

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1f77b4" />
+  <title>경매·공매 지능형 에이전트 — 데모 대시보드</title>
+  <meta name="description" content="법원경매·공매 데이터를 mock 으로 보여주는 정적 대시보드. 실제 입찰/금전거래는 하지 않습니다." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1>경매·공매 지능형 에이전트</h1>
+      <p class="status-line">
+        <span class="badge badge-mock">Mock API 기반 데모</span>
+        <span id="generated-at" class="caption"></span>
+      </p>
+      <p class="caption">
+        실 API 키 없이 로컬 mock 데이터로 동작하는 정적 데모입니다. 실제 입찰·금전거래·외부 전송은 하지 않습니다.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 오늘의 브리핑 -->
+    <section class="card section-briefing" id="section-briefing">
+      <h2>오늘의 브리핑</h2>
+      <div class="metric-grid" id="briefing-metrics"></div>
+      <p class="briefing-summary" id="briefing-summary"></p>
+    </section>
+
+    <div class="row-2">
+      <!-- 위험 요약 -->
+      <section class="card" id="section-risk">
+        <h2>위험 요약</h2>
+        <div id="risk-summary"></div>
+      </section>
+
+      <!-- 신뢰도 요약 -->
+      <section class="card" id="section-confidence">
+        <h2>신뢰도 요약</h2>
+        <div id="confidence-summary"></div>
+      </section>
+    </div>
+
+    <!-- 추천 TOP 5 -->
+    <section class="card" id="section-recommendations">
+      <h2>오늘의 추천 TOP 5</h2>
+      <div class="rec-grid" id="rec-grid"></div>
+    </section>
+
+    <!-- 오늘 할 일 -->
+    <section class="card" id="section-actions">
+      <h2>오늘 할 일</h2>
+      <div class="action-grid" id="action-grid"></div>
+    </section>
+
+    <!-- 전체 물건 -->
+    <section class="card" id="section-items">
+      <h2>전체 물건 샘플</h2>
+      <p class="caption">감정가/최저가 단위는 만원입니다. 가로 스크롤로 모든 컬럼을 확인하세요.</p>
+      <div class="table-wrap">
+        <table id="items-table">
+          <thead>
+            <tr>
+              <th>#</th><th>구분</th><th>주소</th><th>유형</th>
+              <th class="num">감정가</th><th class="num">최저가</th>
+              <th class="num">유찰</th><th>입찰기일</th><th>위험</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 지능형 에이전트 상태 -->
+    <section class="card" id="section-agents">
+      <h2>지능형 에이전트 상태</h2>
+      <div class="agent-grid" id="agent-grid"></div>
+    </section>
+
+    <section class="card disclaimer">
+      <h2>면책</h2>
+      <ul>
+        <li>본 대시보드는 데모용 정적 페이지입니다. 표시된 모든 매물은 mock 데이터이며 실제 거래 대상이 아닙니다.</li>
+        <li>권리분석 표시는 참고용 위험 체크리스트와 추가 확인사항으로만 제공되며, 법률·투자 판단을 대체하지 않습니다.</li>
+        <li>실제 입찰 전에는 등기부등본·전입세대열람·현장조사 등 직접 확인이 필요합니다.</li>
+        <li>실 API 연동 시점에는 데이터 제공처 정책과 개인정보 보호 의무를 따릅니다.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p class="caption">
+        Source: <a href="https://github.com/1976haru/auction" target="_blank" rel="noopener">github.com/1976haru/auction</a>
+        — Streamlit 풀버전: <code>streamlit run dashboard/app.py</code>
+      </p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

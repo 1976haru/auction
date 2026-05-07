@@ -1,0 +1,627 @@
+{
+  "generated_at": "2026-05-08T06:59:02",
+  "source": "db",
+  "summary": {
+    "total_items": 100,
+    "analyzed_items": 100,
+    "high_risk_items": 77,
+    "avg_confidence": 0.758,
+    "recommended_items": 5
+  },
+  "briefing": {
+    "run_date": "2026-05-08",
+    "summary": "오늘의 경매·공매 브리핑입니다.\n총 100건을 확인했고, 실거래가 매칭 가능 물건은 90건입니다.\n고위험 키워드 보유 물건은 77건이며, 검토 후보(A/B/C)는 4건, 주의(D/X)는 0건입니다.\n오늘 우선 볼 물건은 4건입니다.",
+    "matched_items": 90,
+    "candidate_items": 4
+  },
+  "recommendations": [
+    {
+      "rank": 1,
+      "item_id": 91,
+      "source": "public_sale",
+      "title": "서울특별시 강북구 수유동 440",
+      "address": "서울특별시 강북구 수유동 440",
+      "item_type": "아파트",
+      "min_bid_price": 22080,
+      "minimum_price": 22080,
+      "market_price": 122869,
+      "expected_profit": 99328,
+      "expected_profit_rate": 421.94,
+      "risk_level": "medium",
+      "recommendation_score": 79.8,
+      "recommendation_grade": "A",
+      "recommendation_reason": "점수 79.8 (A등급) · 선호 매칭: 선호 유형 일치",
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "warnings": []
+    },
+    {
+      "rank": 2,
+      "item_id": 53,
+      "source": "public_sale",
+      "title": "서울특별시 영등포구 여의도동 396",
+      "address": "서울특별시 영등포구 여의도동 396",
+      "item_type": "아파트",
+      "min_bid_price": 19200,
+      "minimum_price": 19200,
+      "market_price": 71202,
+      "expected_profit": 50626,
+      "expected_profit_rate": 246.04,
+      "risk_level": "medium",
+      "recommendation_score": 65.9,
+      "recommendation_grade": "B",
+      "recommendation_reason": "점수 65.9 (B등급) · 선호 매칭: 선호 유형 일치",
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "warnings": []
+    },
+    {
+      "rank": 3,
+      "item_id": 63,
+      "source": "public_sale",
+      "title": "서울특별시 강북구 수유동 441",
+      "address": "서울특별시 강북구 수유동 441",
+      "item_type": "아파트",
+      "min_bid_price": 54400,
+      "minimum_price": 54400,
+      "market_price": 121231,
+      "expected_profit": 64399,
+      "expected_profit_rate": 113.31,
+      "risk_level": "medium",
+      "recommendation_score": 64.2,
+      "recommendation_grade": "B",
+      "recommendation_reason": "점수 64.2 (B등급) · 선호 매칭: 선호 유형 일치",
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "warnings": []
+    },
+    {
+      "rank": 4,
+      "item_id": 70,
+      "source": "public_sale",
+      "title": "경기도 안양시 동안구 33",
+      "address": "경기도 안양시 동안구 33",
+      "item_type": "오피스텔",
+      "min_bid_price": 34000,
+      "minimum_price": 34000,
+      "market_price": 44300,
+      "expected_profit": 8480,
+      "expected_profit_rate": 23.67,
+      "risk_level": "medium",
+      "recommendation_score": 45.7,
+      "recommendation_grade": "C",
+      "recommendation_reason": "점수 45.7 (C등급) · 선호 매칭: 선호 유형 일치",
+      "next_actions": [
+        "입찰기간 확인",
+        "현장조사 1회"
+      ],
+      "warnings": []
+    },
+    {
+      "rank": 5,
+      "source": "auction",
+      "title": "서울특별시 강서구 화곡동 396",
+      "address": "서울특별시 강서구 화곡동 396",
+      "item_type": "아파트",
+      "min_bid_price": 19200,
+      "minimum_price": 19200,
+      "market_price": 28000,
+      "expected_profit": 7800,
+      "expected_profit_rate": 35.4,
+      "risk_level": "medium",
+      "recommendation_score": 78.5,
+      "recommendation_grade": "A",
+      "recommendation_reason": "감정가 대비 시세 격차 큼 + 위험 키워드 보통 (샘플 보강)",
+      "next_actions": [
+        "등기부등본 재확인",
+        "매각기일 확인",
+        "현장조사 1회"
+      ],
+      "warnings": []
+    }
+  ],
+  "action_items": [
+    {
+      "priority": "high",
+      "title": "등기부등본 원문 확인",
+      "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
+      "due_date": null,
+      "address": "부산광역시 남구 대연동 145",
+      "item_type": "아파트"
+    },
+    {
+      "priority": "high",
+      "title": "등기부등본 원문 확인",
+      "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
+      "due_date": null,
+      "address": "경기도 용인시 수지구 164",
+      "item_type": "빌라"
+    },
+    {
+      "priority": "high",
+      "title": "전입세대열람 확인",
+      "detail": "임차인/대항력 관련 키워드 발견 - 전입세대열람 후 보증금 인수 여부 확인",
+      "due_date": null,
+      "address": "경기도 용인시 수지구 164",
+      "item_type": "빌라"
+    },
+    {
+      "priority": "high",
+      "title": "입찰기일 임박",
+      "detail": "입찰기일까지 5일 남음",
+      "due_date": "2026-05-13~2026-05-15",
+      "address": "경기도 용인시 수지구 164",
+      "item_type": "빌라"
+    },
+    {
+      "priority": "high",
+      "title": "등기부등본 원문 확인",
+      "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
+      "due_date": null,
+      "address": "인천광역시 남동구 구월동 459",
+      "item_type": "토지"
+    },
+    {
+      "priority": "high",
+      "title": "등기부등본 원문 확인",
+      "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
+      "due_date": null,
+      "address": "서울특별시 관악구 봉천동 140",
+      "item_type": "오피스텔"
+    },
+    {
+      "priority": "high",
+      "title": "등기부등본 원문 확인",
+      "detail": "고위험 키워드 발견 - 최신 등기부등본 발급 후 권리관계 확인",
+      "due_date": null,
+      "address": "대구광역시 수성구 범어동 230",
+      "item_type": "빌라"
+    },
+    {
+      "priority": "high",
+      "title": "입찰기일 임박",
+      "detail": "입찰기일까지 2일 남음",
+      "due_date": "2026-05-10~2026-05-12",
+      "address": "대구광역시 수성구 범어동 230",
+      "item_type": "빌라"
+    }
+  ],
+  "risk_summary": {
+    "low": 6,
+    "medium": 17,
+    "high": 77,
+    "top_flags": [
+      {
+        "keyword": "전입세대",
+        "count": 30
+      },
+      {
+        "keyword": "임차인",
+        "count": 30
+      },
+      {
+        "keyword": "대항력",
+        "count": 30
+      },
+      {
+        "keyword": "위반건축물",
+        "count": 23
+      },
+      {
+        "keyword": "점유자 미상",
+        "count": 21
+      },
+      {
+        "keyword": "법정지상권",
+        "count": 21
+      },
+      {
+        "keyword": "명도",
+        "count": 21
+      },
+      {
+        "keyword": "유치권",
+        "count": 19
+      }
+    ]
+  },
+  "confidence_summary": {
+    "price": 0,
+    "risk": 0,
+    "document": 0,
+    "address": 0,
+    "overall": 0
+  },
+  "items": [
+    {
+      "id": 100,
+      "source": "public_sale",
+      "address": "부산광역시 남구 대연동 145",
+      "item_type": "아파트",
+      "appraisal_price": 12000,
+      "min_bid_price": 11040,
+      "fail_count": 0,
+      "bid_date": "2026-05-26~2026-05-28",
+      "risk_level": "high"
+    },
+    {
+      "id": 99,
+      "source": "public_sale",
+      "address": "경기도 용인시 수지구 164",
+      "item_type": "빌라",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-05-13~2026-05-15",
+      "risk_level": "high"
+    },
+    {
+      "id": 98,
+      "source": "public_sale",
+      "address": "부산광역시 남구 대연동 220",
+      "item_type": "빌라",
+      "appraisal_price": 36000,
+      "min_bid_price": 28800,
+      "fail_count": 1,
+      "bid_date": "2026-05-20~2026-05-22",
+      "risk_level": "medium"
+    },
+    {
+      "id": 97,
+      "source": "public_sale",
+      "address": "인천광역시 남동구 구월동 459",
+      "item_type": "토지",
+      "appraisal_price": 12000,
+      "min_bid_price": 11040,
+      "fail_count": 0,
+      "bid_date": "2026-05-06~2026-05-08",
+      "risk_level": "high"
+    },
+    {
+      "id": 96,
+      "source": "public_sale",
+      "address": "서울특별시 관악구 봉천동 140",
+      "item_type": "오피스텔",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-05-28~2026-05-30",
+      "risk_level": "high"
+    },
+    {
+      "id": 95,
+      "source": "public_sale",
+      "address": "대구광역시 수성구 범어동 230",
+      "item_type": "빌라",
+      "appraisal_price": 150000,
+      "min_bid_price": 102000,
+      "fail_count": 2,
+      "bid_date": "2026-05-10~2026-05-12",
+      "risk_level": "high"
+    },
+    {
+      "id": 94,
+      "source": "public_sale",
+      "address": "서울특별시 관악구 봉천동 443",
+      "item_type": "빌라",
+      "appraisal_price": 36000,
+      "min_bid_price": 33120,
+      "fail_count": 0,
+      "bid_date": "2026-05-14~2026-05-16",
+      "risk_level": "high"
+    },
+    {
+      "id": 93,
+      "source": "public_sale",
+      "address": "서울특별시 영등포구 여의도동 232",
+      "item_type": "아파트",
+      "appraisal_price": 36000,
+      "min_bid_price": 28800,
+      "fail_count": 1,
+      "bid_date": "2026-05-07~2026-05-09",
+      "risk_level": "high"
+    },
+    {
+      "id": 92,
+      "source": "public_sale",
+      "address": "대전광역시 서구 둔산동 285",
+      "item_type": "상가",
+      "appraisal_price": 80000,
+      "min_bid_price": 73600,
+      "fail_count": 0,
+      "bid_date": "2026-06-07~2026-06-09",
+      "risk_level": "high"
+    },
+    {
+      "id": 91,
+      "source": "public_sale",
+      "address": "서울특별시 강북구 수유동 440",
+      "item_type": "아파트",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-06-07~2026-06-09",
+      "risk_level": "medium"
+    },
+    {
+      "id": 90,
+      "source": "public_sale",
+      "address": "대구광역시 수성구 범어동 398",
+      "item_type": "상가",
+      "appraisal_price": 150000,
+      "min_bid_price": 120000,
+      "fail_count": 1,
+      "bid_date": "2026-05-08~2026-05-10",
+      "risk_level": "high"
+    },
+    {
+      "id": 89,
+      "source": "public_sale",
+      "address": "경기도 용인시 수지구 209",
+      "item_type": "토지",
+      "appraisal_price": 110000,
+      "min_bid_price": 101200,
+      "fail_count": 0,
+      "bid_date": "2026-06-07~2026-06-09",
+      "risk_level": "high"
+    },
+    {
+      "id": 88,
+      "source": "public_sale",
+      "address": "광주광역시 북구 운암동 258",
+      "item_type": "상가",
+      "appraisal_price": 36000,
+      "min_bid_price": 24480,
+      "fail_count": 2,
+      "bid_date": "2026-05-17~2026-05-19",
+      "risk_level": "high"
+    },
+    {
+      "id": 87,
+      "source": "public_sale",
+      "address": "경기도 안양시 동안구 407",
+      "item_type": "빌라",
+      "appraisal_price": 150000,
+      "min_bid_price": 138000,
+      "fail_count": 0,
+      "bid_date": "2026-05-29~2026-05-31",
+      "risk_level": "medium"
+    },
+    {
+      "id": 86,
+      "source": "public_sale",
+      "address": "서울특별시 강북구 수유동 14",
+      "item_type": "아파트",
+      "appraisal_price": 50000,
+      "min_bid_price": 46000,
+      "fail_count": 0,
+      "bid_date": "2026-05-31~2026-06-02",
+      "risk_level": "high"
+    },
+    {
+      "id": 85,
+      "source": "public_sale",
+      "address": "인천광역시 남동구 구월동 279",
+      "item_type": "토지",
+      "appraisal_price": 36000,
+      "min_bid_price": 33120,
+      "fail_count": 0,
+      "bid_date": "2026-05-06~2026-05-08",
+      "risk_level": "medium"
+    },
+    {
+      "id": 84,
+      "source": "public_sale",
+      "address": "서울특별시 관악구 봉천동 53",
+      "item_type": "상가",
+      "appraisal_price": 12000,
+      "min_bid_price": 9600,
+      "fail_count": 1,
+      "bid_date": "2026-05-07~2026-05-09",
+      "risk_level": "high"
+    },
+    {
+      "id": 83,
+      "source": "public_sale",
+      "address": "대구광역시 수성구 범어동 161",
+      "item_type": "토지",
+      "appraisal_price": 50000,
+      "min_bid_price": 46000,
+      "fail_count": 0,
+      "bid_date": "2026-05-10~2026-05-12",
+      "risk_level": "high"
+    },
+    {
+      "id": 82,
+      "source": "public_sale",
+      "address": "서울특별시 강북구 수유동 228",
+      "item_type": "토지",
+      "appraisal_price": 24000,
+      "min_bid_price": 19200,
+      "fail_count": 1,
+      "bid_date": "2026-05-22~2026-05-24",
+      "risk_level": "high"
+    },
+    {
+      "id": 81,
+      "source": "public_sale",
+      "address": "인천광역시 남동구 구월동 224",
+      "item_type": "상가",
+      "appraisal_price": 36000,
+      "min_bid_price": 28800,
+      "fail_count": 1,
+      "bid_date": "2026-06-03~2026-06-05",
+      "risk_level": "medium"
+    },
+    {
+      "id": 80,
+      "source": "public_sale",
+      "address": "경기도 용인시 수지구 321",
+      "item_type": "빌라",
+      "appraisal_price": 36000,
+      "min_bid_price": 33120,
+      "fail_count": 0,
+      "bid_date": "2026-06-01~2026-06-03",
+      "risk_level": "high"
+    },
+    {
+      "id": 79,
+      "source": "public_sale",
+      "address": "경기도 용인시 수지구 458",
+      "item_type": "토지",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-06-07~2026-06-09",
+      "risk_level": "medium"
+    },
+    {
+      "id": 78,
+      "source": "public_sale",
+      "address": "서울특별시 강북구 수유동 238",
+      "item_type": "빌라",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-05-12~2026-05-14",
+      "risk_level": "high"
+    },
+    {
+      "id": 77,
+      "source": "public_sale",
+      "address": "대전광역시 서구 둔산동 170",
+      "item_type": "오피스텔",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-05-17~2026-05-19",
+      "risk_level": "medium"
+    },
+    {
+      "id": 76,
+      "source": "public_sale",
+      "address": "서울특별시 강북구 수유동 342",
+      "item_type": "상가",
+      "appraisal_price": 50000,
+      "min_bid_price": 34000,
+      "fail_count": 2,
+      "bid_date": "2026-06-02~2026-06-04",
+      "risk_level": "high"
+    },
+    {
+      "id": 75,
+      "source": "public_sale",
+      "address": "서울특별시 영등포구 여의도동 295",
+      "item_type": "토지",
+      "appraisal_price": 110000,
+      "min_bid_price": 88000,
+      "fail_count": 1,
+      "bid_date": "2026-05-12~2026-05-14",
+      "risk_level": "high"
+    },
+    {
+      "id": 74,
+      "source": "public_sale",
+      "address": "경기도 안양시 동안구 53",
+      "item_type": "아파트",
+      "appraisal_price": 150000,
+      "min_bid_price": 120000,
+      "fail_count": 1,
+      "bid_date": "2026-05-12~2026-05-14",
+      "risk_level": "high"
+    },
+    {
+      "id": 73,
+      "source": "public_sale",
+      "address": "서울특별시 영등포구 여의도동 302",
+      "item_type": "오피스텔",
+      "appraisal_price": 24000,
+      "min_bid_price": 22080,
+      "fail_count": 0,
+      "bid_date": "2026-05-17~2026-05-19",
+      "risk_level": "high"
+    },
+    {
+      "id": 72,
+      "source": "public_sale",
+      "address": "대전광역시 서구 둔산동 425",
+      "item_type": "오피스텔",
+      "appraisal_price": 36000,
+      "min_bid_price": 33120,
+      "fail_count": 0,
+      "bid_date": "2026-05-25~2026-05-27",
+      "risk_level": "high"
+    },
+    {
+      "id": 71,
+      "source": "public_sale",
+      "address": "서울특별시 관악구 봉천동 358",
+      "item_type": "빌라",
+      "appraisal_price": 36000,
+      "min_bid_price": 33120,
+      "fail_count": 0,
+      "bid_date": "2026-05-21~2026-05-23",
+      "risk_level": "high"
+    }
+  ],
+  "agent_status": [
+    {
+      "name": "Natural Language Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Intent Understanding Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Recommendation Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Daily Briefing Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Action Planner Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Confidence Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Risk Checklist Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Reasoning Report Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Preference Learning Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Change Detection Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Item Q&A Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Outcome Simulation Agent",
+      "status": "OK"
+    },
+    {
+      "name": "Agent Orchestrator",
+      "status": "OK"
+    }
+  ]
+}
