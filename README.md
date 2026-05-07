@@ -139,6 +139,49 @@ python scripts/export_results.py --target all
 - [ ] `pytest tests/` 가 모두 통과하는지 확인
 - [ ] `python scripts/run_daily_pipeline.py --mock --count 50 --top 5` 가 정상 종료되는지 확인
 
+## Streamlit Cloud 배포 (무료)
+
+이 저장소는 [Streamlit Community Cloud](https://share.streamlit.io) 에 그대로 배포 가능합니다. private 저장소 + secrets 도 무료 티어에서 지원됩니다.
+
+### 1. 사전 준비
+- GitHub 계정 (private repo OK)
+- Streamlit Community Cloud 계정 (https://share.streamlit.io 에서 GitHub 로그인)
+
+### 2. 배포 단계
+1. https://share.streamlit.io → **New app**
+2. 다음과 같이 설정:
+   - **Repository**: `1976haru/auction` (또는 본인 저장소)
+   - **Branch**: `main`
+   - **Main file path**: `dashboard/app.py`
+   - **Python version**: 3.11 (`runtime.txt` 자동 인식)
+3. **Deploy** 클릭 → 1~2분 후 https://<app-name>.streamlit.app 에서 접근 가능
+
+### 3. Secrets 설정 (선택 — mock 모드면 불필요)
+앱 페이지 우상단 ⋮ → **Settings** → **Secrets** 메뉴에 다음 내용 붙여넣기:
+
+```toml
+USE_MOCK_APIS = "true"   # 키 없으면 그대로 두면 모든 데모 동작이 mock으로
+USE_AI = "false"
+ANTHROPIC_API_KEY = ""
+PUBLIC_DATA_SERVICE_KEY = ""
+TELEGRAM_BOT_TOKEN = ""
+TELEGRAM_CHAT_ID = ""
+```
+
+전체 키 목록은 `.streamlit/secrets.toml.example` 참고. Streamlit Cloud 의 secret 은 자동으로 `os.environ` 에 복사됩니다 (`dashboard/bootstrap.py`).
+
+### 4. 자동 부트스트랩
+첫 실행 시 DB 가 비어 있으면 mock 데이터 80건 + 분석 + 추천이 자동 생성되어 사이드바에 "자동 시드 완료" 안내가 표시됩니다. 방문자가 즉시 모든 탭을 둘러볼 수 있습니다.
+
+### 5. 운영 모드 전환
+- secrets 에서 `USE_MOCK_APIS = "false"` + 실제 API 키 입력 → 다음 재시작부터 실 API 호출
+- 자동 시드는 mock 모드에서만 의미 있으며, 실제 API 모드에서는 GitHub Actions daily.yml 의 cron 또는 수동 파이프라인으로 데이터 채움
+
+### 6. 제약사항
+- Streamlit Cloud 의 파일시스템은 ephemeral — 앱 sleep/restart 시 SQLite DB 가 초기화될 수 있음 (자동 시드로 복구)
+- 외부 API key 는 secrets 으로 관리 (절대 코드에 하드코딩 금지)
+- 무료 티어는 동시 1 visitor + 1 GB 메모리 제한
+
 ## 실제 API 전환 방법
 
 `.env` 에서 다음 항목을 실제 키로 채우고 `USE_MOCK_APIS=false` 로 변경:

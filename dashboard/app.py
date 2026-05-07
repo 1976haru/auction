@@ -16,6 +16,10 @@ import json
 import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
 
+# 부트스트랩 (st.secrets -> env 복사 + DB 비어있으면 자동 시드)
+from dashboard.bootstrap import bootstrap as _bootstrap  # noqa: E402
+_BOOTSTRAP = _bootstrap()
+
 from dashboard.charts import (
     backtest_timeline,
     backtest_winrate_timeline,
@@ -96,6 +100,10 @@ with st.sidebar:
     rt = runtime_summary()
     st.caption(f"Mode: {'MOCK' if rt['use_mock_apis'] else 'REAL'} / "
                f"AI: {'on' if rt['use_ai'] else 'off'}")
+    if _BOOTSTRAP.get("seeded"):
+        st.success("자동 시드 완료 (mock 80건)")
+    elif _BOOTSTRAP.get("hydrated"):
+        st.caption(f"환경변수 {_BOOTSTRAP['hydrated']}개 secrets 에서 로드")
     tab_sel = st.radio(
         "메뉴",
         [
