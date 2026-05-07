@@ -26,6 +26,13 @@ DEFAULT_PREF = {
     "min_roi": DEFAULT_MIN_ROI,
     "exclude_keywords": [],
     "notes": "기본값 (선호 데이터 없음)",
+    # 알림 설정
+    "alerts_enabled": True,
+    "alert_channel": "telegram",
+    "alert_min_grade": "B",
+    "alert_imminent_days": 3,
+    "alert_only_watched": False,
+    "alert_include_briefing": True,
 }
 
 
@@ -104,8 +111,10 @@ def save_preferences(pref: dict) -> None:
     c.execute("""
         INSERT INTO user_preferences
             (regions_json, item_types_json, max_risk_level,
-             min_profit_man, min_roi, exclude_keywords, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+             min_profit_man, min_roi, exclude_keywords, notes,
+             alerts_enabled, alert_channel, alert_min_grade,
+             alert_imminent_days, alert_only_watched, alert_include_briefing)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         safe_json(pref.get("regions", [])),
         safe_json(pref.get("item_types", [])),
@@ -114,6 +123,12 @@ def save_preferences(pref: dict) -> None:
         float(pref.get("min_roi", DEFAULT_MIN_ROI)),
         safe_json(pref.get("exclude_keywords", [])),
         pref.get("notes", ""),
+        1 if pref.get("alerts_enabled", True) else 0,
+        pref.get("alert_channel", "telegram"),
+        pref.get("alert_min_grade", "B"),
+        int(pref.get("alert_imminent_days", 3)),
+        1 if pref.get("alert_only_watched", False) else 0,
+        1 if pref.get("alert_include_briefing", True) else 0,
     ))
     conn.commit()
     conn.close()
@@ -134,6 +149,12 @@ def get_preferences() -> dict:
         "min_roi": float(row["min_roi"] or DEFAULT_MIN_ROI),
         "exclude_keywords": loads(row["exclude_keywords"], []),
         "notes": row["notes"] or "",
+        "alerts_enabled": bool(row["alerts_enabled"]) if row["alerts_enabled"] is not None else True,
+        "alert_channel": row["alert_channel"] or "telegram",
+        "alert_min_grade": row["alert_min_grade"] or "B",
+        "alert_imminent_days": int(row["alert_imminent_days"] or 3),
+        "alert_only_watched": bool(row["alert_only_watched"]),
+        "alert_include_briefing": bool(row["alert_include_briefing"]) if row["alert_include_briefing"] is not None else True,
     }
 
 

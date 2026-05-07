@@ -126,6 +126,9 @@ def run_pipeline(use_mock: bool = True, count: int = 100,
     print(f"분석 완료: 시세 {summary['price_analyzed']}건 / 위험 {summary['risk_analyzed']}건")
     print(f"오늘 액션: {summary['actions_planned']}건 / 변경 감지 {summary['changes_detected']}건")
     print(f"브리핑: {summary['briefing_summary']}")
+    if summary.get("alerts"):
+        a = summary["alerts"]
+        print(f"알림: 발송 {a['sent']}건 / 스킵 {a['skipped']}건 / 실패 {a['failed']}건")
     print(f"파일: {paths}")
     print(f"소요 {elapsed:.2f}초\n")
     return summary

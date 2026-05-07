@@ -17,6 +17,11 @@ import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
 
 from agents.action_planner_agent import list_today_actions
+from agents.alert_agent import (
+    collect_pending_alerts,
+    dispatch_alerts,
+    list_recent_alerts,
+)
 from agents.bidding_agent import format_bid_report, get_bid_recommendation
 from agents.change_detection_agent import list_recent_events
 from agents.confidence_agent import get_confidence
@@ -78,6 +83,7 @@ with st.sidebar:
             "시세 트렌드",
             "변화 감지",
             "사용자 선호 설정",
+            "알림",
             "스트레스 테스트 결과",
             "도움말",
         ],
@@ -438,6 +444,8 @@ elif tab_sel == "변화 감지":
 elif tab_sel == "사용자 선호 설정":
     st.header("사용자 선호 설정")
     pref = get_preferences()
+
+    st.subheader("추천 필터")
     regions = st.text_input("선호 지역 (쉼표)", ",".join(pref.get("regions", [])))
     types = st.text_input("선호 유형 (쉼표)", ",".join(pref.get("item_types", [])))
     max_risk = st.selectbox(
@@ -447,7 +455,22 @@ elif tab_sel == "사용자 선호 설정":
     min_profit = st.number_input("최소 기대수익(만원)", value=int(pref.get("min_profit_man", 3000)))
     min_roi = st.number_input("최소 ROI", value=float(pref.get("min_roi", 0.05)))
     excludes = st.text_input("제외 키워드 (쉼표)", ",".join(pref.get("exclude_keywords", [])))
-    if st.button("저장"):
+
+    st.divider()
+    st.subheader("알림 설정")
+    alerts_enabled = st.checkbox("알림 활성화", value=pref.get("alerts_enabled", True))
+    alert_min_grade = st.selectbox(
+        "최소 알림 등급", ["A", "B", "C"],
+        index=["A", "B", "C"].index(pref.get("alert_min_grade", "B")),
+    )
+    alert_imminent_days = st.slider("입찰기일 임박 알림 (D-N 이내)", 1, 14,
+                                     int(pref.get("alert_imminent_days", 3)))
+    alert_only_watched = st.checkbox("관심 매물만 알림",
+                                      value=pref.get("alert_only_watched", False))
+    alert_include_briefing = st.checkbox("일일 브리핑도 알림에 포함",
+                                          value=pref.get("alert_include_briefing", True))
+
+    if st.button("저장", type="primary"):
         save_preferences({
             "regions": [s.strip() for s in regions.split(",") if s.strip()],
             "item_types": [s.strip() for s in types.split(",") if s.strip()],
@@ -456,10 +479,65 @@ elif tab_sel == "사용자 선호 설정":
             "min_roi": float(min_roi),
             "exclude_keywords": [s.strip() for s in excludes.split(",") if s.strip()],
             "notes": "수동 설정",
+            "alerts_enabled": alerts_enabled,
+            "alert_channel": pref.get("alert_channel", "telegram"),
+            "alert_min_grade": alert_min_grade,
+            "alert_imminent_days": alert_imminent_days,
+            "alert_only_watched": alert_only_watched,
+            "alert_include_briefing": alert_include_briefing,
         })
         st.success("저장됨")
 
-# 12. 스트레스 테스트 결과 -----------------------------------------
+# 12. 알림 ---------------------------------------------------------
+elif tab_sel == "알림":
+    st.header("알림")
+    pref = get_preferences()
+
+    if not pref.get("alerts_enabled", True):
+        st.warning("알림이 비활성화 상태입니다. '사용자 선호 설정' 탭에서 다시 켤 수 있습니다.")
+    else:
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("최소 등급", pref.get("alert_min_grade", "B"))
+        c2.metric("D-N 이내", f"{pref.get('alert_imminent_days', 3)}일")
+        c3.metric("관심만", "예" if pref.get("alert_only_watched") else "아니오")
+        c4.metric("브리핑 포함", "예" if pref.get("alert_include_briefing", True) else "아니오")
+
+    st.subheader("발송 대기 중 알림 (preview)")
+    pending = collect_pending_alerts(pref)
+    if not pending:
+        st.info("발송 대기 중인 알림 없음 (모두 발송 완료 또는 조건 미충족).")
+    else:
+        df = pd.DataFrame([{
+            "유형": a["alert_type"], "우선": a["priority"],
+            "제목": a["title"], "본문": a["body"][:80] + "...",
+        } for a in pending])
+        st.dataframe(df, use_container_width=True)
+
+    col_a, col_b = st.columns(2)
+    with col_a:
+        if st.button("미리보기 (dry-run)"):
+            res = dispatch_alerts(pref, dry_run=True)
+            st.json(res)
+    with col_b:
+        if st.button("지금 발송", type="primary"):
+            with st.spinner("발송 중..."):
+                res = dispatch_alerts(pref, dry_run=False)
+            st.success(f"발송 {res['sent']}건 / 스킵 {res['skipped']}건 / 실패 {res['failed']}건")
+            st.json(res)
+
+    st.divider()
+    st.subheader("최근 알림 로그")
+    logs = list_recent_alerts(50)
+    if not logs:
+        st.info("알림 로그 없음")
+    else:
+        df = pd.DataFrame(logs)
+        cols = [c for c in ["id", "alert_type", "priority", "title", "channel",
+                            "status", "sent_at", "created_at", "error_message"]
+                if c in df.columns]
+        st.dataframe(df[cols], use_container_width=True)
+
+# 13. 스트레스 테스트 결과 -----------------------------------------
 elif tab_sel == "스트레스 테스트 결과":
     st.header("스트레스 테스트 결과")
     conn = get_connection()

@@ -229,8 +229,38 @@ def init_db() -> None:
         min_roi              REAL,
         exclude_keywords     TEXT,
         notes                TEXT,
+        alerts_enabled       INTEGER DEFAULT 1,
+        alert_channel        TEXT DEFAULT 'telegram',
+        alert_min_grade      TEXT DEFAULT 'B',
+        alert_imminent_days  INTEGER DEFAULT 3,
+        alert_only_watched   INTEGER DEFAULT 0,
+        alert_include_briefing INTEGER DEFAULT 1,
         updated_at           TEXT DEFAULT (datetime('now','localtime'))
     )""")
+    _ensure_column(conn, "user_preferences", "alerts_enabled", "alerts_enabled INTEGER DEFAULT 1")
+    _ensure_column(conn, "user_preferences", "alert_channel", "alert_channel TEXT DEFAULT 'telegram'")
+    _ensure_column(conn, "user_preferences", "alert_min_grade", "alert_min_grade TEXT DEFAULT 'B'")
+    _ensure_column(conn, "user_preferences", "alert_imminent_days", "alert_imminent_days INTEGER DEFAULT 3")
+    _ensure_column(conn, "user_preferences", "alert_only_watched", "alert_only_watched INTEGER DEFAULT 0")
+    _ensure_column(conn, "user_preferences", "alert_include_briefing", "alert_include_briefing INTEGER DEFAULT 1")
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS alert_log (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        alert_type      TEXT NOT NULL,
+        item_id         INTEGER,
+        dedupe_key      TEXT NOT NULL UNIQUE,
+        priority        TEXT DEFAULT 'medium',
+        title           TEXT,
+        body            TEXT,
+        channel         TEXT,
+        sent_at         TEXT,
+        status          TEXT DEFAULT 'pending',
+        error_message   TEXT,
+        created_at      TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_alert_log_type ON alert_log(alert_type)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_alert_log_item ON alert_log(item_id)")
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS user_feedback (

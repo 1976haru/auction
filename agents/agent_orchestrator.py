@@ -8,6 +8,7 @@ import time
 from typing import Any
 
 from agents.action_planner_agent import plan_actions
+from agents.alert_agent import dispatch_alerts
 from agents.change_detection_agent import detect_changes
 from agents.confidence_agent import compute_all as compute_confidence_all
 from agents.daily_briefing_agent import generate_briefing
@@ -45,6 +46,8 @@ def run_full_analysis(top_query: str = "시세차익 큰 물건 5개 찾아줘")
     briefing = generate_briefing(top_query=top_query)
     log.info("[orchestrator] simulation (top)")
     sims = simulate_top(briefing["top_picks"][:5])
+    log.info("[orchestrator] alerts")
+    alerts = dispatch_alerts(pref)
 
     elapsed = time.time() - started
 
@@ -61,6 +64,7 @@ def run_full_analysis(top_query: str = "시세차익 큰 물건 5개 찾아줘")
         "top_picks": briefing["top_picks"],
         "briefing_summary": briefing["summary"],
         "simulations": len(sims),
+        "alerts": alerts,
     }
     return summary
 
