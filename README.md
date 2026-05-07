@@ -99,11 +99,14 @@ copy .env.example .env     # Windows
 ### 초보자용 명령어 모음
 
 ```bash
+# 0) 환경 진단 (가장 먼저 실행 권장)
+python scripts/doctor.py
+
 # 1) DB 초기화
 python main.py --init-only
 
-# 2) mock 데이터 100건 생성
-python scripts/generate_mock_data.py --count 100 --seed 42
+# 2) mock 데이터 100건 생성 (DB 깨끗이 시작하려면 --reset)
+python scripts/generate_mock_data.py --count 100 --seed 42 --reset
 
 # 3) 일일 파이프라인 실행 (mock-first)
 python scripts/run_daily_pipeline.py --mock --count 100 --top 5
@@ -122,7 +125,24 @@ python scripts/run_stress_test.py --count 1000 --queries 20
 
 # 8) 결과 내보내기
 python scripts/export_results.py --target all
+
+# 9) 외부 API 헬스체크
+python scripts/check_apis.py
+
+# 10) 매물 PDF 리포트 다운로드
+python scripts/export_report.py --item-id 63
 ```
+
+### 트러블슈팅
+
+| 증상 | 해결 |
+|---|---|
+| `pip install` 실패 | Python 3.9+ 확인, `python -m pip install --upgrade pip` |
+| `ModuleNotFoundError` | `python scripts/doctor.py` 로 어느 패키지 빠졌는지 확인 |
+| DB 파일이 잠겨 있음 | 다른 streamlit/python 프로세스 종료 후 재시도 |
+| GitHub raw 에서 파일이 한 줄로 보임 | GitHub raw 디스플레이 한계 - 실제 파일은 정상. clone 받아서 확인 |
+| Streamlit Cloud 재시작 후 데이터 사라짐 | ephemeral fs 한계. 자동 mock 시드로 복구 또는 Turso 연결 권장 |
+| `streamlit` 콘솔에 한글 깨짐 | 콘솔 코드페이지 (Windows: `chcp 65001`) - 브라우저는 정상 |
 
 ### 핵심 사용 시나리오
 
@@ -343,15 +363,30 @@ python scripts/populate_real_data.py --count 50 --include-auction
 
 mock 과 real 어댑터의 함수 시그니처가 동일하므로 호출자 코드는 변경 없이 데이터 소스만 바뀝니다.
 
-## 주의사항
+## 주의사항 — 권리분석 표현 원칙
 
 > 본 프로젝트의 권리분석 기능은 **법률 판단이 아니라 위험요소 체크리스트와 추가 확인사항을 제공**하는 보조 도구입니다.
 
-- "안전합니다", "입찰해도 됩니다", "보장됩니다" 같은 단정 표현을 사용하지 않습니다.
-- 모든 추천은 "검토 후보 / 주의 필요 / 추가 확인 필요" 표현으로 제시됩니다.
+- "안전합니다", "입찰해도 됩니다", "보장됩니다", "수익 확정" 같은 **단정 표현을 사용하지 않습니다**.
+- 모든 추천 결과는 "**검토 후보 / 주의 필요 / 추가 확인 필요 / 현재 자료 기준**" 표현으로 제시됩니다.
+- 등급 X 는 거품/음수 차익으로 자동 제외 — 입찰 추천 아님 (참고용 분류).
+
+## Public Repo 주의사항
+
+저장소가 public 으로 공개되었거나 향후 공개할 계획이 있다면 다음 사항을 반드시 확인하세요.
+
+- `.env` 파일이 git 에 올라가지 않는지 확인 (`.gitignore` 에 포함됨)
+- API 키가 코드/README/예제에 직접 적혀 있지 않은지 확인 (`.env.example` 만 커밋)
+- `data/*.db`, `logs/*.log`, `data/exports/*.json|csv|md|pdf|db.gz` 가 ignore 되는지 확인
+- `.streamlit/secrets.toml` 도 ignore (예시는 `.streamlit/secrets.toml.example` 만 커밋)
+- `git log --all -p -S "sk-"` 로 토큰 패턴이 과거 커밋에 남아있지 않은지 검사 권장
+
+이미 push 한 이후라면:
+- 키 즉시 폐기 후 재발급
+- private 으로 visibility 변경 (Settings → Danger Zone)
 
 ## 면책
 
 - 본 프로그램은 개인 학습·개발용 MVP 입니다.
-- 추천 결과는 참고용이며, 투자 판단과 법률 판단은 사용자가 별도로 검토해야 합니다.
+- 추천 결과는 **현재 자료 기준 참고용**이며, 투자 판단과 법률 판단은 사용자가 별도로 검토해야 합니다.
 - 실제 입찰 전 매각물건명세서, 등기부등본, 현장조사, 전문가 검토를 반드시 병행하세요.

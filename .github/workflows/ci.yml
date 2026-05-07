@@ -34,7 +34,7 @@ jobs:
         run: python main.py --init-only
 
       - name: Generate small mock data
-        run: python scripts/generate_mock_data.py --count 50 --seed 42
+        run: python scripts/generate_mock_data.py --count 50 --seed 42 --reset
 
       - name: Run daily pipeline (mock, count=50)
         run: python scripts/run_daily_pipeline.py --mock --count 50 --top 5
