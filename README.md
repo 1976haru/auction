@@ -182,6 +182,51 @@ TELEGRAM_CHAT_ID = ""
 - 외부 API key 는 secrets 으로 관리 (절대 코드에 하드코딩 금지)
 - 무료 티어는 동시 1 visitor + 1 GB 메모리 제한
 
+## 외부 영구 DB (Turso, 선택)
+
+Streamlit Cloud 의 파일시스템은 ephemeral 이라 앱 재시작 시 SQLite DB 가 초기화됩니다. 자동 부트스트랩이 mock 데이터를 다시 시드하지만 **사용자 설정 / 워치리스트 / 알림 로그 / 백테스트 기록 / 튜닝 결과** 같은 영구 데이터는 사라집니다. 이를 해결하려면 Turso (libSQL Cloud) 를 사용하세요.
+
+### Turso 사용 (무료 티어)
+
+1. https://turso.tech 가입 → 데이터베이스 생성 → URL 과 auth token 복사
+2. 의존성 설치:
+   ```bash
+   pip install libsql-experimental
+   ```
+3. `.env` 또는 Streamlit secrets:
+   ```
+   TURSO_DATABASE_URL=libsql://your-db-name.turso.io
+   TURSO_AUTH_TOKEN=eyJhbGc...
+   ```
+4. 헬스체크: `python scripts/check_apis.py`
+5. 다음 실행부터 자동으로 Turso 연결. 키 미설정 또는 `libsql-experimental` 미설치 시 SQLite fallback (안전).
+
+### SQLite 백업/복원 (간단 대안)
+
+Turso 없이도 SQLite 파일을 주기적으로 백업/복원 가능:
+
+```bash
+# 백업 (gzip 압축)
+python scripts/backup_db.py
+# data/exports/db_backup_YYYYMMDD_HHMMSS.db.gz 생성
+
+# 복원
+python scripts/restore_db.py --src data/exports/db_backup_xxx.db.gz --force
+```
+
+GitHub Actions 같은 CI에서 매일 백업 후 artifact 로 보관하거나, Streamlit Cloud 사이드바에 다운로드 버튼을 추가하는 방법도 가능합니다.
+
+### 백엔드 자동 분기 동작
+
+| 환경 | 활성 backend | 비고 |
+|---|:---:|---|
+| `TURSO_*` 미설정 | SQLite | 기본, 빠른 로컬 |
+| `TURSO_*` 설정 + libsql 설치 | **Turso** | 클라우드 영구 |
+| `TURSO_*` 설정 + libsql 미설치 | SQLite | 경고 후 fallback |
+| Turso 연결 실패 | SQLite | 경고 후 fallback |
+
+`core.db_backend.get_backend_name()` 으로 현재 활성 backend 확인 가능. 헬스체크 (`scripts/check_apis.py`) 의 `turso` 항목에서도 확인.
+
 ## 실제 API 전환 방법 (단계별)
 
 mock-first 모드는 데모/개발용입니다. 실제 매물·시세 데이터로 운영하려면 다음 단계를 따라가세요.

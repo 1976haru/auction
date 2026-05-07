@@ -136,6 +136,31 @@ def check_email() -> dict:
         return {"status": "error", "ok": False, "note": str(e)[:120]}
 
 
+def check_turso() -> dict:
+    """Turso 외부 영구 DB 연결."""
+    if not config.TURSO_DATABASE_URL or not config.TURSO_AUTH_TOKEN:
+        return {"status": "missing_key", "ok": True,
+                 "note": "TURSO 미설정 (로컬 SQLite 사용 - 정상)"}
+    try:
+        import libsql_experimental as libsql
+        conn = libsql.connect(
+            "auction_agent.db",
+            sync_url=config.TURSO_DATABASE_URL,
+            auth_token=config.TURSO_AUTH_TOKEN,
+        )
+        try:
+            conn.execute("SELECT 1").fetchone()
+            return {"status": "ok", "ok": True,
+                     "note": "Turso 연결 OK"}
+        except Exception as e:
+            return {"status": "error", "ok": False, "note": str(e)[:100]}
+    except ImportError:
+        return {"status": "no_lib", "ok": False,
+                 "note": "libsql-experimental 미설치 (pip install libsql-experimental)"}
+    except Exception as e:
+        return {"status": "error", "ok": False, "note": str(e)[:100]}
+
+
 def check_telegram() -> dict:
     if not config.TELEGRAM_BOT_TOKEN or not config.TELEGRAM_CHAT_ID:
         return {"status": "missing_key", "ok": False,
@@ -184,6 +209,7 @@ def run_all() -> dict:
             "slack": check_slack(),
             "discord": check_discord(),
             "email": check_email(),
+            "turso": check_turso(),
         },
     }
 

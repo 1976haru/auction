@@ -33,6 +33,7 @@ data/exports/*.json
 data/exports/*.csv
 data/exports/*.md
 data/exports/*.pdf
+data/exports/*.db.gz
 !data/exports/.gitkeep
 
 # 큰 바이너리/패키지

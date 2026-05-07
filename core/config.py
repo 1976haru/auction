@@ -59,6 +59,10 @@ DB_PATH            = _get("DB_PATH", "data/auction_agent.db")
 EXPORT_DIR         = _get("EXPORT_DIR", "data/exports")
 FIXTURE_DIR        = _get("FIXTURE_DIR", "data/fixtures")
 
+# Turso (외부 영구 DB - 선택). 설정되면 SQLite 대신 사용.
+TURSO_DATABASE_URL = _get("TURSO_DATABASE_URL")
+TURSO_AUTH_TOKEN   = _get("TURSO_AUTH_TOKEN")
+
 # 관심 대상 기본값 ---------------------------------------------------
 TARGET_REGIONS     = [r.strip() for r in _get("TARGET_REGIONS", "서울특별시,경기도,인천광역시").split(",") if r.strip()]
 TARGET_TYPES       = [t.strip() for t in _get("TARGET_TYPES", "아파트,오피스텔,빌라").split(",") if t.strip()]

@@ -27,15 +27,10 @@ ITEM_COLUMNS = [
 
 
 def get_connection() -> sqlite3.Connection:
-    db_path = _config.DB_PATH
-    db_dir = os.path.dirname(db_path)
-    if db_dir:
-        os.makedirs(db_dir, exist_ok=True)
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    """DB 연결 반환. Turso 키가 설정되어 있으면 Turso, 아니면 SQLite.
+    db_backend.open_connection() 이 라우팅 담당."""
+    from core.db_backend import open_connection
+    return open_connection()
 
 
 def build_unique_key(data: dict[str, Any]) -> str:
