@@ -56,6 +56,12 @@ from agents.monitoring_agent import (
     get_stress_history,
     pipeline_timeline_series,
 )
+from agents.auto_tune_agent import (
+    activate_weights,
+    deactivate_all,
+    grid_search,
+    list_tuned_weights,
+)
 from agents.backtest_agent import (
     backtest_all_items,
     fetch_pred_actual_pairs,
@@ -1034,6 +1040,83 @@ elif tab_sel == "백테스트":
                                      "a_mean", "b_mean", "c_mean",
                                      "d_mean", "x_mean"] if c in df.columns]
                 st.dataframe(df[cols], use_container_width=True)
+
+    # 자동 튜닝
+    st.divider()
+    st.subheader("자동 튜닝 (가중치 grid search)")
+    st.caption("점수 가중치를 자동으로 탐색해 단조감소 + 등급 구분력을 최대화합니다.")
+
+    cc1, cc2 = st.columns([2, 1])
+    with cc1:
+        max_combos = st.slider("최대 조합 수", 10, 200, 50,
+                                  help="값이 클수록 더 정밀하지만 시간 소요")
+    with cc2:
+        apply_best = st.checkbox("최적값 즉시 활성화", value=False)
+    if st.button("자동 튜닝 실행", type="primary", key="auto_tune_run"):
+        with st.spinner(f"가중치 {max_combos}개 조합 탐색 중..."):
+            results = grid_search(scenario=history_scenario,
+                                    max_combos=max_combos)
+        if not results:
+            st.error("결과 없음 - 데이터를 먼저 채우세요")
+        else:
+            best = results[0]
+            from agents.auto_tune_agent import save_tuned_weights as _save
+            rid = _save(best["weights"], best["quality"],
+                          notes=f"grid {max_combos} (dashboard)",
+                          activate=apply_best)
+            st.success(f"#{rid} 저장 완료. 활성화: {apply_best}")
+            st.session_state["tune_results"] = results
+
+    res = st.session_state.get("tune_results")
+    if res:
+        st.markdown("**상위 10 조합**")
+        rows = []
+        for i, r in enumerate(res[:10], 1):
+            means = r["ordering"]["grade_means"]
+            rows.append({
+                "rank": i,
+                "quality": round(r["quality"], 2),
+                "monotonic": "OK" if r["ordering"]["monotonic_decreasing"] else "NO",
+                "A": int(means.get("A", 0)),
+                "B": int(means.get("B", 0)),
+                "C": int(means.get("C", 0)),
+                "D": int(means.get("D", 0)),
+                "X": int(means.get("X", 0)),
+                "profit_max": r["weights"]["profit_max"],
+                "profit_div": r["weights"]["profit_divisor"],
+                "risk_low": r["weights"]["risk_low"],
+                "risk_high": r["weights"]["risk_high"],
+                "A_cutoff": r["weights"]["grade_a_cutoff"],
+                "B_cutoff": r["weights"]["grade_b_cutoff"],
+            })
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    # 저장된 튜닝 기록
+    st.markdown("**저장된 튜닝 기록**")
+    tuned_history = list_tuned_weights(20)
+    if not tuned_history:
+        st.caption("기록 없음")
+    else:
+        for t in tuned_history[:10]:
+            cols = st.columns([1, 2, 1, 1, 2])
+            cols[0].write(f"#{t['id']}")
+            cols[1].caption(t.get("notes", "") or "-")
+            cols[2].metric("quality", f"{(t['quality_score'] or 0):.1f}",
+                            label_visibility="collapsed")
+            active_label = "🟢 활성" if t.get("is_active") else ""
+            cols[3].write(active_label)
+            with cols[4]:
+                btn_cols = st.columns(2)
+                if btn_cols[0].button("활성화", key=f"act_{t['id']}",
+                                          disabled=bool(t.get("is_active"))):
+                    activate_weights(t["id"])
+                    st.success("활성화")
+                    st.rerun()
+                if btn_cols[1].button("비활성", key=f"deact_{t['id']}",
+                                          disabled=not t.get("is_active")):
+                    deactivate_all()
+                    st.info("기본값으로 복귀")
+                    st.rerun()
 
 # 14. 스트레스 테스트 결과 -----------------------------------------
 elif tab_sel == "스트레스 테스트 결과":

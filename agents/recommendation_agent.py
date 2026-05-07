@@ -29,6 +29,49 @@ from modules.risk.keyword_analyzer import get_risk_flags, get_risk_level
 RISK_LEVEL_RANK = {"low": 1, "medium": 2, "high": 3, "unknown": 2, "very_low": 0}
 
 
+# 점수 가중치 기본값. auto_tune_agent 가 grid search 로 최적값을 찾을 수 있게
+# 따로 분리해서 관리한다. 합계는 100이 아니어도 됨 (절대값으로 grade 컷오프 비교).
+WEIGHTS_DEFAULT = {
+    "profit_max": 45,         # 시세차익 점수 상한
+    "profit_divisor": 2000,   # 1점 단위 (2000만원 = 1점)
+    "price_conf_max": 15,
+    "risk_low": 20,
+    "risk_medium": 12,
+    "risk_high": 4,
+    "risk_unknown": 10,
+    "bid_max": 5,
+    "pref_max": 5,
+    "pref_compress": 0.5,     # raw 0~10 -> 0~5 압축 비율
+    "data_max": 10,
+    # 등급 컷오프
+    "grade_a_cutoff": 75,
+    "grade_b_cutoff": 60,
+    "grade_c_cutoff": 45,
+}
+
+
+def _load_active_weights() -> dict:
+    """tuned_weights 테이블에서 is_active=1 인 가중치 로드. 없으면 default."""
+    try:
+        from core.database import get_connection
+        conn = get_connection()
+        row = conn.execute(
+            "SELECT weights_json FROM tuned_weights WHERE is_active=1 "
+            "ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        conn.close()
+        if row and row["weights_json"]:
+            import json as _json
+            try:
+                w = _json.loads(row["weights_json"])
+                return {**WEIGHTS_DEFAULT, **w}
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return dict(WEIGHTS_DEFAULT)
+
+
 def _filter_by_intent(items: list[dict], intent: dict, pref: dict) -> list[dict]:
     """후보 1차 필터링. 사용자 선호의 min_profit/min_roi 도 함께 적용."""
     f = intent.get("filters", {})
@@ -84,57 +127,68 @@ def _filter_by_intent(items: list[dict], intent: dict, pref: dict) -> list[dict]
     return out
 
 
-def _grade_for(score: float, has_critical_gap: bool) -> str:
-    """등급 컷오프. 가중치 조정 (profit 35->45, bid/pref 10->5) 에 맞춰 재조정.
-    A는 75 이상으로 올려서 진짜 우량 매물만 통과시킴."""
+def _grade_for(score: float, has_critical_gap: bool, weights: dict | None = None) -> str:
+    """등급 컷오프. weights 의 grade_a/b/c_cutoff 사용 (없으면 75/60/45)."""
     if has_critical_gap:
         return "X"
-    if score >= 75:
+    w = weights or WEIGHTS_DEFAULT
+    if score >= w.get("grade_a_cutoff", 75):
         return "A"
-    if score >= 60:
+    if score >= w.get("grade_b_cutoff", 60):
         return "B"
-    if score >= 45:
+    if score >= w.get("grade_c_cutoff", 45):
         return "C"
     return "D"
 
 
-def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict) -> dict:
+def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict,
+                weights: dict | None = None) -> dict:
+    """매물 점수 + 등급 산출.
+
+    weights=None 이면 활성화된 tuned_weights 사용 (없으면 DEFAULT).
+    auto_tune 이 grid search 시에는 weights 를 명시적으로 전달.
+    """
+    w = weights if weights is not None else _load_active_weights()
     profit = profit_info.get("profit", 0)
     roi = profit_info.get("roi", 0)
     risk_level = item.get("_risk_level", "unknown")
     bid_days = days_until(item.get("bid_date"))
     price_analysis = item.get("_price") or {}
 
-    # 1) 시세차익 (45점) - 분모 2000으로 조정해서 90,000만원까지 차등 평가
+    # 1) 시세차익
     profit_pts = 0
     if profit > 0:
-        profit_pts = min(45, profit / 2000)
-    # 2) 시세 신뢰도 (15점)
-    price_conf_pts = (conf.get("price_confidence", 0) or 0) * 15
-    # 3) 위험도 (20점)
-    risk_pts = {"low": 20, "medium": 12, "high": 4}.get(risk_level, 10)
-    # 4) 입찰기일 (5점) - 타이밍은 중요하지만 손익 예측 신호로는 약함
+        profit_pts = min(w["profit_max"], profit / w["profit_divisor"])
+    # 2) 시세 신뢰도
+    price_conf_pts = (conf.get("price_confidence", 0) or 0) * w["price_conf_max"]
+    # 3) 위험도
+    risk_pts = {
+        "low": w["risk_low"], "medium": w["risk_medium"],
+        "high": w["risk_high"],
+    }.get(risk_level, w["risk_unknown"])
+    # 4) 입찰기일
+    bid_max = w["bid_max"]
     if bid_days is None:
-        bid_pts = 2
+        bid_pts = bid_max * 0.4
     elif bid_days < 0:
         bid_pts = 0
     elif bid_days <= 7:
-        bid_pts = 5
+        bid_pts = bid_max
     elif bid_days <= 14:
-        bid_pts = 3.5
+        bid_pts = bid_max * 0.7
     elif bid_days <= 30:
-        bid_pts = 2.5
+        bid_pts = bid_max * 0.5
     else:
-        bid_pts = 1.5
-    # 5) 사용자 선호 (5점) - 손익 예측보다는 취향 가중치
+        bid_pts = bid_max * 0.3
+    # 5) 사용자 선호
     pref_raw, pref_reasons = preference_match_score(item, pref)
-    pref_pts = pref_raw * 0.5  # 0~10 -> 0~5 압축
-    # 6) 데이터 완성도 (10점)
-    data_pts = (conf.get("overall_confidence", 0) or 0) * 10
+    pref_pts = pref_raw * w["pref_compress"]
+    pref_pts = min(pref_pts, w["pref_max"])
+    # 6) 데이터 완성도
+    data_pts = (conf.get("overall_confidence", 0) or 0) * w["data_max"]
 
     total = round(profit_pts + price_conf_pts + risk_pts + bid_pts + pref_pts + data_pts, 2)
 
-    # 등급 X 자동 부여 조건 (어느 하나라도 해당)
     market = profit_info.get("market_price", 0)
     min_bid = item.get("min_bid_price", 0)
     critical_reasons: list[str] = []
@@ -149,7 +203,7 @@ def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict) -> dict:
     if profit < 0:
         critical_reasons.append("최저가 입찰조차 음수 차익")
 
-    grade = "X" if critical_reasons else _grade_for(total, False)
+    grade = "X" if critical_reasons else _grade_for(total, False, w)
 
     breakdown = {
         "profit_pts": round(profit_pts, 2),

@@ -29,10 +29,12 @@ from core.utils import now_iso, safe_json
 SCENARIO_FOR_BACKTEST = "standard"
 
 
-def evaluate_all_items() -> list[dict]:
+def evaluate_all_items(weights: dict | None = None) -> list[dict]:
     """모든 active 매물에 대해 점수/등급을 계산해서 반환.
-    recommendation_results 에 저장하지 않고 메모리만 사용.
-    user preferences 의 min_profit/min_roi 필터는 적용하지 않는다 (전체 분포 평가)."""
+
+    weights=None 이면 _load_active_weights() (default 또는 tuned).
+    auto_tune 이 grid search 시에는 weights 를 명시적으로 전달.
+    """
     from agents.preference_learning_agent import get_preferences
     from agents.recommendation_agent import (
         _enrich,
@@ -50,7 +52,6 @@ def evaluate_all_items() -> list[dict]:
     items = _enrich(items)
 
     pref = get_preferences()
-    # 백테스트에서는 user preference 강제 임계값을 끈다 (전수 평가)
     intent = {
         "intent": "backtest_all",
         "source_types": ["auction", "public_sale"],
@@ -69,7 +70,8 @@ def evaluate_all_items() -> list[dict]:
 
     out = []
     for it in items:
-        scoring = _score_item(it, it["_profit_info"], it["_confidence"], pref)
+        scoring = _score_item(it, it["_profit_info"], it["_confidence"], pref,
+                                weights=weights)
         out.append({
             "item_id": it["id"],
             "address_full": it.get("address_full"),
@@ -183,10 +185,14 @@ def ensure_simulations_for_items(item_ids: list[int],
     return n
 
 
-def backtest_all_items(scenario: str = SCENARIO_FOR_BACKTEST) -> dict:
-    """전체 매물 단위 백테스트 (recommendation_results 에 의존하지 않음).
-    수많은 데이터 포인트를 모아 등급별 통계의 신뢰성을 높임."""
-    evaluations = evaluate_all_items()
+def backtest_all_items(scenario: str = SCENARIO_FOR_BACKTEST,
+                        weights: dict | None = None) -> dict:
+    """전체 매물 단위 백테스트.
+
+    weights 를 명시 전달하면 그 가중치로 점수/등급을 다시 매겨 평가.
+    (auto_tune 의 grid search 가 사용)
+    """
+    evaluations = evaluate_all_items(weights=weights)
     item_ids = [e["item_id"] for e in evaluations]
     ensure_simulations_for_items(item_ids, scenario)
 

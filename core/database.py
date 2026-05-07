@@ -379,6 +379,16 @@ def init_db() -> None:
     )""")
 
     c.execute("""
+    CREATE TABLE IF NOT EXISTS tuned_weights (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        weights_json    TEXT NOT NULL,
+        quality_score   REAL,
+        notes           TEXT,
+        is_active       INTEGER DEFAULT 0,
+        created_at      TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+
+    c.execute("""
     CREATE TABLE IF NOT EXISTS backtest_runs (
         id                    INTEGER PRIMARY KEY AUTOINCREMENT,
         run_date              TEXT,
