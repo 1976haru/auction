@@ -11,6 +11,7 @@ const RISK_LABEL = { low: "낮음", medium: "보통", high: "높음" };
 
 const QUICK_CHIPS = [
   { id: "all",      label: "전체" },
+  { id: "favorites",label: "★ 내 관심" },
   { id: "auction",  label: "경매" },
   { id: "public",   label: "공매" },
   { id: "apt",      label: "아파트" },
@@ -32,12 +33,36 @@ const AGENT_EXAMPLES = [
   "오늘 뭐부터 봐야 돼?",
 ];
 
+const SORT_LABEL = {
+  score_desc: "추천점수 높은순",
+  profit_desc: "차익 큰순",
+  roi_desc: "수익률 높은순",
+  due_asc: "기일 임박순",
+  price_asc: "최저가 낮은순",
+  risk_asc: "위험 낮은순",
+};
+
+const FAV_KEY = "auction:favorites:v1";
+function loadFavorites() {
+  try {
+    const raw = localStorage.getItem(FAV_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw);
+    return new Set(Array.isArray(arr) ? arr.map(String) : []);
+  } catch { return new Set(); }
+}
+function saveFavorites(set) {
+  try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(set))); }
+  catch {}
+}
+
 // ── 글로벌 상태 ──────────────────────────────────────
 const STATE = {
   data: null,
   items: [],
   filtered: [],
   view: "card",          // card | table
+  favorites: loadFavorites(),
   filters: {
     q: "",
     chip: "all",
@@ -51,8 +76,84 @@ const STATE = {
     risk: "",
     grade: "",
     sort: "score_desc",
+    flag: "",     // 위험 키워드 단일 (예: "임차인")
   },
 };
+
+const FILTER_DEFAULTS = JSON.parse(JSON.stringify(STATE.filters));
+let URL_SYNC_ENABLED = false;
+
+function urlFromState() {
+  const p = new URLSearchParams();
+  const f = STATE.filters;
+  if (f.q) p.set("q", f.q);
+  if (f.chip && f.chip !== "all") p.set("chip", f.chip);
+  if (f.region) p.set("region", f.region);
+  if (f.item_type) p.set("type", f.item_type);
+  if (f.source) p.set("src", f.source);
+  if (f.price_min !== null) p.set("pmin", String(f.price_min));
+  if (f.price_max !== null) p.set("pmax", String(f.price_max));
+  if (f.fail_min !== null) p.set("fail", String(f.fail_min));
+  if (f.due_max !== null) p.set("due", String(f.due_max));
+  if (f.risk) p.set("risk", f.risk);
+  if (f.grade) p.set("grade", f.grade);
+  if (f.sort && f.sort !== "score_desc") p.set("sort", f.sort);
+  if (f.flag) p.set("flag", f.flag);
+  if (STATE.view !== "card") p.set("view", STATE.view);
+  const qs = p.toString();
+  return qs ? "?" + qs : window.location.pathname;
+}
+function pushUrlState() {
+  if (!URL_SYNC_ENABLED) return;
+  const next = urlFromState();
+  if (next !== (window.location.search || window.location.pathname)) {
+    history.replaceState(null, "", next);
+  }
+}
+function applyUrlToState() {
+  const p = new URLSearchParams(window.location.search);
+  const f = STATE.filters;
+  const num = (k) => {
+    const v = p.get(k);
+    return v === null || v === "" ? null : Number(v);
+  };
+  if (p.has("q")) f.q = p.get("q") || "";
+  if (p.has("chip")) f.chip = p.get("chip") || "all";
+  if (p.has("region")) f.region = p.get("region") || "";
+  if (p.has("type")) f.item_type = p.get("type") || "";
+  if (p.has("src")) f.source = p.get("src") || "";
+  if (p.has("pmin")) f.price_min = num("pmin");
+  if (p.has("pmax")) f.price_max = num("pmax");
+  if (p.has("fail")) f.fail_min = num("fail");
+  if (p.has("due")) f.due_max = num("due");
+  if (p.has("risk")) f.risk = p.get("risk") || "";
+  if (p.has("grade")) f.grade = p.get("grade") || "";
+  if (p.has("sort")) f.sort = p.get("sort") || "score_desc";
+  if (p.has("flag")) f.flag = p.get("flag") || "";
+  if (p.has("view")) STATE.view = p.get("view") === "table" ? "table" : "card";
+}
+function syncControlsFromState() {
+  const f = STATE.filters;
+  $("q-input").value = f.q || "";
+  $("f-region").value = f.region || "";
+  $("f-type").value = f.item_type || "";
+  $("f-source").value = f.source || "";
+  $("f-price-min").value = f.price_min ?? "";
+  $("f-price-max").value = f.price_max ?? "";
+  $("f-fail").value = f.fail_min ?? "";
+  $("f-due").value = f.due_max ?? "";
+  $("f-risk").value = f.risk || "";
+  $("f-grade").value = f.grade || "";
+  $("f-sort").value = f.sort || "score_desc";
+  // 보기 토글
+  document.querySelectorAll(".view-btn").forEach((b) => {
+    const active = b.dataset.view === STATE.view;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  $("items-card-view").hidden = (STATE.view !== "card");
+  $("items-table-view").hidden = (STATE.view !== "table");
+}
 
 // ── 유틸 ──────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
@@ -183,16 +284,8 @@ function bindFilterEvents() {
 }
 
 function resetFilters() {
-  STATE.filters = {
-    q: "", chip: "all", region: "", item_type: "", source: "",
-    price_min: null, price_max: null, fail_min: null, due_max: null,
-    risk: "", grade: "", sort: "score_desc",
-  };
-  $("q-input").value = "";
-  ["f-region","f-type","f-source","f-fail","f-due","f-risk","f-grade"].forEach((id) => { $(id).value = ""; });
-  $("f-price-min").value = "";
-  $("f-price-max").value = "";
-  $("f-sort").value = "score_desc";
+  STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
+  syncControlsFromState();
   renderQuickChips();
   applyFilters();
   hideAgentResult();
@@ -202,6 +295,7 @@ function resetFilters() {
 function chipMatch(chip, it) {
   switch (chip) {
     case "all":       return true;
+    case "favorites": return STATE.favorites.has(String(it.id));
     case "auction":   return it.source === "auction";
     case "public":    return it.source === "public_sale";
     case "apt":       return (it.item_type || "").includes("아파트");
@@ -240,11 +334,37 @@ function applyFilters() {
     it.days_left >= 0 && it.days_left <= f.due_max);
   if (f.risk)      out = out.filter((it) => it.risk_level === f.risk);
   if (f.grade)     out = out.filter((it) => it.recommendation_grade === f.grade);
+  if (f.flag)      out = out.filter((it) =>
+    (it.risk_flags || []).some((fl) => (fl.keyword || "").includes(f.flag)));
 
   out = sortItems(out, f.sort);
   STATE.filtered = out;
   renderItems();
-  $("items-count").textContent = `결과 ${out.length}건 / 전체 ${STATE.items.length}건`;
+  renderItemsHead();
+  pushUrlState();
+}
+
+function renderItemsHead() {
+  const f = STATE.filters;
+  const root = $("items-count");
+  const sortLabel = SORT_LABEL[f.sort] || SORT_LABEL.score_desc;
+  let chips = `<span class="meta-chip">정렬 · ${escapeHtml(sortLabel)}</span>`;
+  if (f.flag) {
+    chips += ` <span class="meta-chip meta-chip-warn" data-clear-flag="1">키워드 · ${escapeHtml(f.flag)} <b>×</b></span>`;
+  }
+  if (f.chip && f.chip !== "all") {
+    const cf = QUICK_CHIPS.find((c) => c.id === f.chip);
+    if (cf) chips += ` <span class="meta-chip">${escapeHtml(cf.label)}</span>`;
+  }
+  root.innerHTML = `결과 ${STATE.filtered.length}건 / 전체 ${STATE.items.length}건 ${chips}`;
+  const clearFlag = root.querySelector('[data-clear-flag="1"]');
+  if (clearFlag) {
+    clearFlag.style.cursor = "pointer";
+    clearFlag.addEventListener("click", () => {
+      STATE.filters.flag = "";
+      applyFilters();
+    });
+  }
 }
 
 function sortItems(arr, mode) {
@@ -375,8 +495,19 @@ function renderRiskSummary(rs) {
     const ul = document.createElement("ul");
     ul.className = "flag-list";
     rs.top_flags.forEach((f) => {
+      const kw = f.keyword || f.flag_type || "키워드";
       const li = document.createElement("li");
-      li.textContent = `${f.keyword || f.flag_type || "키워드"} (${f.count || 0})`;
+      li.className = "flag-item";
+      li.textContent = `${kw} (${f.count || 0})`;
+      li.title = `'${kw}' 키워드를 가진 매물만 보기`;
+      li.setAttribute("role", "button");
+      li.setAttribute("tabindex", "0");
+      bindTap(li, () => {
+        STATE.filters.flag = (STATE.filters.flag === kw) ? "" : kw;
+        applyFilters();
+        const items = document.getElementById("section-items");
+        if (items) items.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
       ul.appendChild(li);
     });
     root.appendChild(ul);
@@ -411,6 +542,18 @@ function renderConfidence(c, summary) {
 }
 
 // ── Items rendering ───────────────────────────────
+function urgencyBadge(it) {
+  const d = it.days_left;
+  if (d === null || d === undefined) return "";
+  if (d < 0) return "";
+  if (d <= 3) return `<span class="badge-urgent">D-${d} 임박</span>`;
+  if (d <= 7) return `<span class="badge-soon">D-${d}</span>`;
+  return "";
+}
+function favoriteBtnHtml(it) {
+  const on = STATE.favorites.has(String(it.id));
+  return `<button class="fav-btn${on ? " on" : ""}" data-fav="${it.id}" aria-pressed="${on ? "true" : "false"}" aria-label="관심 매물 ${on ? "해제" : "등록"}">${on ? "★" : "☆"}</button>`;
+}
 function itemCardHtml(it) {
   const grade = it.recommendation_grade || "C";
   const risk = it.risk_level || "medium";
@@ -423,7 +566,10 @@ function itemCardHtml(it) {
         <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
         <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
         <span class="source-pill">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</span>
+        ${urgencyBadge(it)}
         <span class="caption">${escapeHtml(it.item_type || "")}</span>
+        <span class="head-spacer"></span>
+        ${favoriteBtnHtml(it)}
       </div>
       <div class="item-title">${escapeHtml(it.title || "주소 미상")}</div>
       <div class="item-sub">${escapeHtml(it.address || "")} · ${escapeHtml(it.case_no || "사건번호 없음")}</div>
@@ -461,17 +607,19 @@ function renderItems() {
   list.forEach((it, idx) => {
     const card = el(itemCardHtml(it));
     bindTap(card, () => openDetailById(it.id));
+    wireFavoriteButtons(card);
     cardRoot.appendChild(card);
 
     const tr = document.createElement("tr");
     tr.dataset.itemId = it.id;
     const grade = it.recommendation_grade || "C";
     const risk = it.risk_level || "medium";
+    const u = urgencyBadge(it);
     tr.innerHTML = `
       <td>${idx + 1}</td>
       <td>${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</td>
       <td><span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span></td>
-      <td>${escapeHtml(it.address || "")}</td>
+      <td>${escapeHtml(it.address || "")} ${u}</td>
       <td>${escapeHtml(it.item_type || "")}</td>
       <td class="num">${(it.appraisal_price || 0).toLocaleString("ko-KR")}</td>
       <td class="num">${(it.min_bid_price || 0).toLocaleString("ko-KR")}</td>
@@ -489,6 +637,35 @@ function renderItems() {
   });
 }
 
+function toggleFavorite(id) {
+  const key = String(id);
+  if (STATE.favorites.has(key)) STATE.favorites.delete(key);
+  else STATE.favorites.add(key);
+  saveFavorites(STATE.favorites);
+  // 즉시 시각 갱신: 관심 칩 활성 시에는 목록 자체에서 빠질 수 있어 재필터
+  if (STATE.filters.chip === "favorites") applyFilters();
+  // 그렇지 않으면 해당 카드/모달 버튼만 새로고침
+  document.querySelectorAll(`[data-fav="${key}"]`).forEach((btn) => {
+    const on = STATE.favorites.has(key);
+    btn.classList.toggle("on", on);
+    btn.textContent = on ? "★" : "☆";
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
+function wireFavoriteButtons(root) {
+  root.querySelectorAll(".fav-btn").forEach((btn) => {
+    const id = btn.dataset.fav;
+    const handler = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      toggleFavorite(id);
+    };
+    btn.addEventListener("click", handler);
+    btn.addEventListener("pointerdown", (e) => e.stopPropagation());
+  });
+}
+
 function bindViewToggle() {
   document.querySelectorAll(".view-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -501,6 +678,7 @@ function bindViewToggle() {
       });
       $("items-card-view").hidden = (v !== "card");
       $("items-table-view").hidden = (v !== "table");
+      pushUrlState();
     });
   });
 }
@@ -528,7 +706,9 @@ function renderAgents(agents) {
 function openDetailById(id) {
   const it = STATE.items.find((x) => String(x.id) === String(id));
   if (!it) return;
-  $("detail-title").textContent = it.title || "물건 상세";
+  const title = $("detail-title");
+  title.innerHTML = `${escapeHtml(it.title || "물건 상세")} ${favoriteBtnHtml(it)}`;
+  wireFavoriteButtons(title);
   const body = $("detail-body");
   const grade = it.recommendation_grade || "C";
   const risk = it.risk_level || "medium";
@@ -746,6 +926,7 @@ function runAgentSearch(text) {
   result.forEach((it) => {
     const card = el(itemCardHtml(it));
     bindTap(card, () => openDetailById(it.id));
+    wireFavoriteButtons(card);
     grid.appendChild(card);
   });
 }
@@ -811,10 +992,23 @@ function render(data) {
   renderConfidence(data.confidence_summary, summary);
 
   populateFilterOptions();
+  applyUrlToState();
+  syncControlsFromState();
+  URL_SYNC_ENABLED = true;
   renderQuickChips();
   applyFilters();
 
   renderAgents(data.agent_status);
+
+  // 뒤로가기/앞으로가기 시 URL → state 복원
+  window.addEventListener("popstate", () => {
+    URL_SYNC_ENABLED = false;
+    applyUrlToState();
+    syncControlsFromState();
+    renderQuickChips();
+    applyFilters();
+    URL_SYNC_ENABLED = true;
+  });
 }
 
 async function load() {

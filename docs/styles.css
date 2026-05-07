@@ -438,6 +438,80 @@ code {
   border-radius: 999px;
   border: 1px solid #f5d6da;
 }
+.flag-list li.flag-item {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(214, 39, 40, 0.18);
+  touch-action: manipulation;
+  transition: background 0.12s, transform 0.05s;
+}
+.flag-list li.flag-item:active { transform: scale(0.97); background: #fbe2e6; }
+@media (hover: hover) {
+  .flag-list li.flag-item:hover { background: #fbe2e6; }
+}
+
+/* 결과 헤더의 메타 칩 (정렬·키워드) */
+.meta-chip {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #2c3e50;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.meta-chip-warn {
+  background: #fdf2f4;
+  color: #b1303a;
+  border: 1px solid #f5d6da;
+}
+.meta-chip-warn b { font-weight: 700; margin-left: 2px; }
+
+/* 임박 배지 */
+.badge-urgent {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-high);
+  color: white;
+  letter-spacing: 0.02em;
+}
+.badge-soon {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff4e0;
+  color: #b56a00;
+  border: 1px solid #f0c87a;
+}
+
+/* ☆ 관심 버튼 */
+.head-spacer { flex: 1; }
+.fav-btn {
+  border: 0;
+  background: transparent;
+  color: #b8c0c8;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(240, 165, 0, 0.2);
+  transition: background 0.12s, color 0.12s;
+}
+.fav-btn:active { background: #fff7e2; }
+.fav-btn.on { color: #f0a500; }
+@media (hover: hover) {
+  .fav-btn:hover { background: #fff7e2; color: #f0a500; }
+}
+.modal-head .fav-btn { font-size: 1.3rem; margin-left: 8px; vertical-align: middle; }
 
 /* ── Confidence summary ──────────────────── */
 .conf-row {
@@ -603,7 +677,7 @@ code {
   }
 }
 .item-card:active { background: #eef5fb; }
-.item-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.item-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; row-gap: 6px; }
 .item-title { font-weight: 600; font-size: 0.96rem; line-height: 1.3; }
 .item-sub { font-size: 0.82rem; color: var(--color-text-muted); }
 .item-stats {
