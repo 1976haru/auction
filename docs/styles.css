@@ -652,6 +652,32 @@ code {
   color: white;
 }
 
+/* 다운로드 버튼 그룹 */
+.download-group {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: white;
+  overflow: hidden;
+}
+.dl-btn {
+  border: 0;
+  background: white;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-text);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(31, 119, 180, 0.12);
+}
+.dl-btn + .dl-btn { border-left: 1px solid var(--color-border); }
+.dl-btn:active { background: #eef5fb; }
+@media (hover: hover) {
+  .dl-btn:hover { background: #f1f7fb; color: var(--color-primary); }
+}
+.dl-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
 .items-card-grid {
   display: grid;
   gap: 14px;

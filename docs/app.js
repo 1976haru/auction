@@ -357,6 +357,11 @@ function renderItemsHead() {
     if (cf) chips += ` <span class="meta-chip">${escapeHtml(cf.label)}</span>`;
   }
   root.innerHTML = `결과 ${STATE.filtered.length}건 / 전체 ${STATE.items.length}건 ${chips}`;
+  const csvBtn = $("dl-csv"); const jsonBtn = $("dl-json");
+  if (csvBtn && jsonBtn) {
+    const empty = STATE.filtered.length === 0;
+    csvBtn.disabled = empty; jsonBtn.disabled = empty;
+  }
   const clearFlag = root.querySelector('[data-clear-flag="1"]');
   if (clearFlag) {
     clearFlag.style.cursor = "pointer";
@@ -663,6 +668,120 @@ function wireFavoriteButtons(root) {
     };
     btn.addEventListener("click", handler);
     btn.addEventListener("pointerdown", (e) => e.stopPropagation());
+  });
+}
+
+// ── CSV/JSON download ─────────────────────────────
+const EXPORT_COLUMNS = [
+  ["id", "ID"],
+  ["source", "구분"],
+  ["case_no", "사건번호"],
+  ["title", "물건명"],
+  ["address", "주소"],
+  ["region", "지역"],
+  ["item_type", "물건종류"],
+  ["appraisal_price", "감정가(만원)"],
+  ["min_bid_price", "최저가(만원)"],
+  ["market_price", "예상시세(만원)"],
+  ["expected_profit", "예상차익(만원)"],
+  ["expected_profit_rate", "예상수익률(%)"],
+  ["recommendation_score", "추천점수"],
+  ["recommendation_grade", "추천등급"],
+  ["confidence_score", "신뢰도"],
+  ["risk_level", "위험도"],
+  ["fail_count", "유찰"],
+  ["bid_date", "입찰기일"],
+  ["days_left", "D-N"],
+  ["recommendation_reason", "추천이유"],
+  ["warnings", "주의키워드"],
+  ["checklist", "추가확인사항"],
+  ["next_actions", "다음액션"],
+];
+
+function flattenItem(it) {
+  const row = {};
+  EXPORT_COLUMNS.forEach(([k]) => {
+    let v = it[k];
+    if (k === "source") v = SOURCE_LABEL[v] || v || "";
+    else if (k === "risk_level") v = RISK_LABEL[v] || v || "";
+    else if (Array.isArray(v)) {
+      v = v.map((x) => (typeof x === "object" && x !== null) ? (x.keyword || x.flag_type || JSON.stringify(x)) : x).join(" / ");
+    }
+    if (v === null || v === undefined) v = "";
+    row[k] = v;
+  });
+  return row;
+}
+
+function csvEscape(v) {
+  const s = String(v ?? "");
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function buildCsv(items) {
+  const header = EXPORT_COLUMNS.map(([, label]) => csvEscape(label)).join(",");
+  const lines = items.map((it) => {
+    const row = flattenItem(it);
+    return EXPORT_COLUMNS.map(([k]) => csvEscape(row[k])).join(",");
+  });
+  // ﻿: Excel UTF-8 BOM
+  return "﻿" + header + "\r\n" + lines.join("\r\n") + "\r\n";
+}
+
+function buildJson(items) {
+  const payload = {
+    generated_at: new Date().toISOString(),
+    source: "github-pages-export",
+    filters: STATE.filters,
+    sort: STATE.filters.sort,
+    count: items.length,
+    items: items.map((it) => {
+      const row = flattenItem(it);
+      // CSV 친화 평탄화는 그대로 두되, JSON 에선 원본 배열도 보존
+      row.warnings = it.warnings || [];
+      row.checklist = it.checklist || [];
+      row.next_actions = it.next_actions || [];
+      row.risk_flags = it.risk_flags || [];
+      return row;
+    }),
+  };
+  return JSON.stringify(payload, null, 2);
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function timestampSlug() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+
+function bindDownloads() {
+  const csvBtn = $("dl-csv");
+  const jsonBtn = $("dl-json");
+  if (!csvBtn || !jsonBtn) return;
+  csvBtn.addEventListener("click", () => {
+    const items = STATE.filtered;
+    if (!items.length) { alert("내려받을 결과가 없습니다."); return; }
+    downloadBlob(buildCsv(items), `auction_results_${timestampSlug()}.csv`,
+                 "text/csv;charset=utf-8");
+  });
+  jsonBtn.addEventListener("click", () => {
+    const items = STATE.filtered;
+    if (!items.length) { alert("내려받을 결과가 없습니다."); return; }
+    downloadBlob(buildJson(items), `auction_results_${timestampSlug()}.json`,
+                 "application/json;charset=utf-8");
   });
 }
 
@@ -1027,6 +1146,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindSearch();
   bindAgentSearch();
   bindViewToggle();
+  bindDownloads();
   bindModalClose();
   load();
 });
