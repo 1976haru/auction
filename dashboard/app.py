@@ -17,6 +17,8 @@ import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
 
 from dashboard.charts import (
+    backtest_timeline,
+    backtest_winrate_timeline,
     grade_profit_bar,
     grade_winrate_chart,
     pred_vs_actual_scatter,
@@ -33,6 +35,9 @@ from agents.backtest_agent import (
     backtest_all_items,
     fetch_pred_actual_pairs,
     grade_ordering_check,
+    history_chart_series,
+    list_backtest_runs,
+    save_backtest_run,
 )
 from agents.bidding_agent import format_bid_report, get_bid_recommendation
 from agents.compare_agent import (
@@ -697,9 +702,11 @@ elif tab_sel == "백테스트":
         with st.spinner("전체 매물 평가 중..."):
             report = backtest_all_items(scenario=scenario)
         ordering = grade_ordering_check(report)
+        run_id = save_backtest_run(report, ordering)
         st.session_state["bt_report"] = report
         st.session_state["bt_ordering"] = ordering
         st.session_state["bt_scenario"] = scenario
+        st.success(f"실행 완료 - run #{run_id} 시계열에 저장됨")
 
     report = st.session_state.get("bt_report")
     ordering = st.session_state.get("bt_ordering")
@@ -755,6 +762,44 @@ elif tab_sel == "백테스트":
             st.caption("점선 대각선이 완벽 예측 (y=x). 등급별 색상으로 구분. 손익 0선과 교차하는 사분면으로 winning/losing 구분.")
         else:
             st.info("recommendation_results 가 충분히 쌓여야 산점도가 그려집니다.")
+
+    # 시계열 추적 (백테스트 실행 여부와 무관하게 표시)
+    st.divider()
+    st.subheader("백테스트 시계열 추적")
+    st.caption("'백테스트 실행' 버튼을 누를 때마다 결과가 누적됩니다. 알고리즘 튜닝 효과를 시간순으로 확인할 수 있습니다.")
+    history_scenario = st.selectbox("시계열 시나리오 필터",
+                                     ["standard", "conservative", "aggressive"],
+                                     index=0, key="history_scenario")
+    history = history_chart_series(limit=50, scenario=history_scenario, mode="all_items")
+    if not history:
+        st.info(f"{history_scenario} 시나리오의 백테스트 기록 없음. 위 버튼으로 실행하세요.")
+    else:
+        c1, c2, c3 = st.columns(3)
+        c1.metric("기록 수", len(history))
+        if len(history) >= 2:
+            first_mean = history[0]["overall_mean_profit"]
+            last_mean = history[-1]["overall_mean_profit"]
+            delta = last_mean - first_mean
+            c2.metric("평균 손익 변화",
+                       f"{int(last_mean):+,}만원",
+                       delta=f"{int(delta):+,}만원 (첫 기록 대비)")
+            first_wr = history[0]["overall_win_rate"]
+            last_wr = history[-1]["overall_win_rate"]
+            c3.metric("승률 변화", f"{last_wr}%",
+                       delta=f"{last_wr - first_wr:+.1f}%p")
+        st.plotly_chart(backtest_timeline(history), use_container_width=True)
+        st.plotly_chart(backtest_winrate_timeline(history),
+                          use_container_width=True)
+        with st.expander("기록 표 보기"):
+            runs = list_backtest_runs(limit=50, scenario=history_scenario, mode="all_items")
+            if runs:
+                df = pd.DataFrame(runs)
+                cols = [c for c in ["id", "run_date", "scenario", "mode",
+                                     "total_pairs", "overall_win_rate",
+                                     "overall_mean_profit", "monotonic_decreasing",
+                                     "a_mean", "b_mean", "c_mean",
+                                     "d_mean", "x_mean"] if c in df.columns]
+                st.dataframe(df[cols], use_container_width=True)
 
 # 14. 스트레스 테스트 결과 -----------------------------------------
 elif tab_sel == "스트레스 테스트 결과":

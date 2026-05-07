@@ -377,6 +377,26 @@ def init_db() -> None:
         created_at      TEXT DEFAULT (datetime('now','localtime'))
     )""")
 
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS backtest_runs (
+        id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+        run_date              TEXT,
+        scenario              TEXT,
+        mode                  TEXT,
+        total_pairs           INTEGER,
+        overall_win_rate      REAL,
+        overall_mean_profit   REAL,
+        a_count               INTEGER, a_mean REAL, a_winrate REAL,
+        b_count               INTEGER, b_mean REAL, b_winrate REAL,
+        c_count               INTEGER, c_mean REAL, c_winrate REAL,
+        d_count               INTEGER, d_mean REAL, d_winrate REAL,
+        x_count               INTEGER, x_mean REAL, x_winrate REAL,
+        monotonic_decreasing  INTEGER,
+        report_json           TEXT,
+        ordering_json         TEXT,
+        created_at            TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+
     conn.commit()
     conn.close()
     log.info(f"DB 초기화 완료: {_config.DB_PATH}")

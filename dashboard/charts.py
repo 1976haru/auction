@@ -221,6 +221,94 @@ def pred_vs_actual_scatter(pairs: list[dict]) -> go.Figure:
     return fig
 
 
+def backtest_timeline(history: list[dict]) -> go.Figure:
+    """백테스트 추이: 등급별 평균 손익 + 전체 평균 손익 + 단조감소 마커.
+
+    history: history_chart_series() 결과
+    """
+    if not history:
+        return _empty_fig("백테스트 기록 없음")
+    x = [h["run_date"] for h in history]
+    fig = go.Figure()
+    for grade, color in GRADE_COLOR.items():
+        y = [h.get(f"{grade.lower()}_mean", 0) for h in history]
+        fig.add_trace(go.Scatter(
+            x=x, y=y, mode="lines+markers",
+            name=f"{grade} 평균",
+            line=dict(color=color, width=2),
+            hovertemplate=(
+                "<b>%{x}</b><br>"
+                f"등급 {grade}: %{{y:,.0f}}만원<extra></extra>"
+            ),
+        ))
+    # 전체 평균
+    fig.add_trace(go.Scatter(
+        x=x, y=[h["overall_mean_profit"] for h in history],
+        mode="lines+markers", name="전체 평균",
+        line=dict(color="#000", width=3, dash="dot"),
+        hovertemplate="<b>%{x}</b><br>전체: %{y:,.0f}만원<extra></extra>",
+    ))
+    # 단조감소 OK / FAIL 마커 (보조)
+    ok_x = [h["run_date"] for h in history if h.get("monotonic")]
+    fail_x = [h["run_date"] for h in history if not h.get("monotonic")]
+    if ok_x:
+        fig.add_trace(go.Scatter(
+            x=ok_x, y=[0] * len(ok_x), mode="markers",
+            name="단조감소 OK",
+            marker=dict(symbol="triangle-up", size=12, color="green"),
+            hovertemplate="<b>%{x}</b><br>등급 단조감소 OK<extra></extra>",
+        ))
+    if fail_x:
+        fig.add_trace(go.Scatter(
+            x=fail_x, y=[0] * len(fail_x), mode="markers",
+            name="단조감소 FAIL",
+            marker=dict(symbol="x", size=12, color="red"),
+            hovertemplate="<b>%{x}</b><br>등급 단조감소 깨짐<extra></extra>",
+        ))
+    fig.add_hline(y=0, line_dash="dot", line_color="#aaa")
+    fig.update_layout(
+        title="백테스트 등급별 평균 손익 추이",
+        xaxis=dict(title="실행 시각"),
+        yaxis=dict(title="평균 실제 손익 (만원)"),
+        hovermode="x unified",
+        height=420,
+        margin=dict(t=60, b=40, l=40, r=40),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    return fig
+
+
+def backtest_winrate_timeline(history: list[dict]) -> go.Figure:
+    """전체 승률 추이."""
+    if not history:
+        return _empty_fig("백테스트 기록 없음")
+    x = [h["run_date"] for h in history]
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=x, y=[h["overall_win_rate"] for h in history],
+        mode="lines+markers", name="전체 승률(%)",
+        line=dict(color="#1f77b4", width=3),
+        hovertemplate="<b>%{x}</b><br>승률: %{y}%<extra></extra>",
+    ))
+    fig.add_trace(go.Scatter(
+        x=x, y=[h["total_pairs"] for h in history],
+        mode="lines+markers", name="표본 수", yaxis="y2",
+        line=dict(color="#888", dash="dot"),
+        hovertemplate="<b>%{x}</b><br>표본: %{y}건<extra></extra>",
+    ))
+    fig.update_layout(
+        title="전체 승률 + 표본 수 추이",
+        xaxis=dict(title="실행 시각"),
+        yaxis=dict(title="승률 (%)", range=[0, 110]),
+        yaxis2=dict(title="표본 수", overlaying="y", side="right",
+                     showgrid=False),
+        hovermode="x unified",
+        height=320,
+        margin=dict(t=60, b=40, l=40, r=40),
+    )
+    return fig
+
+
 def grade_winrate_chart(grade_stats: dict[str, dict]) -> go.Figure:
     """등급별 승률 + 표본수 묶음 막대."""
     rows = []

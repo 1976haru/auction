@@ -296,3 +296,107 @@ def fetch_pred_actual_pairs(scenario: str = SCENARIO_FOR_BACKTEST,
     """대시보드 산점도용 (예측, 실제) 쌍 반환."""
     pairs = _fetch_pairs(scenario)
     return pairs[:limit]
+
+
+# ── 시계열 추적 (backtest_runs 테이블) ─────────────────────────────
+
+
+def save_backtest_run(report: dict, ordering: dict | None = None) -> int:
+    """백테스트 결과를 backtest_runs 테이블에 누적 저장."""
+    init_db()
+    grades = report.get("grades", {})
+    overall = report.get("overall", {})
+
+    def gd(g, key):
+        s = grades.get(g) or {}
+        if key == "count":
+            return s.get("count")
+        if key == "winrate":
+            return s.get("win_rate")
+        if key == "mean":
+            ap = s.get("actual_profit") or {}
+            return ap.get("mean")
+        return None
+
+    conn = get_connection()
+    cur = conn.execute("""
+        INSERT INTO backtest_runs (
+            run_date, scenario, mode,
+            total_pairs, overall_win_rate, overall_mean_profit,
+            a_count, a_mean, a_winrate,
+            b_count, b_mean, b_winrate,
+            c_count, c_mean, c_winrate,
+            d_count, d_mean, d_winrate,
+            x_count, x_mean, x_winrate,
+            monotonic_decreasing,
+            report_json, ordering_json
+        ) VALUES (
+            datetime('now','localtime'), ?, ?,
+            ?, ?, ?,
+            ?, ?, ?,
+            ?, ?, ?,
+            ?, ?, ?,
+            ?, ?, ?,
+            ?, ?, ?,
+            ?,
+            ?, ?
+        )
+    """, (
+        report.get("scenario"), report.get("mode"),
+        report.get("total_pairs"),
+        overall.get("win_rate"),
+        (overall.get("actual_profit") or {}).get("mean"),
+        gd("A", "count"), gd("A", "mean"), gd("A", "winrate"),
+        gd("B", "count"), gd("B", "mean"), gd("B", "winrate"),
+        gd("C", "count"), gd("C", "mean"), gd("C", "winrate"),
+        gd("D", "count"), gd("D", "mean"), gd("D", "winrate"),
+        gd("X", "count"), gd("X", "mean"), gd("X", "winrate"),
+        1 if (ordering or {}).get("monotonic_decreasing") else 0,
+        safe_json(report), safe_json(ordering or {}),
+    ))
+    rid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    log.info(f"[backtest] run #{rid} saved (scenario={report.get('scenario')}, mode={report.get('mode')})")
+    return int(rid)
+
+
+def list_backtest_runs(limit: int = 50, scenario: str | None = None,
+                        mode: str | None = None) -> list[dict]:
+    """누적된 백테스트 기록 (최신순)."""
+    init_db()
+    conn = get_connection()
+    q = "SELECT * FROM backtest_runs WHERE 1=1"
+    params: list = []
+    if scenario:
+        q += " AND scenario = ?"
+        params.append(scenario)
+    if mode:
+        q += " AND mode = ?"
+        params.append(mode)
+    q += " ORDER BY id DESC LIMIT ?"
+    params.append(limit)
+    rows = conn.execute(q, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def history_chart_series(limit: int = 50, scenario: str | None = "standard",
+                          mode: str | None = "all_items") -> list[dict]:
+    """차트용 시계열 (오래된 순). run_date / mean profit / win_rate / 등급별 mean."""
+    runs = list(reversed(list_backtest_runs(limit=limit, scenario=scenario, mode=mode)))
+    out = []
+    for r in runs:
+        out.append({
+            "run_date": r["run_date"],
+            "total_pairs": r["total_pairs"],
+            "overall_win_rate": r["overall_win_rate"] or 0,
+            "overall_mean_profit": r["overall_mean_profit"] or 0,
+            "a_mean": r["a_mean"] or 0,
+            "b_mean": r["b_mean"] or 0,
+            "c_mean": r["c_mean"] or 0,
+            "d_mean": r["d_mean"] or 0,
+            "x_mean": r["x_mean"] or 0,
+            "monotonic": bool(r["monotonic_decreasing"]),
+        })
+    return out

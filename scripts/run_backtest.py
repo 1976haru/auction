@@ -18,7 +18,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from agents.backtest_agent import backtest, backtest_all_items, grade_ordering_check  # noqa: E402
+from agents.backtest_agent import (  # noqa: E402
+    backtest,
+    backtest_all_items,
+    grade_ordering_check,
+    save_backtest_run,
+)
 from core.utils import ensure_dir, export_path  # noqa: E402
 
 
@@ -38,6 +43,8 @@ def main():
         only = [g.strip() for g in args.grades.split(",")] if args.grades else None
         report = backtest(scenario=args.scenario, only_grades=only)
     ordering = grade_ordering_check(report)
+    run_id = save_backtest_run(report, ordering)
+    print(f"백테스트 run #{run_id} 저장됨 (시계열 추적용)")
 
     ensure_dir(os.path.dirname(export_path("backtest_report.json")))
     out_path = export_path("backtest_report.json")
