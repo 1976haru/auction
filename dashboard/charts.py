@@ -309,6 +309,83 @@ def backtest_winrate_timeline(history: list[dict]) -> go.Figure:
     return fig
 
 
+def pipeline_timeline_chart(series: list[dict]) -> go.Figure:
+    """파이프라인 실행 시간 + 처리량 추이.
+
+    series: [{created_at, elapsed_sec, total_items, status}, ...] (오래된 순)
+    """
+    if not series:
+        return _empty_fig("파이프라인 기록 없음")
+    x = [s["created_at"] for s in series]
+    elapsed = [s["elapsed_sec"] for s in series]
+    items = [s["total_items"] for s in series]
+    status = [s["status"] for s in series]
+    colors = ["#2ca02c" if s == "ok" else "#d62728" for s in status]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=x, y=elapsed, name="소요(s)",
+        marker_color=colors,
+        hovertemplate="<b>%{x}</b><br>소요: %{y:.1f}s<extra></extra>",
+    ))
+    fig.add_trace(go.Scatter(
+        x=x, y=items, name="처리 매물 수", yaxis="y2",
+        mode="lines+markers", line=dict(color="#1f77b4", width=2),
+        hovertemplate="<b>%{x}</b><br>매물: %{y}건<extra></extra>",
+    ))
+    fig.update_layout(
+        title="파이프라인 실행 시간 + 처리량 추이",
+        xaxis=dict(title="실행 시각"),
+        yaxis=dict(title="소요 시간 (초)"),
+        yaxis2=dict(title="처리 매물 수", overlaying="y", side="right",
+                     showgrid=False),
+        height=320,
+        margin=dict(t=60, b=40, l=40, r=40),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02,
+                     xanchor="right", x=1),
+    )
+    return fig
+
+
+def alert_timeline_chart(series: list[dict]) -> go.Figure:
+    """일자별 sent/failed 스택 막대."""
+    if not series:
+        return _empty_fig("알림 기록 없음")
+    days = [s["day"] for s in series]
+    sent = [s["sent"] or 0 for s in series]
+    failed = [s["failed"] or 0 for s in series]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x=days, y=sent, name="sent",
+                          marker_color="#2ca02c"))
+    fig.add_trace(go.Bar(x=days, y=failed, name="failed",
+                          marker_color="#d62728"))
+    fig.update_layout(
+        title="일자별 알림 발송 (sent / failed)",
+        barmode="stack",
+        xaxis=dict(title="일자"),
+        yaxis=dict(title="건수"),
+        height=320,
+        margin=dict(t=60, b=40, l=40, r=40),
+    )
+    return fig
+
+
+def channel_distribution_pie(by_channel: dict[str, int]) -> go.Figure:
+    """채널별 알림 분포 파이 차트."""
+    if not by_channel:
+        return _empty_fig("채널 발송 기록 없음")
+    fig = go.Figure(data=[go.Pie(
+        labels=list(by_channel.keys()),
+        values=list(by_channel.values()),
+        hole=0.4,
+    )])
+    fig.update_layout(
+        title="채널별 알림 분포",
+        height=300,
+        margin=dict(t=60, b=20, l=20, r=20),
+    )
+    return fig
+
+
 def grade_winrate_chart(grade_stats: dict[str, dict]) -> go.Figure:
     """등급별 승률 + 표본수 묶음 막대."""
     rows = []

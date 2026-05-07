@@ -21,10 +21,13 @@ from dashboard.bootstrap import bootstrap as _bootstrap  # noqa: E402
 _BOOTSTRAP = _bootstrap()
 
 from dashboard.charts import (
+    alert_timeline_chart,
     backtest_timeline,
     backtest_winrate_timeline,
+    channel_distribution_pie,
     grade_profit_bar,
     grade_winrate_chart,
+    pipeline_timeline_chart,
     pred_vs_actual_scatter,
     trend_line_chart,
     trend_with_reference,
@@ -34,6 +37,15 @@ from agents.alert_agent import (
     collect_pending_alerts,
     dispatch_alerts,
     list_recent_alerts,
+)
+from agents.monitoring_agent import (
+    alert_summary as ma_alert_summary,
+    alert_timeline_series,
+    db_health,
+    detect_anomalies,
+    get_pipeline_history,
+    get_stress_history,
+    pipeline_timeline_series,
 )
 from agents.backtest_agent import (
     backtest_all_items,
@@ -124,6 +136,7 @@ with st.sidebar:
             "알림",
             "백테스트",
             "스트레스 테스트 결과",
+            "운영 모니터링",
             "도움말",
         ],
     )
@@ -990,6 +1003,122 @@ elif tab_sel == "스트레스 테스트 결과":
         st.dataframe(pd.DataFrame([dict(r) for r in rows]), use_container_width=True)
 
 # 13. 도움말 -------------------------------------------------------
+elif tab_sel == "운영 모니터링":
+    st.header("운영 모니터링")
+    st.caption("파이프라인 / 알림 / 스트레스 테스트 / DB 상태를 한 화면에서 확인합니다.")
+
+    # 이상 감지 배너
+    issues = detect_anomalies()
+    if issues:
+        for it in issues:
+            if it["severity"] == "warning":
+                st.warning(f"[!] {it['message']}")
+            else:
+                st.info(f"{it['message']}")
+    else:
+        st.success("최근 운영 데이터에서 이상 징후가 감지되지 않았습니다.")
+
+    # 메트릭 카드
+    health = db_health()
+    pipelines = get_pipeline_history(50)
+    alerts_summary = ma_alert_summary(limit=1000)
+    stress = get_stress_history(20)
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("총 매물", health["tables"].get("items", 0))
+    c2.metric("파이프라인 누적", len(pipelines))
+    c3.metric("알림 누적", alerts_summary["total"])
+    c4.metric("DB 크기", f"{health['db_size_kb']:.0f} KB")
+
+    # 파이프라인 시계열
+    st.subheader("파이프라인 실행 추이")
+    series_p = pipeline_timeline_series(30)
+    if series_p:
+        st.plotly_chart(pipeline_timeline_chart(series_p),
+                          use_container_width=True)
+    else:
+        st.info("파이프라인 실행 기록 없음. `python scripts/run_daily_pipeline.py` 실행")
+
+    # 알림 통계 (시계열 + 채널 분포)
+    st.subheader("알림 발송 통계")
+    cc1, cc2 = st.columns([3, 2])
+    with cc1:
+        timeline = alert_timeline_series(200)
+        st.plotly_chart(alert_timeline_chart(timeline),
+                          use_container_width=True)
+    with cc2:
+        st.plotly_chart(channel_distribution_pie(alerts_summary["by_channel"]),
+                          use_container_width=True)
+
+    # 알림 상세 통계 표
+    sc1, sc2, sc3 = st.columns(3)
+    with sc1:
+        st.markdown("**채널별**")
+        if alerts_summary["by_channel"]:
+            df = pd.DataFrame(
+                [{"채널": k, "건수": v} for k, v in alerts_summary["by_channel"].items()]
+            ).sort_values("건수", ascending=False)
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.caption("기록 없음")
+    with sc2:
+        st.markdown("**상태별**")
+        if alerts_summary["by_status"]:
+            df = pd.DataFrame(
+                [{"상태": k, "건수": v} for k, v in alerts_summary["by_status"].items()]
+            ).sort_values("건수", ascending=False)
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.caption("기록 없음")
+    with sc3:
+        st.markdown("**유형별**")
+        if alerts_summary["by_type"]:
+            df = pd.DataFrame(
+                [{"유형": k, "건수": v} for k, v in alerts_summary["by_type"].items()]
+            ).sort_values("건수", ascending=False)
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.caption("기록 없음")
+
+    # 최근 파이프라인 실행 표
+    st.subheader("최근 파이프라인 실행")
+    if pipelines:
+        df_p = pd.DataFrame(pipelines)
+        cols = [c for c in ["id", "run_type", "status", "total_items",
+                            "elapsed_sec", "started_at", "finished_at"]
+                if c in df_p.columns]
+        st.dataframe(df_p[cols].head(15), use_container_width=True,
+                       hide_index=True)
+    else:
+        st.caption("기록 없음")
+
+    # 최근 스트레스 테스트
+    st.subheader("최근 스트레스 테스트")
+    if stress:
+        df_s = pd.DataFrame(stress)
+        cols = [c for c in ["id", "scenario", "item_count", "query_count",
+                            "elapsed_sec", "success", "created_at"]
+                if c in df_s.columns]
+        st.dataframe(df_s[cols], use_container_width=True, hide_index=True)
+    else:
+        st.caption("기록 없음. `python scripts/run_stress_test.py --count 1000 --queries 20`")
+
+    # DB 헬스 - 테이블별 행수
+    st.subheader("DB 상태")
+    cc1, cc2 = st.columns([2, 1])
+    with cc1:
+        df_t = pd.DataFrame(
+            sorted(
+                ({"테이블": k, "행수": v} for k, v in health["tables"].items()),
+                key=lambda x: -x["행수"],
+            )
+        )
+        st.dataframe(df_t, use_container_width=True, hide_index=True)
+    with cc2:
+        st.metric("총 테이블", health["table_count"])
+        st.metric("총 행수", f"{health['total_rows']:,}")
+        st.caption(f"DB 경로: `{health['db_path']}`")
+
 elif tab_sel == "도움말":
     st.header("도움말")
     st.markdown("""
