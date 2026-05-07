@@ -182,24 +182,87 @@ TELEGRAM_CHAT_ID = ""
 - 외부 API key 는 secrets 으로 관리 (절대 코드에 하드코딩 금지)
 - 무료 티어는 동시 1 visitor + 1 GB 메모리 제한
 
-## 실제 API 전환 방법
+## 실제 API 전환 방법 (단계별)
 
-`.env` 에서 다음 항목을 실제 키로 채우고 `USE_MOCK_APIS=false` 로 변경:
+mock-first 모드는 데모/개발용입니다. 실제 매물·시세 데이터로 운영하려면 다음 단계를 따라가세요.
+
+### 1) 키 발급 (모두 무료, Claude만 유료)
 
 | 항목 | 변수 | 발급처 |
 |---|---|---|
-| Claude API | `ANTHROPIC_API_KEY`, `USE_AI=true` | Anthropic Console (유료) |
-| 국토부 실거래가 | `PUBLIC_DATA_SERVICE_KEY` | 공공데이터포털 (무료) |
-| 온비드 공매 | `PUBLIC_DATA_SERVICE_KEY` 또는 `ONBID_API_KEY` | 공공데이터포털 |
-| 텔레그램 봇 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | BotFather (무료) |
+| 국토부 실거래가 | `PUBLIC_DATA_SERVICE_KEY` | https://www.data.go.kr (무료, 즉시 발급) |
+| 온비드 공매 | `PUBLIC_DATA_SERVICE_KEY` 공용 또는 `ONBID_API_KEY` | https://www.data.go.kr |
+| 텔레그램 봇 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | https://t.me/BotFather (무료) |
+| Claude API | `ANTHROPIC_API_KEY` + `USE_AI=true` | https://console.anthropic.com (유료) |
 
-실제 API 연동은 다음 모듈의 인터페이스 자리에 구현하면 됩니다.
+### 2) `.env` 또는 Streamlit secrets 에 키 입력
 
-- `modules/auction/crawler.py` (Playwright 크롤링)
-- `modules/public_sale/onbid_client.py` (REST 호출)
-- `modules/price/molit_api.py` (XML 파싱)
+```bash
+USE_MOCK_APIS=false
+PUBLIC_DATA_SERVICE_KEY=...
+TELEGRAM_BOT_TOKEN=...
+TELEGRAM_CHAT_ID=...
+USE_AI=true
+ANTHROPIC_API_KEY=...
+```
 
-mock 모듈은 `modules/.../mock_*.py` 로 분리되어 있어 인터페이스만 동일하게 맞추면 됩니다.
+### 3) 헬스체크
+
+```bash
+python scripts/check_apis.py
+```
+
+각 API 의 인증/연결 상태를 콘솔에 표시합니다 (마스킹된 키 + 응답 샘플 카운트).
+
+### 4) 실 매물 데이터 적재
+
+```bash
+python scripts/populate_real_data.py --count 100 --reset
+```
+
+내부적으로 `USE_MOCK_APIS=false` + `PUBLIC_DATA_SERVICE_KEY` 가 있을 때만 실 API를 호출합니다. 키가 없으면 자동으로 mock 으로 fallback (안전 동작).
+
+### 5) 파이프라인 실행
+
+```bash
+python scripts/run_daily_pipeline.py --mock --count 100 --top 5
+```
+
+- `--mock` 플래그는 mock 데이터 _생성_ 옵션이고, **시세 매칭은 `USE_MOCK_APIS` 값을 따릅니다**.
+- 실 API 모드에서 `price_matcher.fetch_trades()` 가 자동으로 `real_molit_api` 호출.
+- 실 API 호출 실패하거나 매칭 결과 0건이면 자동 mock fallback (운영 안정성).
+
+### 6) 자동 스위치 동작 요약
+
+| 상태 | 시세 매칭 | 공매 수집 | Claude | 텔레그램 |
+|---|:---:|:---:|:---:|:---:|
+| `USE_MOCK_APIS=true` | mock | mock | mock | mock(콘솔) |
+| `USE_MOCK_APIS=false` + 키 있음 | **real** | **real** | real (USE_AI=true 시) | **real** |
+| `USE_MOCK_APIS=false` + 키 없음 | mock fallback | mock fallback | mock | mock(콘솔) |
+| real 호출 실패 | mock fallback | (예외 로그) | mock | (예외 로그) |
+
+### 7) 어댑터 모듈 구조
+
+| 인터페이스 | mock 구현 | real 구현 |
+|---|---|---|
+| `fetch_trades(addr, type, area)` | `modules/valuation/mock_molit_api.py` | `modules/valuation/real_molit_api.py` |
+| `list_public_sale_items(count)` | `modules/public_sale/mock_onbid_api.py` | `modules/public_sale/real_onbid_api.py` |
+| `list_auction_items(count)` | `modules/auction/mock_auction_api.py` | `modules/auction/crawler.py` (Playwright, 별도 설치 필요) |
+| `call_claude(prompt)` | `core/mock_api.py` | `core/ai_client.py` (anthropic SDK) |
+| `send_message(text)` | `core/mock_api.py` | `modules/alerts/telegram.py` (requests) |
+
+새 데이터 소스 추가는 동일 시그니처로 mock + real 한 쌍을 만들고 어댑터 진입점만 분기하면 됩니다.
+
+### 8) 법원경매 크롤링 (선택)
+
+`modules/auction/crawler.py` 는 Playwright 기반이라 별도 설치 필요:
+
+```bash
+pip install playwright>=1.44
+playwright install chromium
+```
+
+법원경매 사이트는 selector 가 자주 바뀌므로 실 크롤링 전에 selector 검증 권장. 현재는 mock_auction_api 가 같은 인터페이스로 동작합니다.
 
 ## 주의사항
 

@@ -7,11 +7,36 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from core.config import USE_MOCK_APIS
+from core.config import PUBLIC_DATA_KEY, USE_MOCK_APIS
 from core.database import get_connection, init_db
 from core.logger import log
 from core.utils import safe_json
-from modules.valuation.mock_molit_api import fetch_trades, summarize_trades
+from modules.valuation.mock_molit_api import (
+    fetch_trades as _mock_fetch_trades,
+    summarize_trades,
+)
+
+
+def fetch_trades(address: str, item_type: str, area_m2: float = 0,
+                 seed: int | None = None) -> list[dict]:
+    """USE_MOCK_APIS / PUBLIC_DATA_KEY 에 따라 mock or real 자동 선택.
+
+    real 호출 실패하거나 결과가 비어 있으면 mock 으로 fallback.
+    """
+    if USE_MOCK_APIS or not PUBLIC_DATA_KEY:
+        return _mock_fetch_trades(address, item_type, area_m2=area_m2, seed=seed)
+    # real 시도
+    try:
+        from modules.valuation.real_molit_api import fetch_trades as _real_fetch
+        trades = _real_fetch(address, item_type, area_m2=area_m2, seed=seed)
+    except Exception as e:
+        log.warning(f"[price_matcher] real API 실패 -> mock fallback: {e}")
+        return _mock_fetch_trades(address, item_type, area_m2=area_m2, seed=seed)
+    if not trades:
+        # 키는 있지만 매칭 결과 없음 - 디버깅 위해 별도 로그
+        log.info(f"[price_matcher] real API 결과 0건 -> mock fallback")
+        return _mock_fetch_trades(address, item_type, area_m2=area_m2, seed=seed)
+    return trades
 
 
 def _confidence(transaction_count: int, addr_match: bool, type_match: bool) -> tuple[str, str]:
@@ -27,15 +52,28 @@ def _confidence(transaction_count: int, addr_match: bool, type_match: bool) -> t
 
 
 def match_price(item: dict[str, Any], use_mock: bool | None = None) -> dict:
-    use_mock = USE_MOCK_APIS if use_mock is None else use_mock
+    """item 에 매칭되는 실거래가를 가져오고 시세/신뢰도/거품 플래그 산출.
+
+    use_mock=None: 환경(USE_MOCK_APIS + PUBLIC_DATA_KEY)에 따라 자동 선택.
+    use_mock=True: 강제 mock.
+    use_mock=False: 실 API. 실패 시 mock fallback (fetch_trades 내부 처리).
+    """
     address = item.get("address_full", "")
     item_type = item.get("item_type", "")
     area = float(item.get("area_m2") or 0)
 
-    if use_mock:
+    if use_mock is None:
         trades = fetch_trades(address, item_type, area_m2=area)
+    elif use_mock:
+        trades = _mock_fetch_trades(address, item_type, area_m2=area)
     else:
-        trades = []  # 실제 API 연동은 인터페이스 자리만 확보
+        # real 강제. 실패해도 fallback 안 함 (호출자가 명시적으로 강제)
+        try:
+            from modules.valuation.real_molit_api import fetch_trades as _real_fetch
+            trades = _real_fetch(address, item_type, area_m2=area)
+        except Exception as e:
+            log.warning(f"[match_price] real 강제 호출 실패: {e}")
+            trades = []
     summary = summarize_trades(trades)
 
     market_price = summary["avg_price_6m"] or summary["avg_price_12m"]
