@@ -871,6 +871,11 @@ elif tab_sel == "사용자 선호 설정":
                                       value=pref.get("alert_only_watched", False))
     alert_include_briefing = st.checkbox("일일 브리핑도 알림에 포함",
                                           value=pref.get("alert_include_briefing", True))
+    alert_include_ops = st.checkbox(
+        "운영 이상 감지 알림 포함",
+        value=pref.get("alert_include_ops", True),
+        help="파이프라인 지연/실패 / 알림 실패율 증가 / DB 비대화 등 자동 감지 후 알림",
+    )
 
     if st.button("저장", type="primary"):
         save_preferences({
@@ -888,6 +893,7 @@ elif tab_sel == "사용자 선호 설정":
             "alert_imminent_days": alert_imminent_days,
             "alert_only_watched": alert_only_watched,
             "alert_include_briefing": alert_include_briefing,
+            "alert_include_ops": alert_include_ops,
         })
         st.success("저장됨")
 
@@ -1152,6 +1158,12 @@ elif tab_sel == "운영 모니터링":
                 st.warning(f"[!] {it['message']}")
             else:
                 st.info(f"{it['message']}")
+        if st.button("이상 감지 알림 즉시 발송"):
+            res = dispatch_alerts(dry_run=False)
+            st.success(
+                f"발송 {res['sent']} / 스킵 {res['skipped']} / 실패 {res['failed']} "
+                f"(채널 {res['channels']})"
+            )
     else:
         st.success("최근 운영 데이터에서 이상 징후가 감지되지 않았습니다.")
 

@@ -239,6 +239,7 @@ def init_db() -> None:
     _ensure_column(conn, "user_preferences", "alert_imminent_days", "alert_imminent_days INTEGER DEFAULT 3")
     _ensure_column(conn, "user_preferences", "alert_only_watched", "alert_only_watched INTEGER DEFAULT 0")
     _ensure_column(conn, "user_preferences", "alert_include_briefing", "alert_include_briefing INTEGER DEFAULT 1")
+    _ensure_column(conn, "user_preferences", "alert_include_ops", "alert_include_ops INTEGER DEFAULT 1")
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS alert_log (

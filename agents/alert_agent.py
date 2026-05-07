@@ -187,6 +187,33 @@ def _collect_watch_changes() -> list[dict]:
     return out
 
 
+def _collect_operational_anomalies() -> list[dict]:
+    """운영 모니터링 이상 감지를 알림 후보로 변환.
+
+    detect_anomalies() 가 반환하는 [{severity, message}] 를 알림 dict 로 변환.
+    severity warning -> alert priority high, info -> low.
+    payload 에 message 그대로 들어가 dedup 키 일관됨 (같은 메시지는 재전송 안 됨).
+    """
+    try:
+        from agents.monitoring_agent import detect_anomalies
+    except Exception:
+        return []
+    issues = detect_anomalies()
+    out = []
+    for it in issues:
+        severity = it.get("severity", "info")
+        msg = it.get("message", "")
+        out.append({
+            "alert_type": "operational_anomaly",
+            "item_id": None,
+            "title": f"[운영 이상] {msg[:50]}",
+            "body": msg,
+            "priority": "high" if severity == "warning" else "low",
+            "payload": {"severity": severity, "message": msg},
+        })
+    return out
+
+
 def _collect_briefing_summary() -> list[dict]:
     conn = get_connection()
     row = conn.execute(
@@ -225,6 +252,8 @@ def collect_pending_alerts(pref: dict | None = None) -> list[dict]:
         only_watched=pref.get("alert_only_watched", False),
     ))
     alerts.extend(_collect_watch_changes())
+    if pref.get("alert_include_ops", True):
+        alerts.extend(_collect_operational_anomalies())
     if pref.get("alert_include_briefing", True):
         alerts.extend(_collect_briefing_summary())
 

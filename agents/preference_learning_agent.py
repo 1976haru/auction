@@ -34,6 +34,7 @@ DEFAULT_PREF = {
     "alert_imminent_days": 3,
     "alert_only_watched": False,
     "alert_include_briefing": True,
+    "alert_include_ops": True,        # 운영 이상 감지 알림
 }
 
 
@@ -115,8 +116,8 @@ def save_preferences(pref: dict) -> None:
              min_profit_man, min_roi, exclude_keywords, notes,
              alerts_enabled, alert_channel, alert_channels_json,
              alert_min_grade, alert_imminent_days, alert_only_watched,
-             alert_include_briefing)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             alert_include_briefing, alert_include_ops)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         safe_json(pref.get("regions", [])),
         safe_json(pref.get("item_types", [])),
@@ -132,6 +133,7 @@ def save_preferences(pref: dict) -> None:
         int(pref.get("alert_imminent_days", 3)),
         1 if pref.get("alert_only_watched", False) else 0,
         1 if pref.get("alert_include_briefing", True) else 0,
+        1 if pref.get("alert_include_ops", True) else 0,
     ))
     conn.commit()
     conn.close()
@@ -159,6 +161,7 @@ def get_preferences() -> dict:
         "alert_imminent_days": int(row["alert_imminent_days"] or 3),
         "alert_only_watched": bool(row["alert_only_watched"]),
         "alert_include_briefing": bool(row["alert_include_briefing"]) if row["alert_include_briefing"] is not None else True,
+        "alert_include_ops": bool(row["alert_include_ops"]) if row["alert_include_ops"] is not None else True,
     }
 
 
