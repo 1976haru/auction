@@ -262,7 +262,41 @@ pip install playwright>=1.44
 playwright install chromium
 ```
 
-법원경매 사이트는 selector 가 자주 바뀌므로 실 크롤링 전에 selector 검증 권장. 현재는 mock_auction_api 가 같은 인터페이스로 동작합니다.
+#### selector 헬스체크
+
+법원경매 사이트(courtauction.go.kr)는 selector 가 자주 바뀌므로 실 크롤링 전에 헬스체크 권장:
+
+```bash
+python scripts/check_court_auction.py
+```
+
+`SELECTORS` dict 의 각 key 가 사이트에 살아 있는지 1회 검증하고 깨진 selector 를 콘솔에 표시합니다 (예: `[FAIL] result_table = table.Ltbl_list`).
+
+#### selector 업데이트 워크플로
+
+1. `python scripts/check_court_auction.py` 실행 → FAIL 표시 확인
+2. 브라우저로 https://www.courtauction.go.kr 접속
+3. F12 개발자 도구 → Elements 패널에서 해당 요소 우클릭 → **Copy selector**
+4. `modules/auction/crawler.py` 의 `SELECTORS` dict 해당 key 수정 (한 곳만 바꾸면 됨)
+5. `python scripts/check_court_auction.py` 로 재검증
+6. OK 면 git commit
+
+#### 실 크롤링 실행
+
+```bash
+python scripts/populate_real_data.py --count 50 --include-auction
+```
+
+`--include-auction` 플래그가 있을 때만 법원경매 크롤링이 실행됩니다 (기본은 온비드만). Playwright 미설치 / 사이트 selector 깨짐 / 네트워크 실패 시 빈 결과 + 로그 경고로 안전 fallback (운영 무중단).
+
+#### 어댑터
+
+| 인터페이스 | mock | real |
+|---|---|---|
+| `list_auction_items(count)` | `modules/auction/mock_auction_api.py` | `modules/auction/real_auction_api.py` (crawler 호출) |
+| `validate_site_selectors()` | (해당 없음) | `modules/auction/crawler.py` |
+
+mock 과 real 어댑터의 함수 시그니처가 동일하므로 호출자 코드는 변경 없이 데이터 소스만 바뀝니다.
 
 ## 주의사항
 

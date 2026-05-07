@@ -25,7 +25,8 @@ from core.database import init_db, reset_db, upsert_item  # noqa: E402
 from core.logger import log  # noqa: E402
 
 
-def populate(count: int = 50, reset: bool = False) -> dict:
+def populate(count: int = 50, reset: bool = False,
+             include_auction: bool = False) -> dict:
     if reset:
         reset_db()
     else:
@@ -48,20 +49,43 @@ def populate(count: int = 50, reset: bool = False) -> dict:
         except Exception as e:
             log.warning(f"[real-populate] upsert 실패: {e}")
 
+    auction_saved = 0
+    if include_auction:
+        try:
+            from modules.auction.real_auction_api import list_auction_items as real_auction
+            auc_items = real_auction(count=count)
+            for it in auc_items:
+                try:
+                    upsert_item(it)
+                    auction_saved += 1
+                except Exception as e:
+                    log.warning(f"[real-populate] auction upsert 실패: {e}")
+        except Exception as e:
+            log.warning(f"[real-populate] auction crawler 실패: {e}")
+
     # 문서 mock 으로 채움 (real 문서 다운로드는 별도 작업)
     from modules.documents.mock_documents import populate_documents
     docs = populate_documents(seed=42)
 
-    log.info(f"[real-populate] real items={saved} mock docs={docs}")
-    return {"items": saved, "documents": docs, "source": "real_onbid"}
+    log.info(f"[real-populate] onbid={saved} auction={auction_saved} mock_docs={docs}")
+    return {
+        "items": saved + auction_saved,
+        "onbid_items": saved,
+        "auction_items": auction_saved,
+        "documents": docs,
+        "source": "real",
+    }
 
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--count", type=int, default=50)
     p.add_argument("--reset", action="store_true")
+    p.add_argument("--include-auction", action="store_true",
+                   help="법원경매 크롤링 포함 (Playwright 필요)")
     args = p.parse_args()
-    res = populate(count=args.count, reset=args.reset)
+    res = populate(count=args.count, reset=args.reset,
+                    include_auction=args.include_auction)
     print(f"\n[OK] 데이터 적재 완료 (source={res.get('source', 'mock')})")
     print(f"  - items: {res['items']}건")
     print(f"  - documents: {res.get('documents', 0)}건")
