@@ -16,6 +16,13 @@ import json
 import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
 
+from dashboard.charts import (
+    grade_profit_bar,
+    grade_winrate_chart,
+    pred_vs_actual_scatter,
+    trend_line_chart,
+    trend_with_reference,
+)
 from agents.action_planner_agent import list_today_actions
 from agents.alert_agent import (
     collect_pending_alerts,
@@ -274,25 +281,19 @@ elif tab_sel == "물건 상세분석":
         bid = get_bid_recommendation(it["id"])
         st.text(format_bid_report(bid))
 
-        # 시세 트렌드 차트
+        # 시세 트렌드 차트 (plotly)
         st.markdown("### 시세 트렌드")
         trades = get_trade_history(it["id"])
         monthly = monthly_aggregate(trades)
         pa = get_price_analysis(it["id"]) or {}
         if monthly:
-            df_m = pd.DataFrame(monthly).set_index("ym")
-            chart_df = df_m[["avg_price", "min_price", "max_price"]].rename(
-                columns={"avg_price": "평균", "min_price": "최저", "max_price": "최고"}
-            )
-            st.line_chart(chart_df, height=280)
-            ref_lines = pd.DataFrame({
-                "감정가": [it.get("appraisal_price", 0)] * len(df_m),
-                "최저가": [it.get("min_bid_price", 0)] * len(df_m),
-                "추정 시세": [pa.get("market_price_estimate", 0)] * len(df_m),
-                "월평균": df_m["avg_price"].values,
-            }, index=df_m.index)
-            st.caption("기준선과 월평균 비교")
-            st.line_chart(ref_lines, height=240)
+            st.plotly_chart(trend_line_chart(monthly, title="월별 평균/최저/최고 + 거래수"),
+                              use_container_width=True)
+            st.plotly_chart(trend_with_reference(monthly, {
+                "감정가": it.get("appraisal_price", 0),
+                "최저가": it.get("min_bid_price", 0),
+                "추정 시세": pa.get("market_price_estimate", 0),
+            }, title="기준선과 월평균 비교"), use_container_width=True)
             st.caption(f"매칭된 거래 {len(trades)}건 / 월별 {len(monthly)}개월")
             with st.expander("개별 거래 보기"):
                 st.dataframe(pd.DataFrame(trades), use_container_width=True)
@@ -546,12 +547,10 @@ elif tab_sel == "시세 트렌드":
                            delta=f"{delta_pct:+.1f}% (기간 시작 대비)")
                 c2.metric("기간 거래수", int(df["count"].sum()))
                 c3.metric("기간 표본 월수", len(df))
-                chart_df = df[["avg_price", "min_price", "max_price"]].rename(
-                    columns={"avg_price": "평균", "min_price": "최저", "max_price": "최고"}
+                st.plotly_chart(
+                    trend_line_chart(trend, title=f"{si} {gu} {itype} 월별 시세"),
+                    use_container_width=True,
                 )
-                st.line_chart(chart_df, height=320)
-                st.caption("월별 거래 건수")
-                st.bar_chart(df[["count"]].rename(columns={"count": "거래수"}), height=180)
 
     else:
         items = _get_items(500)
@@ -568,20 +567,17 @@ elif tab_sel == "시세 트렌드":
             if not monthly:
                 st.info("이 매물에 매칭된 실거래가가 없습니다.")
             else:
-                df = pd.DataFrame(monthly).set_index("ym")
                 c1, c2, c3, c4 = st.columns(4)
                 c1.metric("감정가", f"{it.get('appraisal_price', 0):,}만원")
                 c2.metric("최저가", f"{it.get('min_bid_price', 0):,}만원")
                 c3.metric("추정 시세", f"{pa.get('market_price_estimate', 0):,}만원")
                 c4.metric("매칭 거래수", len(trades))
-                ref_df = pd.DataFrame({
-                    "월평균": df["avg_price"].values,
-                    "감정가": [it.get("appraisal_price", 0)] * len(df),
-                    "최저가": [it.get("min_bid_price", 0)] * len(df),
-                    "추정 시세": [pa.get("market_price_estimate", 0)] * len(df),
-                }, index=df.index)
-                st.line_chart(ref_df, height=320)
-                st.caption("기준선과 월평균 비교 (감정가/최저가가 시세보다 위에 있으면 거품 의심)")
+                st.plotly_chart(trend_with_reference(monthly, {
+                    "감정가": it.get("appraisal_price", 0),
+                    "최저가": it.get("min_bid_price", 0),
+                    "추정 시세": pa.get("market_price_estimate", 0),
+                }, title="기준선과 월평균 비교 (감정가/최저가가 시세보다 위에 있으면 거품 의심)"),
+                use_container_width=True)
                 with st.expander("개별 거래 보기"):
                     st.dataframe(pd.DataFrame(trades), use_container_width=True)
 
@@ -736,11 +732,14 @@ elif tab_sel == "백테스트":
         if rows:
             st.dataframe(pd.DataFrame(rows), use_container_width=True)
 
-            # 등급별 평균 손익 막대 차트
-            chart_df = pd.DataFrame({
-                row["등급"]: [row["평균 실제 손익(만원)"]] for row in rows
-            }).T.rename(columns={0: "평균 실제 손익"})
-            st.bar_chart(chart_df, height=240)
+            # 등급별 평균 손익 + 승률 (plotly)
+            c1, c2 = st.columns([3, 2])
+            with c1:
+                st.plotly_chart(grade_profit_bar(report["grades"]),
+                                  use_container_width=True)
+            with c2:
+                st.plotly_chart(grade_winrate_chart(report["grades"]),
+                                  use_container_width=True)
 
         if ordering:
             st.subheader("등급 순서 검증")
@@ -751,16 +750,9 @@ elif tab_sel == "백테스트":
         st.subheader("예측 vs 실제 산점도")
         pairs = fetch_pred_actual_pairs(scenario=st.session_state["bt_scenario"], limit=500)
         if pairs:
-            sc_df = pd.DataFrame([
-                {
-                    "예측 손익": p.get("profit_estimate", 0),
-                    "실제 손익": p.get("simulated_profit", 0),
-                    "등급": p.get("grade", "?"),
-                } for p in pairs
-            ])
-            st.scatter_chart(sc_df, x="예측 손익", y="실제 손익", color="등급",
-                              height=320)
-            st.caption("대각선에 가까울수록 예측이 정확. 등급별 색상으로 구분")
+            st.plotly_chart(pred_vs_actual_scatter(pairs),
+                              use_container_width=True)
+            st.caption("점선 대각선이 완벽 예측 (y=x). 등급별 색상으로 구분. 손익 0선과 교차하는 사분면으로 winning/losing 구분.")
         else:
             st.info("recommendation_results 가 충분히 쌓여야 산점도가 그려집니다.")
 
