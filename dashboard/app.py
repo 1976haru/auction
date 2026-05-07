@@ -20,6 +20,14 @@ import streamlit as st  # noqa: E402
 from dashboard.bootstrap import bootstrap as _bootstrap  # noqa: E402
 _BOOTSTRAP = _bootstrap()
 
+# 반응형 헬퍼
+from dashboard.responsive import (  # noqa: E402
+    compact_mode_toggle,
+    inject_mobile_css,
+    is_compact,
+    responsive_columns,
+)
+
 from dashboard.charts import (
     alert_timeline_chart,
     backtest_timeline,
@@ -92,7 +100,12 @@ from modules.valuation.price_matcher import (
 )
 
 init_db()
-st.set_page_config(page_title="경매·공매 AI 에이전트", layout="wide")
+st.set_page_config(
+    page_title="경매·공매 AI 에이전트",
+    layout="wide",
+    initial_sidebar_state="auto",
+)
+inject_mobile_css()
 
 SOURCE_LABELS = {"auction": "경매", "public_sale": "공매"}
 
@@ -113,6 +126,7 @@ with st.sidebar:
     rt = runtime_summary()
     st.caption(f"Mode: {'MOCK' if rt['use_mock_apis'] else 'REAL'} / "
                f"AI: {'on' if rt['use_ai'] else 'off'}")
+    compact_mode_toggle()
     if _BOOTSTRAP.get("seeded"):
         st.success("자동 시드 완료 (mock 80건)")
     elif _BOOTSTRAP.get("hydrated"):
@@ -163,7 +177,7 @@ if tab_sel == "오늘의 브리핑":
     if not b:
         st.info("아직 브리핑이 없습니다. 위 버튼을 눌러 생성하세요.")
     else:
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2, c3, c4 = responsive_columns(4) if not is_compact() else st.columns(2) + st.columns(2)
         c1.metric("총 분석 물건", b["total_items"])
         c2.metric("실거래가 매칭", b["matched_items"])
         c3.metric("검토 후보", b["candidate_items"])
@@ -538,7 +552,7 @@ elif tab_sel == "워치리스트":
                 st.rerun()
     else:
         # 요약 메트릭
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2, c3, c4 = responsive_columns(4) if not is_compact() else st.columns(2) + st.columns(2)
         c1.metric("총 매물 수", summary["count"])
         c2.metric("총 예상 차익", f"{int(summary['total_profit_estimate']):+,}만")
         c3.metric("입찰기일 임박", summary["imminent_count"], delta="D-7 이내")
@@ -783,7 +797,7 @@ elif tab_sel == "시세 트렌드":
             if not monthly:
                 st.info("이 매물에 매칭된 실거래가가 없습니다.")
             else:
-                c1, c2, c3, c4 = st.columns(4)
+                c1, c2, c3, c4 = responsive_columns(4) if not is_compact() else st.columns(2) + st.columns(2)
                 c1.metric("감정가", f"{it.get('appraisal_price', 0):,}만원")
                 c2.metric("최저가", f"{it.get('min_bid_price', 0):,}만원")
                 c3.metric("추정 시세", f"{pa.get('market_price_estimate', 0):,}만원")
@@ -871,7 +885,7 @@ elif tab_sel == "알림":
     if not pref.get("alerts_enabled", True):
         st.warning("알림이 비활성화 상태입니다. '사용자 선호 설정' 탭에서 다시 켤 수 있습니다.")
     else:
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2, c3, c4 = responsive_columns(4) if not is_compact() else st.columns(2) + st.columns(2)
         c1.metric("최소 등급", pref.get("alert_min_grade", "B"))
         c2.metric("D-N 이내", f"{pref.get('alert_imminent_days', 3)}일")
         c3.metric("관심만", "예" if pref.get("alert_only_watched") else "아니오")
@@ -1056,7 +1070,7 @@ elif tab_sel == "운영 모니터링":
     alerts_summary = ma_alert_summary(limit=1000)
     stress = get_stress_history(20)
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4 = responsive_columns(4) if not is_compact() else st.columns(2) + st.columns(2)
     c1.metric("총 매물", health["tables"].get("items", 0))
     c2.metric("파이프라인 누적", len(pipelines))
     c3.metric("알림 누적", alerts_summary["total"])
