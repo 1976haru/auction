@@ -1,0 +1,13 @@
+run = "streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8080"
+language = "python3"
+entrypoint = "dashboard/app.py"
+
+[nix]
+channel = "stable-23_05"
+
+[env]
+USE_MOCK_APIS = "true"
+PYTHONUNBUFFERED = "1"
+
+[deployment]
+run = ["sh", "-c", "streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8080"]
