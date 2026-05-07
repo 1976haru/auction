@@ -28,7 +28,8 @@ DEFAULT_PREF = {
     "notes": "기본값 (선호 데이터 없음)",
     # 알림 설정
     "alerts_enabled": True,
-    "alert_channel": "telegram",
+    "alert_channel": "telegram",                  # legacy 단일 채널
+    "alert_channels": ["telegram"],               # multi-channel (이게 우선)
     "alert_min_grade": "B",
     "alert_imminent_days": 3,
     "alert_only_watched": False,
@@ -112,9 +113,10 @@ def save_preferences(pref: dict) -> None:
         INSERT INTO user_preferences
             (regions_json, item_types_json, max_risk_level,
              min_profit_man, min_roi, exclude_keywords, notes,
-             alerts_enabled, alert_channel, alert_min_grade,
-             alert_imminent_days, alert_only_watched, alert_include_briefing)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             alerts_enabled, alert_channel, alert_channels_json,
+             alert_min_grade, alert_imminent_days, alert_only_watched,
+             alert_include_briefing)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         safe_json(pref.get("regions", [])),
         safe_json(pref.get("item_types", [])),
@@ -125,6 +127,7 @@ def save_preferences(pref: dict) -> None:
         pref.get("notes", ""),
         1 if pref.get("alerts_enabled", True) else 0,
         pref.get("alert_channel", "telegram"),
+        safe_json(pref.get("alert_channels", ["telegram"])),
         pref.get("alert_min_grade", "B"),
         int(pref.get("alert_imminent_days", 3)),
         1 if pref.get("alert_only_watched", False) else 0,
@@ -151,6 +154,7 @@ def get_preferences() -> dict:
         "notes": row["notes"] or "",
         "alerts_enabled": bool(row["alerts_enabled"]) if row["alerts_enabled"] is not None else True,
         "alert_channel": row["alert_channel"] or "telegram",
+        "alert_channels": loads(row["alert_channels_json"], [row["alert_channel"] or "telegram"]),
         "alert_min_grade": row["alert_min_grade"] or "B",
         "alert_imminent_days": int(row["alert_imminent_days"] or 3),
         "alert_only_watched": bool(row["alert_only_watched"]),

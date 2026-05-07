@@ -239,6 +239,7 @@ def init_db() -> None:
     )""")
     _ensure_column(conn, "user_preferences", "alerts_enabled", "alerts_enabled INTEGER DEFAULT 1")
     _ensure_column(conn, "user_preferences", "alert_channel", "alert_channel TEXT DEFAULT 'telegram'")
+    _ensure_column(conn, "user_preferences", "alert_channels_json", "alert_channels_json TEXT")
     _ensure_column(conn, "user_preferences", "alert_min_grade", "alert_min_grade TEXT DEFAULT 'B'")
     _ensure_column(conn, "user_preferences", "alert_imminent_days", "alert_imminent_days INTEGER DEFAULT 3")
     _ensure_column(conn, "user_preferences", "alert_only_watched", "alert_only_watched INTEGER DEFAULT 0")

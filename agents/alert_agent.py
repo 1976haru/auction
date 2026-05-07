@@ -20,7 +20,7 @@ from agents.preference_learning_agent import get_preferences
 from core.database import get_connection, init_db
 from core.logger import log
 from core.utils import days_until, now_iso, today_str
-from modules.alerts.telegram import send_message
+from modules.alerts.dispatcher import send_to_channels
 
 
 GRADE_RANK = {"A": 1, "B": 2, "C": 3, "D": 4, "X": 5}
@@ -31,8 +31,10 @@ def _hash(payload: Any) -> str:
     return hashlib.sha1(s.encode("utf-8")).hexdigest()[:12]
 
 
-def _dedupe_key(alert_type: str, item_id: int | None, payload: Any) -> str:
-    return f"{alert_type}|{item_id or 0}|{today_str()}|{_hash(payload)}"
+def _dedupe_key(alert_type: str, item_id: int | None, payload: Any,
+                channel: str = "*") -> str:
+    """채널별 dedup. 같은 알림이라도 telegram 과 slack 은 각각 1회씩 발송."""
+    return f"{alert_type}|{item_id or 0}|{channel}|{today_str()}|{_hash(payload)}"
 
 
 def _is_already_sent(dedupe_key: str) -> bool:
@@ -226,18 +228,26 @@ def collect_pending_alerts(pref: dict | None = None) -> list[dict]:
     if pref.get("alert_include_briefing", True):
         alerts.extend(_collect_briefing_summary())
 
+    # 채널 무관 base key (preview 용). 실제 발송 시 채널별 key 생성.
     for a in alerts:
-        a["dedupe_key"] = _dedupe_key(a["alert_type"], a.get("item_id"), a.get("payload"))
+        a["dedupe_key"] = _dedupe_key(a["alert_type"], a.get("item_id"),
+                                       a.get("payload"))
     return alerts
 
 
 def dispatch_alerts(pref: dict | None = None, dry_run: bool = False) -> dict:
-    """알림 수집 후 미발송 분만 채널로 보낸다.
+    """알림 수집 후 사용자가 선택한 모든 채널에 발송.
+
+    multi-channel 동작:
+    - 사용자 선호 alert_channels 리스트의 각 채널에 fanout
+    - 채널별 dedup 키로 같은 채널에 중복 발송 방지
+    - 각 채널별 send 결과를 alert_log 에 별도 행으로 기록
 
     Returns:
-        {"collected": int, "sent": int, "skipped": int, "failed": int, "details": [...]}
+        {collected, sent, skipped, failed, details, channels}
     """
     pref = pref or get_preferences()
+    channels = pref.get("alert_channels") or [pref.get("alert_channel", "telegram")]
     alerts = collect_pending_alerts(pref)
 
     sent = 0
@@ -245,30 +255,45 @@ def dispatch_alerts(pref: dict | None = None, dry_run: bool = False) -> dict:
     failed = 0
     details = []
     for a in alerts:
-        if _is_already_sent(a["dedupe_key"]):
-            skipped += 1
-            details.append({"key": a["dedupe_key"], "status": "skipped"})
-            continue
-        if dry_run:
-            details.append({"key": a["dedupe_key"], "status": "dry_run", "title": a["title"]})
-            continue
         text = f"<b>{a['title']}</b>\n{a['body']}"
-        ok = send_message(text)
-        if ok:
-            _record_alert(a, "sent")
-            sent += 1
-            details.append({"key": a["dedupe_key"], "status": "sent", "title": a["title"]})
-        else:
-            _record_alert(a, "failed", "send_message returned False")
-            failed += 1
-            details.append({"key": a["dedupe_key"], "status": "failed", "title": a["title"]})
+        if dry_run:
+            details.append({
+                "title": a["title"], "status": "dry_run",
+                "channels": channels,
+            })
+            continue
+        # 채널별로 dedup + 발송
+        per_channel: dict[str, str] = {}
+        for ch in channels:
+            ch_key = _dedupe_key(a["alert_type"], a.get("item_id"),
+                                  a.get("payload"), channel=ch)
+            entry = {**a, "dedupe_key": ch_key, "channel": ch}
+            if _is_already_sent(ch_key):
+                skipped += 1
+                per_channel[ch] = "skipped"
+                continue
+            results = send_to_channels(text, channels=[ch])
+            ok = results.get(ch, False)
+            if ok:
+                _record_alert(entry, "sent")
+                sent += 1
+                per_channel[ch] = "sent"
+            else:
+                _record_alert(entry, "failed", f"send_to_channels[{ch}]=False")
+                failed += 1
+                per_channel[ch] = "failed"
+        details.append({"title": a["title"], "channels": per_channel})
 
-    log.info(f"[alert] collected={len(alerts)} sent={sent} skipped={skipped} failed={failed}")
+    log.info(
+        f"[alert] alerts={len(alerts)} channels={channels} "
+        f"sent={sent} skipped={skipped} failed={failed}"
+    )
     return {
         "collected": len(alerts),
         "sent": sent,
         "skipped": skipped,
         "failed": failed,
+        "channels": channels,
         "details": details,
     }
 

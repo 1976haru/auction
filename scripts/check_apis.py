@@ -92,6 +92,50 @@ def check_claude() -> dict:
         return {"status": "error", "ok": False, "note": str(e)[:100]}
 
 
+def check_slack() -> dict:
+    if not config.SLACK_WEBHOOK_URL:
+        return {"status": "missing_key", "ok": False,
+                 "note": "SLACK_WEBHOOK_URL 미설정"}
+    # 실 호출은 alert 발송이라 안 함. URL 형식만 검증.
+    if not config.SLACK_WEBHOOK_URL.startswith("https://hooks.slack.com/"):
+        return {"status": "invalid_url", "ok": False,
+                 "note": "SLACK_WEBHOOK_URL 가 hooks.slack.com 으로 시작하지 않음"}
+    return {"status": "configured", "ok": True,
+             "note": "URL 형식 OK (실 발송은 alert 시점)"}
+
+
+def check_discord() -> dict:
+    if not config.DISCORD_WEBHOOK_URL:
+        return {"status": "missing_key", "ok": False,
+                 "note": "DISCORD_WEBHOOK_URL 미설정"}
+    if "discord.com/api/webhooks" not in config.DISCORD_WEBHOOK_URL:
+        return {"status": "invalid_url", "ok": False,
+                 "note": "Discord webhook URL 형식 불일치"}
+    return {"status": "configured", "ok": True,
+             "note": "URL 형식 OK (실 발송은 alert 시점)"}
+
+
+def check_email() -> dict:
+    if not all([config.SMTP_HOST, config.SMTP_USER, config.SMTP_PASSWORD,
+                config.SMTP_FROM, config.SMTP_TO]):
+        return {"status": "missing_config", "ok": False,
+                 "note": "SMTP_HOST/USER/PASSWORD/FROM/TO 중 일부 미설정"}
+    try:
+        import smtplib
+        if config.SMTP_USE_TLS:
+            with smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT, timeout=10) as s:
+                s.ehlo()
+                s.starttls()
+                s.login(config.SMTP_USER, config.SMTP_PASSWORD)
+        else:
+            with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT, timeout=10) as s:
+                s.login(config.SMTP_USER, config.SMTP_PASSWORD)
+        return {"status": "ok", "ok": True,
+                 "note": f"{config.SMTP_HOST}:{config.SMTP_PORT} 로그인 성공"}
+    except Exception as e:
+        return {"status": "error", "ok": False, "note": str(e)[:120]}
+
+
 def check_telegram() -> dict:
     if not config.TELEGRAM_BOT_TOKEN or not config.TELEGRAM_CHAT_ID:
         return {"status": "missing_key", "ok": False,
@@ -126,6 +170,10 @@ def run_all() -> dict:
                 "ANTHROPIC_API_KEY": _mask(config.ANTHROPIC_API_KEY),
                 "TELEGRAM_BOT_TOKEN": _mask(config.TELEGRAM_BOT_TOKEN),
                 "TELEGRAM_CHAT_ID": _mask(config.TELEGRAM_CHAT_ID),
+                "SLACK_WEBHOOK_URL": _mask(config.SLACK_WEBHOOK_URL),
+                "DISCORD_WEBHOOK_URL": _mask(config.DISCORD_WEBHOOK_URL),
+                "SMTP_HOST": config.SMTP_HOST or "(미설정)",
+                "SMTP_USER": _mask(config.SMTP_USER),
             },
         },
         "checks": {
@@ -133,6 +181,9 @@ def run_all() -> dict:
             "onbid": check_onbid(),
             "claude": check_claude(),
             "telegram": check_telegram(),
+            "slack": check_slack(),
+            "discord": check_discord(),
+            "email": check_email(),
         },
     }
 

@@ -39,6 +39,21 @@ ONBID_API_KEY      = _get("ONBID_API_KEY")
 TELEGRAM_BOT_TOKEN = _get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID   = _get("TELEGRAM_CHAT_ID")
 
+# Slack -------------------------------------------------------------
+SLACK_WEBHOOK_URL  = _get("SLACK_WEBHOOK_URL")
+
+# Discord -----------------------------------------------------------
+DISCORD_WEBHOOK_URL = _get("DISCORD_WEBHOOK_URL")
+
+# Email (SMTP) ------------------------------------------------------
+SMTP_HOST          = _get("SMTP_HOST")
+SMTP_PORT          = int(_get("SMTP_PORT", "587"))
+SMTP_USER          = _get("SMTP_USER")
+SMTP_PASSWORD      = _get("SMTP_PASSWORD")
+SMTP_FROM          = _get("SMTP_FROM")
+SMTP_TO            = _get("SMTP_TO")
+SMTP_USE_TLS       = _to_bool(_get("SMTP_USE_TLS", "true"), default=True)
+
 # DB / 경로 ----------------------------------------------------------
 DB_PATH            = _get("DB_PATH", "data/auction_agent.db")
 EXPORT_DIR         = _get("EXPORT_DIR", "data/exports")

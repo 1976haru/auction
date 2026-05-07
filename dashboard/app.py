@@ -780,6 +780,14 @@ elif tab_sel == "사용자 선호 설정":
     st.divider()
     st.subheader("알림 설정")
     alerts_enabled = st.checkbox("알림 활성화", value=pref.get("alerts_enabled", True))
+    available_channels = ["telegram", "slack", "discord", "email"]
+    current_channels = pref.get("alert_channels") or [pref.get("alert_channel", "telegram")]
+    alert_channels = st.multiselect(
+        "알림 채널 (다중 선택)",
+        available_channels,
+        default=[c for c in current_channels if c in available_channels] or ["telegram"],
+        help="선택한 모든 채널로 동시 발송. 키 미설정 채널은 자동 콘솔 fallback.",
+    )
     alert_min_grade = st.selectbox(
         "최소 알림 등급", ["A", "B", "C"],
         index=["A", "B", "C"].index(pref.get("alert_min_grade", "B")),
@@ -801,7 +809,8 @@ elif tab_sel == "사용자 선호 설정":
             "exclude_keywords": [s.strip() for s in excludes.split(",") if s.strip()],
             "notes": "수동 설정",
             "alerts_enabled": alerts_enabled,
-            "alert_channel": pref.get("alert_channel", "telegram"),
+            "alert_channel": alert_channels[0] if alert_channels else "telegram",
+            "alert_channels": alert_channels or ["telegram"],
             "alert_min_grade": alert_min_grade,
             "alert_imminent_days": alert_imminent_days,
             "alert_only_watched": alert_only_watched,
