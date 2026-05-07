@@ -46,15 +46,15 @@ def _export_top(top_picks: list[dict]) -> dict:
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(top_picks, f, ensure_ascii=False, indent=2, default=str)
     paths["json"] = json_path
-    # CSV
+    # CSV (utf-8-sig + CRLF — Excel 호환)
     csv_path = export_path("daily_recommendations.csv")
     headers = [
         "rank", "grade", "score", "address", "item_type",
         "appraisal_price", "min_bid_price", "market_price",
         "profit_estimate", "roi_estimate", "risk_level", "bid_date",
     ]
-    with open(csv_path, "w", encoding="utf-8") as f:
-        f.write(",".join(headers) + "\n")
+    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+        f.write(",".join(headers) + "\r\n")
         for i, r in enumerate(top_picks, 1):
             it = r.get("item", {})
             row = [
@@ -69,7 +69,7 @@ def _export_top(top_picks: list[dict]) -> dict:
                 str(r.get("risk_level", "")),
                 str(it.get("bid_date", "")),
             ]
-            f.write(",".join(row) + "\n")
+            f.write(",".join(row) + "\r\n")
     paths["csv"] = csv_path
     # Markdown
     md_path = export_path("daily_recommendations.md")
