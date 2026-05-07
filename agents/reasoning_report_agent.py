@@ -58,6 +58,16 @@ def build_reasoning(result_entry: dict) -> dict:
         warnings.append("실거래가 데이터 부족 - 시세 추정 신뢰도 낮음")
     if confidence.get("document_confidence", 1) < 0.5:
         warnings.append("핵심 문서 일부 미공개 - 추가 확인 필요")
+    # 감정가/시세 거품 경고
+    from modules.valuation.price_matcher import get_price_analysis
+    pa = get_price_analysis(item.get("id")) if item.get("id") else None
+    if pa and pa.get("appraisal_inflated"):
+        from core.utils import loads as _loads
+        for w in _loads(pa.get("inflation_warnings_json"), []):
+            warnings.append(f"가격 이상치: {w}")
+    # 추천 점수 분해의 critical_reasons도 노출
+    for cr in (breakdown.get("critical_reasons") or []):
+        warnings.append(f"제외 사유: {cr}")
 
     # 입찰가 범위
     bid_rec = get_bid_recommendation(item["id"]) if item.get("id") else None

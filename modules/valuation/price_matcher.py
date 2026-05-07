@@ -49,6 +49,24 @@ def match_price(item: dict[str, Any], use_mock: bool | None = None) -> dict:
     type_match = bool(item_type)
     conf, reason = _confidence(summary["transaction_count"], addr_match, type_match)
 
+    # 감정가 거품 감지 (시세 대비 과대평가만 거름. 저평가는 매수자 우호).
+    inflation_warning: list[str] = []
+    if appraisal_to_market and appraisal_to_market > 1.5:
+        inflation_warning.append(
+            f"감정가가 시세의 {appraisal_to_market * 100:.0f}% - 비정상적으로 높음"
+        )
+    if minimum_to_market and minimum_to_market > 1.2:
+        inflation_warning.append(
+            f"최저가가 시세의 {minimum_to_market * 100:.0f}% - 시세 이상으로 책정됨"
+        )
+    # 시세 대비 감정가가 매우 낮은 케이스(0.5 미만)는 mock 한계일 수 있어
+    # data_quality_warning 별도로 표시하지만 inflation 필터로는 막지 않는다.
+    data_quality_warnings: list[str] = []
+    if appraisal_to_market and 0 < appraisal_to_market < 0.5:
+        data_quality_warnings.append(
+            f"감정가가 시세의 {appraisal_to_market * 100:.0f}% - mock 데이터 한계 가능 (실제로는 매수자 우호)"
+        )
+
     return {
         "trades": trades,
         "avg_price_6m": summary["avg_price_6m"],
@@ -60,6 +78,9 @@ def match_price(item: dict[str, Any], use_mock: bool | None = None) -> dict:
         "minimum_to_market_ratio": round(minimum_to_market, 3),
         "appraisal_to_market_ratio": round(appraisal_to_market, 3),
         "data_shortage": summary["data_shortage"],
+        "appraisal_inflated": bool(inflation_warning),
+        "inflation_warnings": inflation_warning,
+        "data_quality_warnings": data_quality_warnings,
         "confidence": conf,
         "confidence_reason": reason,
         "address_match": addr_match,
@@ -76,8 +97,9 @@ def save_price_analysis(item_id: int, result: dict) -> None:
             item_id, avg_price_6m, avg_price_12m,
             market_price_estimate, minimum_to_market_ratio,
             appraisal_to_market_ratio, transaction_count,
-            confidence, confidence_reason, data_shortage
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            confidence, confidence_reason, data_shortage,
+            appraisal_inflated, inflation_warnings_json
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(item_id) DO UPDATE SET
             avg_price_6m=excluded.avg_price_6m,
             avg_price_12m=excluded.avg_price_12m,
@@ -88,6 +110,8 @@ def save_price_analysis(item_id: int, result: dict) -> None:
             confidence=excluded.confidence,
             confidence_reason=excluded.confidence_reason,
             data_shortage=excluded.data_shortage,
+            appraisal_inflated=excluded.appraisal_inflated,
+            inflation_warnings_json=excluded.inflation_warnings_json,
             created_at=datetime('now','localtime')
     """, (
         item_id,
@@ -96,6 +120,8 @@ def save_price_analysis(item_id: int, result: dict) -> None:
         result["appraisal_to_market_ratio"], result["transaction_count"],
         result["confidence"], result["confidence_reason"],
         1 if result["data_shortage"] else 0,
+        1 if result.get("appraisal_inflated") else 0,
+        safe_json(result.get("inflation_warnings", [])),
     ))
     # 거래 내역 저장 (최대 20건)
     for t in (result.get("trades") or [])[:20]:

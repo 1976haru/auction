@@ -57,17 +57,33 @@ def _delta_vs_yesterday(today: dict) -> dict:
 def generate_briefing(top_query: str = "시세차익 큰 물건 5개 찾아줘") -> dict:
     log.info("[briefing] 생성 시작")
     stats = _stats()
-    rec = recommend(top_query, n=5)
+    # 더 넉넉하게 가져와서 등급별로 분리
+    rec = recommend(top_query, n=15)
     candidate = rec["total_found"]
     delta = _delta_vs_yesterday(stats)
 
-    summary = (
-        f"오늘의 경매·공매 브리핑입니다.\n"
-        f"총 {stats['total']}건을 확인했고, 실거래가 매칭 가능 물건은 {stats['matched']}건입니다.\n"
-        f"고위험 키워드 보유 물건은 {stats['high_risk']}건이며, "
-        f"검토 후보는 {candidate}건입니다.\n"
-        f"오늘 우선 볼 물건은 {len(rec['results'])}건입니다."
+    # 등급별 분리: A/B/C 는 검토 후보 / D/X 는 주의(검토 보류)
+    primary = [r for r in rec["results"] if r.get("grade") in ("A", "B", "C")]
+    warnings_picks = [r for r in rec["results"] if r.get("grade") in ("D", "X")]
+    primary = primary[:5]
+    warnings_picks = warnings_picks[:5]
+
+    insufficient = len(primary) < 3
+    insufficient_msg = (
+        "오늘 검토 후보(A/B/C 등급)가 3건 미만입니다 - 추천 후보 부족"
+        if insufficient else ""
     )
+
+    summary_lines = [
+        f"오늘의 경매·공매 브리핑입니다.",
+        f"총 {stats['total']}건을 확인했고, 실거래가 매칭 가능 물건은 {stats['matched']}건입니다.",
+        f"고위험 키워드 보유 물건은 {stats['high_risk']}건이며, "
+        f"검토 후보(A/B/C)는 {len(primary)}건, 주의(D/X)는 {len(warnings_picks)}건입니다.",
+        f"오늘 우선 볼 물건은 {len(primary)}건입니다.",
+    ]
+    if insufficient_msg:
+        summary_lines.append(insufficient_msg)
+    summary = "\n".join(summary_lines)
 
     briefing = {
         "run_date": today_str(),
@@ -76,9 +92,11 @@ def generate_briefing(top_query: str = "시세차익 큰 물건 5개 찾아줘")
         "matched_items": stats["matched"],
         "candidate_items": candidate,
         "high_risk_items": stats["high_risk"],
-        "top_picks": rec["results"],
+        "top_picks": primary,
+        "warning_picks": warnings_picks,
         "summary": summary,
         "delta": delta,
+        "insufficient_candidates": insufficient,
         "generated_at": now_iso(),
     }
 
@@ -88,12 +106,13 @@ def generate_briefing(top_query: str = "시세차익 큰 물건 5개 찾아줘")
         INSERT INTO daily_briefings
             (run_date, total_items, analyzed_items, matched_items,
              candidate_items, high_risk_items, top_picks_json,
-             summary, delta_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             warning_picks_json, summary, delta_json, insufficient)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         briefing["run_date"], stats["total"], stats["analyzed"], stats["matched"],
         candidate, stats["high_risk"], safe_json(briefing["top_picks"]),
-        summary, safe_json(delta),
+        safe_json(briefing["warning_picks"]),
+        summary, safe_json(delta), 1 if insufficient else 0,
     ))
     conn.commit()
     conn.close()

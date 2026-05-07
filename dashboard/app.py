@@ -104,13 +104,17 @@ if tab_sel == "오늘의 브리핑":
         c4.metric("고위험 후보", b["high_risk_items"])
         st.markdown("### 요약")
         st.write(b["summary"])
-        st.markdown("### 오늘 우선 볼 물건")
+        st.markdown("### 오늘 우선 볼 물건 (검토 후보 A/B/C)")
         try:
             picks = json.loads(b["top_picks_json"] or "[]")
         except Exception:
             picks = []
+        try:
+            delta = json.loads(b["delta_json"] or "{}")
+        except Exception:
+            delta = {}
         if not picks:
-            st.info("추천 후보 없음")
+            st.warning("검토 후보(A/B/C 등급)가 없습니다 - 추천 후보 부족")
         else:
             for i, r in enumerate(picks, 1):
                 it = r.get("item", {})
@@ -118,6 +122,22 @@ if tab_sel == "오늘의 브리핑":
                     f"{i}. [{r.get('grade')}] {it.get('address_full', '')} | "
                     f"차익 {r.get('profit_estimate', 0):,}만원 | "
                     f"점수 {r.get('score', 0):.1f}"
+                )
+
+        try:
+            warning_picks = json.loads(b["warning_picks_json"] or "[]")
+        except Exception:
+            warning_picks = []
+        if warning_picks:
+            st.markdown("### 주의 후보 (D/X 등급 - 검토 보류 권장)")
+            for i, r in enumerate(warning_picks, 1):
+                it = r.get("item", {})
+                cr = (r.get("score_breakdown") or {}).get("critical_reasons") or []
+                reason = cr[0] if cr else "낮은 점수"
+                st.write(
+                    f"{i}. [{r.get('grade')}] {it.get('address_full', '')} | "
+                    f"차익 {r.get('profit_estimate', 0):,}만원 | "
+                    f"사유: {reason}"
                 )
 
 # 2. 오늘 할 일 ----------------------------------------------------

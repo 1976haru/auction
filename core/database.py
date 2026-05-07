@@ -155,8 +155,12 @@ def init_db() -> None:
         confidence               TEXT,
         confidence_reason        TEXT,
         data_shortage            INTEGER DEFAULT 0,
+        appraisal_inflated       INTEGER DEFAULT 0,
+        inflation_warnings_json  TEXT,
         created_at               TEXT DEFAULT (datetime('now','localtime'))
     )""")
+    _ensure_column(conn, "price_analyses", "appraisal_inflated", "appraisal_inflated INTEGER DEFAULT 0")
+    _ensure_column(conn, "price_analyses", "inflation_warnings_json", "inflation_warnings_json TEXT")
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS risk_flags (
@@ -239,18 +243,22 @@ def init_db() -> None:
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS daily_briefings (
-        id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        run_date        TEXT,
-        total_items     INTEGER,
-        analyzed_items  INTEGER,
-        matched_items   INTEGER,
-        candidate_items INTEGER,
-        high_risk_items INTEGER,
-        top_picks_json  TEXT,
-        summary         TEXT,
-        delta_json      TEXT,
-        created_at      TEXT DEFAULT (datetime('now','localtime'))
+        id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+        run_date           TEXT,
+        total_items        INTEGER,
+        analyzed_items     INTEGER,
+        matched_items      INTEGER,
+        candidate_items    INTEGER,
+        high_risk_items    INTEGER,
+        top_picks_json     TEXT,
+        warning_picks_json TEXT,
+        summary            TEXT,
+        delta_json         TEXT,
+        insufficient       INTEGER DEFAULT 0,
+        created_at         TEXT DEFAULT (datetime('now','localtime'))
     )""")
+    _ensure_column(conn, "daily_briefings", "warning_picks_json", "warning_picks_json TEXT")
+    _ensure_column(conn, "daily_briefings", "insufficient", "insufficient INTEGER DEFAULT 0")
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS action_items (

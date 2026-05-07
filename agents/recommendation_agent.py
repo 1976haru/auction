@@ -30,16 +30,21 @@ RISK_LEVEL_RANK = {"low": 1, "medium": 2, "high": 3, "unknown": 2, "very_low": 0
 
 
 def _filter_by_intent(items: list[dict], intent: dict, pref: dict) -> list[dict]:
+    """후보 1차 필터링. 사용자 선호의 min_profit/min_roi 도 함께 적용."""
     f = intent.get("filters", {})
     risk_max = f.get("risk_level_max", "medium")
     risk_max_rank = RISK_LEVEL_RANK.get(risk_max, 2)
     excludes = set((f.get("exclude_keywords") or []) + (pref.get("exclude_keywords") or []))
     bid_within = f.get("bid_within_days")
     include_high = f.get("include_high_risk", False)
+    enforce_pref = f.get("enforce_preferences", True)
 
     regions = intent.get("regions") or intent.get("regions_default") or []
     types = intent.get("item_types") or intent.get("item_types_default") or []
     src_types = intent.get("source_types") or ["auction", "public_sale"]
+
+    min_profit = pref.get("min_profit_man", 0) if enforce_pref else 0
+    min_roi = pref.get("min_roi", 0) if enforce_pref else 0  # 0~1 비율
 
     out = []
     for it in items:
@@ -53,13 +58,28 @@ def _filter_by_intent(items: list[dict], intent: dict, pref: dict) -> list[dict]
         if not include_high and RISK_LEVEL_RANK.get(rl, 2) > risk_max_rank:
             continue
         if excludes:
-            flag_types = {f["flag_type"] for f in it.get("_flags", [])}
+            flag_types = {fl["flag_type"] for fl in it.get("_flags", [])}
             if flag_types & excludes:
                 continue
         if bid_within is not None:
             d = days_until(it.get("bid_date"))
             if d is None or d < 0 or d > bid_within:
                 continue
+
+        # 감정가 거품 / 최저가가 시세 이상 -> 후보 제외 (high-risk 옵션 켜져도 적용)
+        pa = it.get("_price") or {}
+        if pa.get("appraisal_inflated"):
+            it["_excluded_reason"] = "감정가/최저가가 시세보다 비정상적으로 높음"
+            continue
+
+        # 사용자 선호 최저 수익 임계
+        profit = it.get("_profit_info", {}).get("profit", 0)
+        roi = it.get("_profit_info", {}).get("roi", 0)
+        if min_profit and profit < min_profit:
+            continue
+        if min_roi and roi / 100.0 < min_roi:
+            continue
+
         out.append(it)
     return out
 
@@ -81,14 +101,15 @@ def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict) -> dict:
     roi = profit_info.get("roi", 0)
     risk_level = item.get("_risk_level", "unknown")
     bid_days = days_until(item.get("bid_date"))
+    price_analysis = item.get("_price") or {}
 
     # 1) 시세차익 (35점)
     profit_pts = 0
     if profit > 0:
-        profit_pts = min(35, profit / 1000)  # 1000만원 -> 1점, 35,000만원 이상 만점
-    # 2) 시세 신뢰도 (15점) - confidence_score 0~1
+        profit_pts = min(35, profit / 1000)
+    # 2) 시세 신뢰도 (15점)
     price_conf_pts = (conf.get("price_confidence", 0) or 0) * 15
-    # 3) 위험도 (20점) - low=20, medium=12, high=4, unknown=10
+    # 3) 위험도 (20점)
     risk_pts = {"low": 20, "medium": 12, "high": 4}.get(risk_level, 10)
     # 4) 입찰기일 (10점)
     if bid_days is None:
@@ -105,16 +126,27 @@ def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict) -> dict:
         bid_pts = 3
     # 5) 사용자 선호 (10점)
     pref_pts, pref_reasons = preference_match_score(item, pref)
-    # 6) 데이터 완성도 (10점) - overall_confidence 비율
+    # 6) 데이터 완성도 (10점)
     data_pts = (conf.get("overall_confidence", 0) or 0) * 10
 
     total = round(profit_pts + price_conf_pts + risk_pts + bid_pts + pref_pts + data_pts, 2)
 
-    has_critical_gap = (
-        risk_level == "high" and not profit > 5000  # high risk + 차익 작음 -> 제외
-    ) or profit_info.get("market_price", 0) <= 0
+    # 등급 X 자동 부여 조건 (어느 하나라도 해당)
+    market = profit_info.get("market_price", 0)
+    min_bid = item.get("min_bid_price", 0)
+    critical_reasons: list[str] = []
+    if market <= 0:
+        critical_reasons.append("시세 추정 실패")
+    if price_analysis.get("appraisal_inflated"):
+        critical_reasons.append("감정가/최저가가 시세보다 비정상적으로 높음")
+    if min_bid and market and min_bid > market:
+        critical_reasons.append(f"최저가({min_bid:,})가 추정 시세({market:,})보다 높음")
+    if risk_level == "high" and profit < 5000:
+        critical_reasons.append("고위험 + 차익 부족")
+    if profit < 0:
+        critical_reasons.append("최저가 입찰조차 음수 차익")
 
-    grade = _grade_for(total, has_critical_gap)
+    grade = "X" if critical_reasons else _grade_for(total, False)
 
     breakdown = {
         "profit_pts": round(profit_pts, 2),
@@ -124,6 +156,7 @@ def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict) -> dict:
         "pref_pts": round(pref_pts, 2),
         "data_pts": round(data_pts, 2),
         "preference_reasons": pref_reasons,
+        "critical_reasons": critical_reasons,
     }
     return {"score": total, "grade": grade, "breakdown": breakdown}
 
