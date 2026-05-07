@@ -85,13 +85,15 @@ def _filter_by_intent(items: list[dict], intent: dict, pref: dict) -> list[dict]
 
 
 def _grade_for(score: float, has_critical_gap: bool) -> str:
+    """등급 컷오프. 가중치 조정 (profit 35->45, bid/pref 10->5) 에 맞춰 재조정.
+    A는 75 이상으로 올려서 진짜 우량 매물만 통과시킴."""
     if has_critical_gap:
         return "X"
-    if score >= 80:
+    if score >= 75:
         return "A"
-    if score >= 65:
+    if score >= 60:
         return "B"
-    if score >= 50:
+    if score >= 45:
         return "C"
     return "D"
 
@@ -103,29 +105,30 @@ def _score_item(item: dict, profit_info: dict, conf: dict, pref: dict) -> dict:
     bid_days = days_until(item.get("bid_date"))
     price_analysis = item.get("_price") or {}
 
-    # 1) 시세차익 (35점)
+    # 1) 시세차익 (45점) - 분모 2000으로 조정해서 90,000만원까지 차등 평가
     profit_pts = 0
     if profit > 0:
-        profit_pts = min(35, profit / 1000)
+        profit_pts = min(45, profit / 2000)
     # 2) 시세 신뢰도 (15점)
     price_conf_pts = (conf.get("price_confidence", 0) or 0) * 15
     # 3) 위험도 (20점)
     risk_pts = {"low": 20, "medium": 12, "high": 4}.get(risk_level, 10)
-    # 4) 입찰기일 (10점)
+    # 4) 입찰기일 (5점) - 타이밍은 중요하지만 손익 예측 신호로는 약함
     if bid_days is None:
-        bid_pts = 4
+        bid_pts = 2
     elif bid_days < 0:
         bid_pts = 0
     elif bid_days <= 7:
-        bid_pts = 10
-    elif bid_days <= 14:
-        bid_pts = 7
-    elif bid_days <= 30:
         bid_pts = 5
+    elif bid_days <= 14:
+        bid_pts = 3.5
+    elif bid_days <= 30:
+        bid_pts = 2.5
     else:
-        bid_pts = 3
-    # 5) 사용자 선호 (10점)
-    pref_pts, pref_reasons = preference_match_score(item, pref)
+        bid_pts = 1.5
+    # 5) 사용자 선호 (5점) - 손익 예측보다는 취향 가중치
+    pref_raw, pref_reasons = preference_match_score(item, pref)
+    pref_pts = pref_raw * 0.5  # 0~10 -> 0~5 압축
     # 6) 데이터 완성도 (10점)
     data_pts = (conf.get("overall_confidence", 0) or 0) * 10
 

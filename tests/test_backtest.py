@@ -52,5 +52,20 @@ def test_x_grade_mostly_unprofitable():
     report = backtest_all_items()
     x = report["grades"].get("X")
     if x and x["count"] > 0:
-        # X 등급은 거품 매물이라 평균 손익 음수 또는 매우 낮음
         assert x["actual_profit"]["mean"] < x["actual_profit"].get("max", 0) + 1
+
+
+def test_grade_means_monotonic_decreasing():
+    """가중치 재조정 효과: A>=B>=C>=D 순으로 평균 실제 손익이 단조 감소.
+    표본이 매우 작으면 통계 변동이 클 수 있어 100건으로 시드.
+    X는 critical_reasons 매물이라 별도."""
+    from agents.backtest_agent import backtest_all_items, grade_ordering_check
+    from scripts.generate_mock_data import generate
+    generate(count=100, seed=42, reset=True)
+    report = backtest_all_items()
+    ordering = grade_ordering_check(report)
+    # 표본이 두 개 이상의 등급에 들어 있어야 의미 있음
+    if len(ordering["grade_means"]) >= 2:
+        assert ordering["monotonic_decreasing"], (
+            f"등급별 평균 손익이 단조 감소하지 않음: {ordering['grade_means']}"
+        )
