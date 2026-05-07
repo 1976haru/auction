@@ -85,7 +85,7 @@ from agents.watchlist_agent import (
 from agents.change_detection_agent import list_recent_events
 from agents.confidence_agent import get_confidence
 from agents.daily_briefing_agent import generate_briefing, get_latest_briefing
-from agents.item_qa_agent import ask
+from agents.item_qa_agent import ask, cache_stats as qa_cache_stats, clear_cache as qa_clear_cache
 from agents.preference_learning_agent import (
     DEFAULT_PREF,
     get_preferences,
@@ -373,8 +373,16 @@ elif tab_sel == "물건 상세분석":
 
         st.markdown("### 물건 Q&A")
         question = st.text_input("질문하기", value="이 물건 위험해?")
-        if st.button("질문하기 실행"):
-            ans = ask(it["id"], question)
+        cqa1, cqa2 = st.columns([3, 1])
+        with cqa1:
+            run_qa = st.button("질문하기 실행")
+        with cqa2:
+            no_cache = st.checkbox("캐시 무시", value=False,
+                                      help="체크 시 캐시 우회하고 새로 호출")
+        if run_qa:
+            ans = ask(it["id"], question, use_cache=not no_cache)
+            if ans.get("cached"):
+                st.caption("⚡ 캐시된 답변 (TTL 24h)")
             st.write(ans["answer"])
 
         st.markdown("### PDF 리포트")
@@ -1231,6 +1239,19 @@ elif tab_sel == "운영 모니터링":
         st.dataframe(df_s[cols], use_container_width=True, hide_index=True)
     else:
         st.caption("기록 없음. `python scripts/run_stress_test.py --count 1000 --queries 20`")
+
+    # Q&A 캐시
+    st.subheader("Q&A 답변 캐시")
+    cs = qa_cache_stats()
+    cqc1, cqc2, cqc3, cqc4 = st.columns(4)
+    cqc1.metric("엔트리 수", cs["entries"])
+    cqc2.metric("총 히트", cs["total_hits"])
+    cqc3.metric("매물 수", cs["distinct_items"])
+    cqc4.metric("마지막 사용", cs["last_used_at"] or "-")
+    if st.button("전체 캐시 삭제"):
+        n = qa_clear_cache()
+        st.success(f"{n}건 삭제됨")
+        st.rerun()
 
     # DB 헬스 - 테이블별 행수
     st.subheader("DB 상태")

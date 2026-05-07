@@ -10,12 +10,16 @@ peer 비교)를 모아 AI 또는 mock 에 질의한다.
 """
 from __future__ import annotations
 
+import hashlib
+import re
+from datetime import datetime, timedelta
 from typing import Any
 
 from agents.confidence_agent import get_confidence
 from core.ai_client import item_qa as ai_item_qa
-from core.database import get_connection
-from core.utils import days_until, loads
+from core.database import get_connection, init_db
+from core.logger import log
+from core.utils import days_until, loads, now_iso
 from modules.documents.mock_documents import get_item_documents
 from modules.profit_calculator import calc_profit
 from modules.risk.keyword_analyzer import get_risk_flags
@@ -24,6 +28,9 @@ from modules.valuation.price_matcher import (
     get_trade_history,
     monthly_aggregate,
 )
+
+# 캐시 TTL (시간). 이 시간이 지나면 자동 무효화.
+CACHE_TTL_HOURS = 24
 
 
 def _peer_stats(item: dict) -> dict:
@@ -178,15 +185,146 @@ def _build_context(item_id: int) -> dict:
     return item
 
 
-def ask(item_id: int, question: str) -> dict:
+# ── 캐싱 헬퍼 ────────────────────────────────────────────────────
+
+
+def _normalize_question(q: str) -> str:
+    """질문 정규화 - 공백/구두점 통일해 동의 표현 매칭률↑."""
+    s = (q or "").strip().lower()
+    s = re.sub(r"[?!.,;:\s]+", " ", s)
+    return s.strip()
+
+
+def _context_signature(ctx: dict) -> str:
+    """컨텍스트 변화 추적용 짧은 시그니처. 핵심 지표 변하면 캐시 무효화."""
+    parts = [
+        str(ctx.get("appraisal_price")),
+        str(ctx.get("min_bid_price")),
+        str((ctx.get("recommendation") or {}).get("grade")),
+        str(ctx.get("risk_score")),
+        str(round((ctx.get("confidence") or {}).get("overall_confidence", 0) or 0, 2)),
+        str(len(ctx.get("documents") or [])),
+        str(ctx.get("bid_date")),
+    ]
+    raw = "|".join(parts)
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def _cache_key(item_id: int, q_norm: str, sig: str) -> str:
+    raw = f"{item_id}|{q_norm}|{sig}"
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+
+
+def _cache_lookup(cache_key: str, ttl_hours: int = CACHE_TTL_HOURS) -> str | None:
+    """TTL 내 캐시된 답변 반환. 없거나 만료면 None."""
+    init_db()
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT answer, created_at, hit_count FROM qa_cache WHERE cache_key=?",
+        (cache_key,),
+    ).fetchone()
+    if not row:
+        conn.close()
+        return None
+    try:
+        created = datetime.strptime(row["created_at"], "%Y-%m-%d %H:%M:%S")
+        if datetime.now() - created > timedelta(hours=ttl_hours):
+            conn.close()
+            return None
+    except Exception:
+        conn.close()
+        return None
+    # hit_count + last_used_at 갱신
+    conn.execute(
+        "UPDATE qa_cache SET hit_count=hit_count+1, last_used_at=? WHERE cache_key=?",
+        (now_iso(), cache_key),
+    )
+    conn.commit()
+    conn.close()
+    return row["answer"]
+
+
+def _cache_store(item_id: int, q_norm: str, sig: str,
+                  cache_key: str, answer: str) -> None:
+    init_db()
+    conn = get_connection()
+    conn.execute("""
+        INSERT INTO qa_cache (item_id, question_norm, context_sig, cache_key,
+                               answer, hit_count, last_used_at)
+        VALUES (?, ?, ?, ?, ?, 0, ?)
+        ON CONFLICT(cache_key) DO UPDATE SET
+            answer=excluded.answer,
+            last_used_at=excluded.last_used_at,
+            created_at=datetime('now','localtime')
+    """, (item_id, q_norm, sig, cache_key, answer, now_iso()))
+    conn.commit()
+    conn.close()
+
+
+def clear_cache(item_id: int | None = None) -> int:
+    """캐시 삭제. item_id=None 이면 전체. 삭제 행 수 반환."""
+    init_db()
+    conn = get_connection()
+    if item_id is None:
+        cur = conn.execute("DELETE FROM qa_cache")
+    else:
+        cur = conn.execute("DELETE FROM qa_cache WHERE item_id=?", (item_id,))
+    n = cur.rowcount
+    conn.commit()
+    conn.close()
+    log.info(f"[qa_cache] cleared {n} rows (item_id={item_id})")
+    return int(n)
+
+
+def cache_stats() -> dict:
+    """캐시 사용 통계."""
+    init_db()
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT COUNT(*) as total, SUM(hit_count) as total_hits, "
+        "MAX(last_used_at) as last_used FROM qa_cache"
+    ).fetchone()
+    distinct_items = conn.execute(
+        "SELECT COUNT(DISTINCT item_id) FROM qa_cache"
+    ).fetchone()[0]
+    conn.close()
+    return {
+        "entries": int(row["total"] or 0),
+        "total_hits": int(row["total_hits"] or 0),
+        "distinct_items": int(distinct_items or 0),
+        "last_used_at": row["last_used"],
+    }
+
+
+# ── 메인 API ────────────────────────────────────────────────────
+
+
+def ask(item_id: int, question: str, use_cache: bool = True,
+        ttl_hours: int = CACHE_TTL_HOURS) -> dict:
     ctx = _build_context(item_id)
     if not ctx:
         return {"error": f"item_id={item_id} 없음"}
-    answer = ai_item_qa(question, ctx)
+
+    q_norm = _normalize_question(question)
+    sig = _context_signature(ctx)
+    key = _cache_key(item_id, q_norm, sig)
+
+    cached_answer = _cache_lookup(key, ttl_hours=ttl_hours) if use_cache else None
+    if cached_answer is not None:
+        answer = cached_answer
+        cached = True
+    else:
+        answer = ai_item_qa(question, ctx)
+        if use_cache:
+            _cache_store(item_id, q_norm, sig, key, answer)
+        cached = False
+
     return {
         "item_id": item_id,
         "question": question,
         "answer": answer,
+        "cached": cached,
+        "cache_key": key,
         "context_summary": {
             "address": ctx.get("address_full"),
             "grade": ctx.get("recommendation", {}).get("grade"),

@@ -384,6 +384,20 @@ def init_db() -> None:
     )""")
 
     c.execute("""
+    CREATE TABLE IF NOT EXISTS qa_cache (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id         INTEGER,
+        question_norm   TEXT NOT NULL,
+        context_sig     TEXT NOT NULL,
+        cache_key       TEXT NOT NULL UNIQUE,
+        answer          TEXT NOT NULL,
+        hit_count       INTEGER DEFAULT 0,
+        last_used_at    TEXT,
+        created_at      TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_qa_cache_item ON qa_cache(item_id)")
+
+    c.execute("""
     CREATE TABLE IF NOT EXISTS backtest_runs (
         id                    INTEGER PRIMARY KEY AUTOINCREMENT,
         run_date              TEXT,
