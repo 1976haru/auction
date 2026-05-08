@@ -577,6 +577,7 @@ function applyFilters() {
   }
   STATE.filtered = out;
   STATE.pageShown = PAGE_SIZE;  // 필터/검색 바뀌면 항상 처음부터
+  resetCardFocus();             // 키보드 카드 포커스도 초기화
   renderItems();
   renderItemsHead();
   renderCharts();
@@ -3230,6 +3231,60 @@ function bindSettings() {
   });
 }
 
+// ── 매물 카드 키보드 네비게이션 (j/k, Up/Down, Enter) ─────
+let CARD_FOCUS_IDX = -1;
+
+function _allCardsInView() {
+  return Array.from(document.querySelectorAll("#items-card-view .item-card"));
+}
+
+function focusCardAt(idx) {
+  const cards = _allCardsInView();
+  if (!cards.length) { CARD_FOCUS_IDX = -1; return; }
+  const clamped = Math.max(0, Math.min(cards.length - 1, idx));
+  cards.forEach((c) => c.classList.remove("kbd-focused"));
+  const target = cards[clamped];
+  target.classList.add("kbd-focused");
+  target.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  try { target.focus({ preventScroll: true }); } catch (_) { target.focus(); }
+  CARD_FOCUS_IDX = clamped;
+}
+
+function resetCardFocus() {
+  CARD_FOCUS_IDX = -1;
+  document.querySelectorAll("#items-card-view .item-card.kbd-focused")
+    .forEach((c) => c.classList.remove("kbd-focused"));
+}
+
+function bindCardKbdNav() {
+  document.addEventListener("keydown", (e) => {
+    const anyModalOpen = !$("detail-modal").hidden ||
+                         !$("compare-modal").hidden ||
+                         !$("kbd-modal").hidden ||
+                         !$("settings-modal").hidden ||
+                         !$("about-modal").hidden;
+    if (anyModalOpen) return;
+    if (isTextFocus(e.target)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (STATE.view !== "card") return; // 테이블 보기에선 비활성
+
+    if (e.key === "j" || e.key === "ArrowDown") {
+      e.preventDefault();
+      focusCardAt(CARD_FOCUS_IDX < 0 ? 0 : CARD_FOCUS_IDX + 1);
+    } else if (e.key === "k" || e.key === "ArrowUp") {
+      e.preventDefault();
+      focusCardAt(Math.max(0, CARD_FOCUS_IDX < 0 ? 0 : CARD_FOCUS_IDX - 1));
+    } else if (e.key === "Enter" && CARD_FOCUS_IDX >= 0) {
+      const cards = _allCardsInView();
+      const target = cards[CARD_FOCUS_IDX];
+      if (target && target.dataset.itemId) {
+        e.preventDefault();
+        openDetailById(target.dataset.itemId);
+      }
+    }
+  });
+}
+
 // ── 키보드 단축키 ────────────────────────────────
 const GRADE_ROTATION = ["", "A", "B", "C", "D", "X"];
 
@@ -3522,6 +3577,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindKbdShortcuts();
   bindSettings();
   bindAbout();
+  bindCardKbdNav();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
