@@ -3175,6 +3175,72 @@ function renderSearchSuggest() {
   }
 }
 
+/* 음성 검색 (Web Speech API) — 지원 브라우저에서만 활성 */
+function bindVoiceSearch() {
+  const btn = $("voice-btn");
+  if (!btn) return;
+  const Recog = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recog) return; // 미지원이면 버튼 hidden 그대로
+
+  btn.hidden = false;
+  let rec = null;
+  let listening = false;
+
+  const stop = () => {
+    if (rec) { try { rec.stop(); } catch (_) {} }
+    listening = false;
+    btn.classList.remove("listening");
+  };
+
+  btn.addEventListener("click", () => {
+    if (listening) { stop(); return; }
+    try {
+      rec = new Recog();
+      rec.lang = "ko-KR";
+      rec.interimResults = true;
+      rec.continuous = false;
+      rec.maxAlternatives = 1;
+
+      rec.addEventListener("start", () => {
+        listening = true;
+        btn.classList.add("listening");
+        showToast("말씀하세요… (다시 누르면 멈춤)", null);
+      });
+      rec.addEventListener("result", (e) => {
+        const last = e.results[e.results.length - 1];
+        const transcript = (last && last[0] && last[0].transcript) || "";
+        const input = $("q-input");
+        if (input) input.value = transcript.trim();
+        if (last && last.isFinal) {
+          STATE.filters.q = (input.value || "").trim();
+          if (STATE.filters.q) pushSearchHistory(STATE.filters.q);
+          applyFilters();
+          hideSearchSuggest();
+          hideToast();
+        }
+      });
+      rec.addEventListener("error", (e) => {
+        listening = false;
+        btn.classList.remove("listening");
+        const msg = e.error === "not-allowed"
+          ? "마이크 권한이 거부됐어요. 브라우저 설정에서 허용해 주세요."
+          : `음성 인식 실패: ${e.error || "알 수 없음"}`;
+        showToast(msg, null);
+        setTimeout(hideToast, 3500);
+      });
+      rec.addEventListener("end", () => {
+        listening = false;
+        btn.classList.remove("listening");
+      });
+
+      rec.start();
+    } catch (err) {
+      showToast(`음성 인식 시작 실패: ${err && err.message ? err.message : err}`, null);
+      setTimeout(hideToast, 3000);
+    }
+  });
+}
+
 function bindSearch() {
   const input = $("q-input");
   const submit = (explicit) => {
@@ -4156,6 +4222,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindUrgentBanner();
   bindDensity();
   bindScrollTop();
+  bindVoiceSearch();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
