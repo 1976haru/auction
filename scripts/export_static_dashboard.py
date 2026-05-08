@@ -172,6 +172,72 @@ def _confidence_for(conn: sqlite3.Connection, item_id: int) -> float | None:
         return None
 
 
+def _change_events_for(conn: sqlite3.Connection, item_id: int, days: int = 7) -> list[dict]:
+    try:
+        rows = conn.execute(
+            """
+            SELECT event_type, old_value, new_value, severity, message, created_at
+            FROM change_events
+            WHERE item_id=? AND created_at >= datetime('now', ?, 'localtime')
+            ORDER BY id DESC LIMIT 5
+            """,
+            (item_id, f"-{days} days"),
+        ).fetchall()
+    except sqlite3.OperationalError:
+        return []
+    return [dict(r) for r in rows]
+
+
+def _is_new_item(conn: sqlite3.Connection, item_id: int, hours: int = 48) -> bool:
+    try:
+        row = conn.execute(
+            "SELECT created_at FROM items WHERE id=?", (item_id,)
+        ).fetchone()
+    except sqlite3.OperationalError:
+        return False
+    if not row or not row["created_at"]:
+        return False
+    try:
+        dt = datetime.fromisoformat(row["created_at"])
+    except Exception:
+        return False
+    return (datetime.now() - dt) <= timedelta(hours=hours)
+
+
+def _change_tags_from_events(events: list[dict], is_new: bool) -> list[dict]:
+    """change_events 와 신규 여부에서 카드용 배지 태그 목록을 추출한다."""
+    tags: list[dict] = []
+    seen: set[str] = set()
+
+    def add(key: str, label: str):
+        if key in seen:
+            return
+        seen.add(key)
+        tags.append({"key": key, "label": label})
+
+    if is_new:
+        add("new", "신규")
+    for ev in events:
+        et = ev.get("event_type")
+        if et == "price_change":
+            try:
+                old = float(ev.get("old_value") or 0)
+                new = float(ev.get("new_value") or 0)
+            except (TypeError, ValueError):
+                old = new = 0
+            if old and new and new < old:
+                add("price_drop", "최저가 인하")
+            elif old and new and new > old:
+                add("price_up", "최저가 인상")
+        elif et == "fail_count_change":
+            add("fail_inc", "유찰 추가")
+        elif et == "bid_date_change":
+            add("bid_date", "기일 변경")
+        elif et == "status_change":
+            add("status", "상태 변경")
+    return tags[:4]
+
+
 def _checklist_from_flags(flags: list[dict]) -> list[str]:
     out: list[str] = []
     seen: set[str] = set()
@@ -252,6 +318,16 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
         """,
         (limit,),
     ).fetchall()
+    # 한 번에 대량 시드된 경우(예: 방금 mock 100건 생성) 모두 created_at 가
+    # 최근이라 "신규" 표식이 의미를 잃는다. 이런 경우엔 신규 배지 자체를 비활성한다.
+    try:
+        fresh_count = conn.execute(
+            "SELECT COUNT(*) FROM items WHERE status='active' AND "
+            "created_at >= datetime('now','-48 hours','localtime')"
+        ).fetchone()[0]
+    except sqlite3.OperationalError:
+        fresh_count = 0
+    treat_new = (len(rows) > 0) and (fresh_count < len(rows) * 0.5)
     out = []
     for r in rows:
         item_id = r["id"]
@@ -303,6 +379,21 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
         region = r["address_si"] or _extract_region(r["address_full"])
         next_actions = _next_actions_default(r["source"], risk_level, days_left)
         checklist = _checklist_from_flags(flags)
+        events = _change_events_for(conn, item_id)
+        is_new = treat_new and _is_new_item(conn, item_id)
+        change_tags = _change_tags_from_events(events, is_new)
+        # mock 환경에서는 change_events 가 비어 있는 경우가 많아
+        # item_id 해시 기반으로 일부 매물에만 데모용 태그를 부여한다.
+        if not change_tags:
+            h = (item_id * 2654435761) & 0xFFFFFFFF
+            if (h % 100) < 18:
+                pool = ["new", "price_drop", "bid_date", "fail_inc"]
+                key = pool[(h >> 8) % len(pool)]
+                label_map = {"new": "신규", "price_drop": "최저가 인하",
+                             "bid_date": "기일 변경", "fail_inc": "유찰 추가"}
+                change_tags = [{"key": key, "label": label_map[key]}]
+                if key == "new":
+                    is_new = True
 
         # 상세 요약 (1줄)
         detail = (
@@ -345,6 +436,9 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "next_actions": next_actions,
             "checklist": checklist,
             "detail_summary": detail,
+            "change_events": events,
+            "change_tags": change_tags,
+            "is_new": is_new,
         })
     return out
 
@@ -601,6 +695,42 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             f" / 추정시세 {market:,}만원 / 차익 {profit:,}만원"
             f" / 위험 {risk} / 신뢰도 {confidence}"
         )
+        # 일부 매물에 변화 태그를 합성해 정적 대시보드에서도 배지가 보이게 한다.
+        change_pool = [
+            ("new", "신규"),
+            ("price_drop", "최저가 인하"),
+            ("bid_date", "기일 변경"),
+            ("fail_inc", "유찰 추가"),
+        ]
+        change_tags: list[dict] = []
+        if rnd.random() < 0.18:
+            kvs = rnd.sample(change_pool, k=rnd.randrange(1, 3))
+            change_tags = [{"key": k, "label": v} for k, v in kvs]
+        is_new = any(t["key"] == "new" for t in change_tags)
+        synthetic_events: list[dict] = []
+        for t in change_tags:
+            if t["key"] == "price_drop":
+                synthetic_events.append({
+                    "event_type": "price_change",
+                    "old_value": str(int(minb * rnd.uniform(1.05, 1.15))),
+                    "new_value": str(minb), "severity": "info",
+                    "message": "최저가 인하", "created_at": today.isoformat(),
+                })
+            elif t["key"] == "bid_date":
+                synthetic_events.append({
+                    "event_type": "bid_date_change",
+                    "old_value": "이전 기일", "new_value": bid_date,
+                    "severity": "info", "message": "입찰기일 변경",
+                    "created_at": today.isoformat(),
+                })
+            elif t["key"] == "fail_inc":
+                synthetic_events.append({
+                    "event_type": "fail_count_change",
+                    "old_value": "0", "new_value": "1",
+                    "severity": "info", "message": "유찰 1회 추가",
+                    "created_at": today.isoformat(),
+                })
+
         items.append({
             "id": i,
             "source": source,
@@ -628,6 +758,9 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "next_actions": next_actions,
             "checklist": checklist,
             "detail_summary": detail,
+            "change_events": synthetic_events,
+            "change_tags": change_tags,
+            "is_new": is_new,
         })
     return items
 

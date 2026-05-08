@@ -834,6 +834,31 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   border: 1px solid var(--color-soft-bd);
 }
 
+/* 변화 감지 배지 */
+.badge-change {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.badge-change-new        { background: rgba(44, 160, 44, 0.16); color: var(--color-low); border: 1px solid rgba(44,160,44,0.35); }
+.badge-change-price_drop { background: rgba(44, 160, 44, 0.16); color: var(--color-low); border: 1px solid rgba(44,160,44,0.35); }
+.badge-change-price_up   { background: var(--color-warn-bg); color: var(--color-warn-text); border: 1px solid var(--color-warn-bd); }
+.badge-change-bid_date   { background: var(--color-soft-bg); color: var(--color-soft-text); border: 1px solid var(--color-soft-bd); }
+.badge-change-fail_inc   { background: var(--color-soft-bg); color: var(--color-soft-text); border: 1px solid var(--color-soft-bd); }
+.badge-change-status     { background: var(--color-warn-bg); color: var(--color-warn-text); border: 1px solid var(--color-warn-bd); }
+
+/* 모달 안의 변화 태그 묶음 */
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
 /* ☆ 관심 버튼 */
 .head-spacer { flex: 1; }
 .fav-btn {

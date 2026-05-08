@@ -12,6 +12,7 @@ const RISK_LABEL = { low: "낮음", medium: "보통", high: "높음" };
 const QUICK_CHIPS = [
   { id: "all",      label: "전체" },
   { id: "favorites",label: "★ 내 관심" },
+  { id: "changes",  label: "🆕 변화" },
   { id: "auction",  label: "경매" },
   { id: "public",   label: "공매" },
   { id: "apt",      label: "아파트" },
@@ -339,6 +340,7 @@ function chipMatch(chip, it) {
   switch (chip) {
     case "all":       return true;
     case "favorites": return STATE.favorites.has(String(it.id));
+    case "changes":   return Array.isArray(it.change_tags) && it.change_tags.length > 0;
     case "auction":   return it.source === "auction";
     case "public":    return it.source === "public_sale";
     case "apt":       return (it.item_type || "").includes("아파트");
@@ -469,6 +471,9 @@ function renderRecs(recs) {
       ? `<div class="rec-next"><b>다음 확인:</b> ${escapeHtml(r.next_actions.join(" · "))}</div>` : "";
     const reason = r.recommendation_reason
       ? `<div class="rec-reason">${escapeHtml(r.recommendation_reason)}</div>` : "";
+    // 매물 상세 데이터(변화 태그 등)는 items 배열에서 join
+    const itFull = r.item_id ? STATE.items.find((x) => String(x.id) === String(r.item_id)) : null;
+    const recCh = itFull ? changeBadgesHtml(itFull) : "";
     const card = el(
       `<article class="rec-card" data-item-id="${r.item_id || ""}">
          <div class="rec-head">
@@ -476,6 +481,7 @@ function renderRecs(recs) {
            <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
            <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
            <span class="source-pill">${escapeHtml(SOURCE_LABEL[r.source] || r.source || "")}</span>
+           ${recCh}
          </div>
          <div class="rec-title">${escapeHtml(r.title || r.address || "")}</div>
          <div class="rec-meta">${escapeHtml(r.address || "")} · ${escapeHtml(r.item_type || "")}</div>
@@ -601,6 +607,24 @@ function urgencyBadge(it) {
   if (d <= 7) return `<span class="badge-soon">D-${d}</span>`;
   return "";
 }
+
+const CHANGE_LABEL = {
+  new: "🆕 신규",
+  price_drop: "⬇ 최저가 인하",
+  price_up: "⬆ 최저가 인상",
+  bid_date: "📅 기일 변경",
+  fail_inc: "🔄 유찰 추가",
+  status: "⚠ 상태 변경",
+};
+function changeBadgesHtml(it) {
+  const tags = it.change_tags;
+  if (!Array.isArray(tags) || !tags.length) return "";
+  return tags.map((t) => {
+    const k = (t && t.key) || "new";
+    const label = CHANGE_LABEL[k] || (t && t.label) || "변화";
+    return `<span class="badge-change badge-change-${escapeHtml(k)}">${escapeHtml(label)}</span>`;
+  }).join("");
+}
 function favoriteBtnHtml(it) {
   const on = STATE.favorites.has(String(it.id));
   return `<button class="fav-btn${on ? " on" : ""}" data-fav="${it.id}" aria-pressed="${on ? "true" : "false"}" aria-label="관심 매물 ${on ? "해제" : "등록"}">${on ? "★" : "☆"}</button>`;
@@ -623,6 +647,7 @@ function itemCardHtml(it) {
         <span class="source-pill">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</span>
         ${urgencyBadge(it)}
         <span class="caption">${escapeHtml(it.item_type || "")}</span>
+        ${changeBadgesHtml(it)}
         <span class="head-spacer"></span>
         ${compareBtnHtml(it)}
         ${favoriteBtnHtml(it)}
@@ -674,11 +699,12 @@ function renderItems() {
     const grade = it.recommendation_grade || "C";
     const risk = it.risk_level || "medium";
     const u = urgencyBadge(it);
+    const ch = changeBadgesHtml(it);
     tr.innerHTML = `
       <td>${idx + 1}</td>
       <td>${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</td>
       <td><span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span></td>
-      <td>${escapeHtml(it.address || "")} ${u}</td>
+      <td>${escapeHtml(it.address || "")} ${u} ${ch}</td>
       <td>${escapeHtml(it.item_type || "")}</td>
       <td class="num">${(it.appraisal_price || 0).toLocaleString("ko-KR")}</td>
       <td class="num">${(it.min_bid_price || 0).toLocaleString("ko-KR")}</td>
@@ -1366,6 +1392,19 @@ function openDetailById(id) {
         <li>공격: ${fmtMan(expectedBidHi)} (최저가 +18%)</li>
       </ul>
       <p class="caption">예상 입찰가는 mock 데이터 기반 단순 추정치입니다.</p>
+    </div>
+
+    <div class="detail-section">
+      <h3>최근 변화 (7일)</h3>
+      ${(it.change_events || []).length
+        ? `<ul>${it.change_events.map((ev) => {
+            const old = ev.old_value || "-"; const cur = ev.new_value || "-";
+            const msg = ev.message || ev.event_type || "변화";
+            return `<li>${escapeHtml(msg)} — <code>${escapeHtml(old)}</code> → <code>${escapeHtml(cur)}</code></li>`;
+          }).join("")}</ul>`
+        : `<p class="caption">최근 7일 내 기록된 변경 이력이 없습니다.</p>`}
+      ${(it.change_tags || []).length
+        ? `<div class="detail-tags">${changeBadgesHtml(it)}</div>` : ""}
     </div>
 
     <div class="detail-section">
