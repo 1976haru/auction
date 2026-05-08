@@ -2974,6 +2974,21 @@ function bindPwa() {
   }
 }
 
+function setupStickyOffset() {
+  const sec = document.querySelector(".search-section");
+  if (!sec) return;
+  const update = () => {
+    document.documentElement.style.setProperty("--items-head-top", `${sec.offsetHeight}px`);
+  };
+  update();
+  if (window.ResizeObserver) {
+    new ResizeObserver(update).observe(sec);
+  } else {
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   bindTheme();
   bindFilterEvents();
@@ -2987,5 +3002,6 @@ document.addEventListener("DOMContentLoaded", () => {
   bindSettings();
   bindMoreButton();
   bindPwa();
+  setupStickyOffset();
   load();
 });

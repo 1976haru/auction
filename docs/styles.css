@@ -1377,10 +1377,24 @@ kbd {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 12px;
   flex-wrap: wrap;
+  /* 검색 sticky 바 아래에 자동으로 고정 — JS 가 --items-head-top 을 갱신 */
+  position: sticky;
+  top: var(--items-head-top, 0);
+  z-index: 40;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  /* 카드 내부 padding 을 상쇄해 좌우 풀폭으로 띠처럼 보이게 */
+  margin: -20px -22px 12px;
+  padding: 10px 22px;
 }
 .items-head h2 { margin: 0; }
+@media (max-width: 640px) {
+  .items-head {
+    margin: -14px -14px 10px;
+    padding: 8px 14px;
+  }
+}
 .items-controls {
   display: flex;
   align-items: center;
