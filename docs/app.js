@@ -2418,6 +2418,7 @@ function openDetailById(id) {
   wireBidSimulator();
   wireNoteSection();
   wireSimilarItems();
+  updateNavButtons();
 }
 
 function wireNoteSection() {
@@ -2504,12 +2505,56 @@ function bindModalClose() {
     if (e.target instanceof HTMLElement && e.target.dataset.close === "1") close();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !$("detail-modal").hidden) close();
+    if (!$("detail-modal").hidden) {
+      if (e.key === "Escape") { close(); return; }
+      // 좌/우 화살표 — 입력 포커스 중엔 무시
+      if (isTextFocus(e.target)) return;
+      if (e.key === "ArrowLeft") { e.preventDefault(); navDetail(-1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); navDetail(1); }
+    }
   });
   const printBtn = $("detail-print");
   if (printBtn) printBtn.addEventListener("click", printDetail);
   const shareBtn = $("detail-share");
   if (shareBtn) shareBtn.addEventListener("click", shareDetail);
+  const prevBtn = $("detail-prev");
+  if (prevBtn) prevBtn.addEventListener("click", () => navDetail(-1));
+  const nextBtn = $("detail-next");
+  if (nextBtn) nextBtn.addEventListener("click", () => navDetail(1));
+}
+
+function navDetail(direction) {
+  if (!CURRENT_DETAIL_ID) return;
+  const list = STATE.filtered.length ? STATE.filtered : STATE.items;
+  const idx = list.findIndex((it) => String(it.id) === String(CURRENT_DETAIL_ID));
+  if (idx < 0) return;
+  const next = idx + direction;
+  if (next < 0 || next >= list.length) return;
+  openDetailById(list[next].id);
+  const body = $("detail-body");
+  if (body) body.scrollTop = 0;
+}
+
+function updateNavButtons() {
+  const prev = $("detail-prev");
+  const next = $("detail-next");
+  if (!prev || !next || !CURRENT_DETAIL_ID) return;
+  const list = STATE.filtered.length ? STATE.filtered : STATE.items;
+  const idx = list.findIndex((it) => String(it.id) === String(CURRENT_DETAIL_ID));
+  prev.disabled = (idx <= 0);
+  next.disabled = (idx < 0 || idx >= list.length - 1);
+  // 위치 표시는 title 옆 caption 으로 — 간단 텍스트 추가
+  const title = $("detail-title");
+  if (title && idx >= 0) {
+    const existing = title.querySelector(".nav-pos");
+    if (existing) existing.remove();
+    const pos = document.createElement("span");
+    pos.className = "nav-pos caption";
+    pos.style.marginLeft = "8px";
+    pos.style.fontWeight = "400";
+    pos.textContent = `${idx + 1}/${list.length}`;
+    title.appendChild(pos);
+  }
 }
 
 function closeDetailModal() {
