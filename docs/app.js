@@ -1181,6 +1181,99 @@ function renderCharts() {
   if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
 }
 
+/* 매물 상세용 sparkline. price_trend = [{ym, avg_price, count}, ...] */
+function renderPriceTrendSvg(it) {
+  const pts = (it && it.price_trend) || [];
+  if (!pts.length) {
+    return `<p class="caption">표본이 부족해 시세 트렌드를 표시할 수 없습니다.</p>`;
+  }
+  const W = 360, H = 130;
+  const padL = 36, padR = 10, padT = 12, padB = 22;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+
+  const refs = {
+    "감정가": it.appraisal_price || 0,
+    "최저가": it.min_bid_price || 0,
+    "추정시세": it.market_price || 0,
+  };
+  const refColors = { "감정가": "#888", "최저가": "#1f77b4", "추정시세": "#2ca02c" };
+
+  const ys = pts.map((p) => p.avg_price);
+  const refVals = Object.values(refs).filter((v) => v > 0);
+  const minY = Math.min(...ys, ...refVals);
+  const maxY = Math.max(...ys, ...refVals);
+  const range = Math.max(1, maxY - minY);
+
+  const xAt = (i) => padL + (pts.length === 1 ? innerW / 2 : (innerW * i) / (pts.length - 1));
+  const yAt = (v) => padT + innerH - ((v - minY) / range) * innerH;
+
+  let lines = "";
+  // 기준선 (점선)
+  Object.entries(refs).forEach(([label, v]) => {
+    if (!v) return;
+    const y = yAt(v).toFixed(2);
+    lines += `<line x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}"
+      stroke="${refColors[label]}" stroke-width="1" stroke-dasharray="3,3" opacity="0.55"/>
+      <text x="${W - padR - 2}" y="${(parseFloat(y) - 2).toFixed(1)}"
+        text-anchor="end" font-size="9" fill="${refColors[label]}">
+        ${label} ${Math.round(v).toLocaleString("ko-KR")}
+      </text>`;
+  });
+
+  // 라인 (avg_price)
+  let dPath = "";
+  pts.forEach((p, i) => {
+    const x = xAt(i).toFixed(2), y = yAt(p.avg_price).toFixed(2);
+    dPath += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+  });
+
+  // 점 + tooltip
+  let dots = "";
+  pts.forEach((p, i) => {
+    const x = xAt(i).toFixed(2), y = yAt(p.avg_price).toFixed(2);
+    dots += `<g><circle cx="${x}" cy="${y}" r="2.5" fill="#1f77b4"/>
+      <title>${p.ym} · 평균 ${p.avg_price.toLocaleString("ko-KR")} 만원 (${p.count || 0}건)</title>
+    </g>`;
+  });
+
+  // x축 라벨 (시작/중간/끝)
+  const xticks = [0, Math.floor(pts.length / 2), pts.length - 1]
+    .filter((v, idx, a) => a.indexOf(v) === idx);
+  let xLabels = "";
+  xticks.forEach((i) => {
+    const x = xAt(i).toFixed(2);
+    xLabels += `<text x="${x}" y="${H - padB + 14}" text-anchor="middle"
+      font-size="9" fill="var(--color-text-muted)">${pts[i].ym}</text>`;
+  });
+
+  // y축 라벨 (min/max)
+  const yLabels = `
+    <text x="${padL - 4}" y="${(yAt(maxY) + 3).toFixed(1)}" text-anchor="end"
+      font-size="9" fill="var(--color-text-muted)">${Math.round(maxY).toLocaleString("ko-KR")}</text>
+    <text x="${padL - 4}" y="${(yAt(minY) + 3).toFixed(1)}" text-anchor="end"
+      font-size="9" fill="var(--color-text-muted)">${Math.round(minY).toLocaleString("ko-KR")}</text>
+  `;
+
+  return `
+    <div class="trend-host">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="월별 시세 트렌드">
+        ${lines}
+        <path d="${dPath}" fill="none" stroke="#1f77b4" stroke-width="1.8"
+              stroke-linejoin="round" stroke-linecap="round"/>
+        ${dots}
+        ${yLabels}
+        ${xLabels}
+      </svg>
+      <div class="trend-legend">
+        <span><i style="background:#1f77b4"></i>월평균 거래가</span>
+        <span><i style="background:#888"></i>감정가</span>
+        <span><i style="background:#2ca02c"></i>추정시세</span>
+      </div>
+    </div>
+  `;
+}
+
 // ── CSV/JSON download ─────────────────────────────
 const EXPORT_COLUMNS = [
   ["id", "ID"],
@@ -1382,6 +1475,7 @@ function openDetailById(id) {
     <div class="detail-section">
       <h3>시세 분석</h3>
       <p>${escapeHtml(it.detail_summary || "-")}</p>
+      ${renderPriceTrendSvg(it)}
     </div>
 
     <div class="detail-section">

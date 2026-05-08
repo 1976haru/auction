@@ -860,6 +860,31 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   margin-top: 8px;
 }
 
+/* 시세 트렌드 sparkline */
+.trend-host {
+  margin-top: 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px;
+}
+.trend-host svg { display: block; width: 100%; height: auto; }
+.trend-legend {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+}
+.trend-legend i {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
 /* 키보드 단축키 표 */
 .kbd-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
 .kbd-table th, .kbd-table td {

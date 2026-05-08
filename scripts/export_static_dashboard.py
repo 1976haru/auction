@@ -172,6 +172,54 @@ def _confidence_for(conn: sqlite3.Connection, item_id: int) -> float | None:
         return None
 
 
+def _price_trend_for(conn: sqlite3.Connection, item_id: int,
+                     market_price: int, months: int = 12) -> list[dict]:
+    """매물 단위 월별 시세 sparkline 데이터.
+    실거래 기록이 있으면 그것을 월별 집계, 없으면 market_price 중심으로 합성한다."""
+    out: list[dict] = []
+    try:
+        rows = conn.execute(
+            """
+            SELECT trade_date, trade_price FROM price_records
+            WHERE item_id=? AND trade_price > 0
+            ORDER BY trade_date ASC
+            """,
+            (item_id,),
+        ).fetchall()
+    except sqlite3.OperationalError:
+        rows = []
+    if rows:
+        by_ym: dict[str, list[int]] = {}
+        for r in rows:
+            d = (r["trade_date"] or "")[:7]
+            if len(d) < 7:
+                continue
+            by_ym.setdefault(d, []).append(int(r["trade_price"] or 0))
+        keys = sorted(by_ym.keys())[-months:]
+        for ym in keys:
+            arr = by_ym[ym]
+            out.append({"ym": ym, "avg_price": int(sum(arr) / len(arr)),
+                        "count": len(arr)})
+    if not out:
+        # 합성: market_price 중심으로 12개월 시드 기반 흐름 생성
+        base = market_price or 0
+        if base <= 0:
+            return []
+        rnd = random.Random(item_id * 0x9E3779B9 & 0xFFFFFFFF)
+        # 약한 추세(±15%) + 작은 노이즈
+        trend = rnd.uniform(-0.15, 0.15)
+        today = datetime.now().date().replace(day=1)
+        series = []
+        for k in range(months - 1, -1, -1):
+            ym = (today - timedelta(days=30 * k))
+            ratio = 1.0 + trend * (1 - k / (months - 1)) + rnd.uniform(-0.04, 0.04)
+            avg = max(1, int(base * ratio))
+            series.append({"ym": f"{ym.year:04d}-{ym.month:02d}",
+                           "avg_price": avg, "count": rnd.randrange(1, 6)})
+        out = series
+    return out
+
+
 def _change_events_for(conn: sqlite3.Connection, item_id: int, days: int = 7) -> list[dict]:
     try:
         rows = conn.execute(
@@ -379,6 +427,7 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
         region = r["address_si"] or _extract_region(r["address_full"])
         next_actions = _next_actions_default(r["source"], risk_level, days_left)
         checklist = _checklist_from_flags(flags)
+        price_trend = _price_trend_for(conn, item_id, int(market) if market else 0)
         events = _change_events_for(conn, item_id)
         is_new = treat_new and _is_new_item(conn, item_id)
         change_tags = _change_tags_from_events(events, is_new)
@@ -439,6 +488,7 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "change_events": events,
             "change_tags": change_tags,
             "is_new": is_new,
+            "price_trend": price_trend,
         })
     return out
 
@@ -761,6 +811,13 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "change_events": synthetic_events,
             "change_tags": change_tags,
             "is_new": is_new,
+            "price_trend": (lambda base: [
+                {"ym": (today.replace(day=1) - timedelta(days=30 * k)).strftime("%Y-%m"),
+                 "avg_price": max(1, int(base * (1 + rnd.uniform(-0.12, 0.12) +
+                                                 rnd.uniform(-0.04, 0.04)))),
+                 "count": rnd.randrange(1, 6)}
+                for k in range(11, -1, -1)
+            ])(market),
         })
     return items
 
