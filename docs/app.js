@@ -3977,6 +3977,41 @@ function bindUrgentBanner() {
   }
 }
 
+function bindScrollTop() {
+  const btn = $("scroll-top");
+  if (!btn) return;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const y = window.scrollY || window.pageYOffset || 0;
+    const show = y > 600;
+    if (show && btn.hidden) btn.hidden = false;
+    else if (!show && !btn.hidden) btn.hidden = true;
+  };
+  window.addEventListener("scroll", () => {
+    if (raf) return;
+    raf = requestAnimationFrame(update);
+  }, { passive: true });
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  // Home 키 단축
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Home" && !isTextFocus(e.target)) {
+      const anyModalOpen = !$("detail-modal").hidden ||
+                           !$("compare-modal").hidden ||
+                           !$("kbd-modal").hidden ||
+                           !$("settings-modal").hidden ||
+                           !$("about-modal").hidden;
+      if (!anyModalOpen) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  });
+  update();
+}
+
 function setupStickyOffset() {
   const sec = document.querySelector(".search-section");
   if (!sec) return;
@@ -4008,6 +4043,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindSelectionMode();
   bindUrgentBanner();
   bindDensity();
+  bindScrollTop();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
