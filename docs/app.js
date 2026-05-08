@@ -1470,6 +1470,12 @@ function renderAgents(agents) {
 function openDetailById(id) {
   const it = STATE.items.find((x) => String(x.id) === String(id));
   if (!it) return;
+  CURRENT_DETAIL_ID = String(it.id);
+  // 공유 가능한 해시 딥링크 동기화 (사이드 효과로 popstate 가 일어나면 무시)
+  const wantHash = `#item-${it.id}`;
+  if (window.location.hash !== wantHash) {
+    history.replaceState(null, "", window.location.pathname + window.location.search + wantHash);
+  }
   const title = $("detail-title");
   title.innerHTML = `${escapeHtml(it.title || "물건 상세")} ${favoriteBtnHtml(it)}`;
   wireFavoriteButtons(title);
@@ -1574,11 +1580,10 @@ function openDetailById(id) {
   document.body.style.overflow = "hidden";
 }
 
+let CURRENT_DETAIL_ID = null;
+
 function bindModalClose() {
-  const close = () => {
-    $("detail-modal").hidden = true;
-    document.body.style.overflow = "";
-  };
+  const close = () => closeDetailModal();
   $("detail-close").addEventListener("click", close);
   $("detail-modal").addEventListener("click", (e) => {
     if (e.target instanceof HTMLElement && e.target.dataset.close === "1") close();
@@ -1588,6 +1593,83 @@ function bindModalClose() {
   });
   const printBtn = $("detail-print");
   if (printBtn) printBtn.addEventListener("click", printDetail);
+  const shareBtn = $("detail-share");
+  if (shareBtn) shareBtn.addEventListener("click", shareDetail);
+}
+
+function closeDetailModal() {
+  $("detail-modal").hidden = true;
+  if ($("compare-modal").hidden && $("kbd-modal").hidden) {
+    document.body.style.overflow = "";
+  }
+  // 해시가 현재 매물이면 정리
+  if (CURRENT_DETAIL_ID && window.location.hash === `#item-${CURRENT_DETAIL_ID}`) {
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+  CURRENT_DETAIL_ID = null;
+}
+
+function shareDetail() {
+  if (!CURRENT_DETAIL_ID) return;
+  const it = STATE.items.find((x) => String(x.id) === String(CURRENT_DETAIL_ID));
+  if (!it) return;
+
+  // 해시 포함 절대 URL 생성 (수신자가 열면 바로 매물 모달 오픈)
+  const url = new URL(window.location.href);
+  url.hash = `item-${it.id}`;
+  const shareUrl = url.toString();
+
+  const grade = it.recommendation_grade || "C";
+  const risk = RISK_LABEL[it.risk_level] || it.risk_level || "-";
+  const lines = [
+    `[${grade}등급] ${it.title || it.address || "물건"}`,
+    `점수 ${it.recommendation_score ?? "-"} · 차익 ${(it.expected_profit || 0).toLocaleString("ko-KR")}만원 · 위험 ${risk}`,
+    `${SOURCE_LABEL[it.source] || it.source || ""} · ${it.item_type || ""} · ${it.bid_date || "기일 미정"}`,
+  ];
+  const text = lines.join("\n");
+  const title = "경매·공매 지능형 에이전트";
+
+  if (navigator.share) {
+    navigator.share({ title, text, url: shareUrl })
+      .catch((err) => {
+        // 사용자가 취소했거나 권한 거부 — 폴백 안 함
+        if (err && err.name === "AbortError") return;
+        copyShareLink(text, shareUrl);
+      });
+  } else {
+    copyShareLink(text, shareUrl);
+  }
+}
+
+function copyShareLink(text, url) {
+  const payload = `${text}\n${url}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(payload).then(() => {
+      showToast("링크와 요약이 복사됐어요. 붙여 넣어 공유하세요.", null);
+      setTimeout(hideToast, 2500);
+    }).catch(() => fallbackCopy(payload));
+  } else {
+    fallbackCopy(payload);
+  }
+}
+
+function fallbackCopy(text) {
+  // 구형 브라우저 폴백
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try {
+    document.execCommand("copy");
+    showToast("링크가 복사됐어요.", null);
+    setTimeout(hideToast, 2500);
+  } catch (_) {
+    showToast("복사가 차단됐어요. 주소창의 URL을 직접 공유해 주세요.", null);
+    setTimeout(hideToast, 3500);
+  } finally {
+    document.body.removeChild(ta);
+  }
 }
 
 function printDetail() {
@@ -1812,6 +1894,23 @@ function render(data) {
     applyFilters();
     URL_SYNC_ENABLED = true;
   });
+
+  // 해시 딥링크: #item-123 이면 해당 매물 모달 자동 오픈
+  routeHashToDetail();
+  window.addEventListener("hashchange", routeHashToDetail);
+}
+
+function routeHashToDetail() {
+  const m = window.location.hash.match(/^#item-(\d+)$/);
+  if (!m) {
+    // 모달이 열려 있는데 해시가 사라졌다면 닫기
+    if (CURRENT_DETAIL_ID && !$("detail-modal").hidden) closeDetailModal();
+    return;
+  }
+  const id = m[1];
+  if (CURRENT_DETAIL_ID === String(id) && !$("detail-modal").hidden) return;
+  // STATE.items 가 채워진 시점에서 호출되므로 안전
+  openDetailById(id);
 }
 
 async function load() {
