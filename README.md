@@ -341,7 +341,7 @@ python -m http.server 8000 -d docs
 
 ## 변경 이력 (정적 대시보드)
 
-GitHub Pages 정적 대시보드의 누적 개선을 19개 Phase (A ~ S) 로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
+GitHub Pages 정적 대시보드의 누적 개선을 20개 Phase (A ~ T) 로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
 
 ### Phase A — 출시 + 기본 UX (`af5d50c` ~ `3af4b16`)
 - 정적 대시보드 초기 출시 (`docs/index.html` + `app.js` + `styles.css` + `mock_dashboard.json`)
@@ -441,8 +441,11 @@ GitHub Pages 정적 대시보드의 누적 개선을 19개 Phase (A ~ S) 로 정
 ### Phase R — 카드 시각 미세조정 (`eb58863`)
 - **R104 카드 등급 색 좌측 바** — 매물 카드 좌측에 3px 등급 색 띠 (A=초록 / B=파랑 / C=주황 / D=회색 / X=빨강). data-grade / data-risk 속성 + CSS 속성 선택자로 조건 적용. 조밀 모드에서도 두께 유지. 기존 등급 pill 과 결합돼 한 페이지에서 A 등급만 빠르게 스캔하기 쉬움
 
-### Phase S — 매수자 시그널 (`d2b4683` ~ 최신)
+### Phase S — 매수자 시그널 (`d2b4683`)
 - **S111 가격 추세 인디케이터** — 매물 카드 하단에 시세 추세 칩 (↑↑/↑/→/↓/↓↓). price_trend 의 첫 N vs 마지막 N개월 평균 비율로 계산. 매수자 관점 색: 빨강↑ 부담, 초록↓ 기회. 4개월 미만 데이터는 표시 안 함. 호버 시 정확한 %·개월 툴팁
+
+### Phase T — 인쇄 폴리싱 (`32c4186` ~ 최신)
+- **T115 매물 PDF 에 메모 본문 포함** — printDetail 시 textarea 값을 .note-print div 로 미러. 인쇄 시 textarea/액션 버튼/저장 상태 라벨 숨김, 메모 본문이 흰 배경 검은 글자 pre-wrap 으로 가독성 좋게 출력. 빈 메모는 박스 자체 미출력 → 받은 사람이 PDF 만으로도 메모 그대로 읽음
 
 ### 누적 사용자 데이터 키
 | 키 | 내용 | 백업 포함 |
