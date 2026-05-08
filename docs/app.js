@@ -3017,25 +3017,69 @@ function hideSearchSuggest() {
   $("search-suggest").hidden = true;
 }
 
+function _matchItemsForSuggest(q, limit) {
+  const needle = String(q || "").trim().toLowerCase();
+  if (needle.length < 2) return [];
+  const matches = [];
+  for (const it of STATE.items) {
+    const fields = [it.title, it.address, it.region, it.item_type, it.case_no]
+      .filter(Boolean).map((s) => String(s).toLowerCase());
+    if (fields.some((f) => f.includes(needle))) {
+      matches.push(it);
+      if (matches.length >= limit) break;
+    }
+  }
+  return matches;
+}
+
+function _highlightMatch(text, q) {
+  if (!q) return escapeHtml(text || "");
+  const safe = escapeHtml(text || "");
+  const safeQ = escapeHtml(q);
+  // 대소문자 무시 매칭, 첫 매칭만 강조
+  const idx = safe.toLowerCase().indexOf(safeQ.toLowerCase());
+  if (idx < 0) return safe;
+  return safe.slice(0, idx) + `<mark>${safe.slice(idx, idx + safeQ.length)}</mark>` + safe.slice(idx + safeQ.length);
+}
+
 function renderSearchSuggest() {
   const root = $("search-suggest");
   if (!root) return;
-  const arr = STATE.recentSearches;
-  if (!arr.length) {
+  const input = $("q-input");
+  const currentQ = (input && input.value || "").trim();
+  const recents = STATE.recentSearches;
+  const matched = _matchItemsForSuggest(currentQ, 5);
+
+  if (!recents.length && !matched.length) {
     root.innerHTML = `<p class="search-suggest-empty">최근 검색어가 없어요. 검색 후 Enter 또는 검색 버튼을 누르면 여기 모입니다.</p>`;
     return;
   }
-  let body = `<div class="search-suggest-head">최근 검색어</div>`;
-  body += arr.map((q) =>
-    `<div class="search-suggest-row" role="option" data-q="${escapeHtml(q)}">
-       <span class="ico">⏱</span>
-       <span class="q">${escapeHtml(q)}</span>
-       <button class="x" type="button" data-remove="${escapeHtml(q)}" aria-label="이 검색어 지우기">×</button>
-     </div>`
-  ).join("");
-  body += `<div class="search-suggest-foot">
-    <button id="search-clear-all" type="button">전체 지우기</button>
-  </div>`;
+  let body = "";
+  // 매물 매칭 (입력 2+ 자일 때만)
+  if (matched.length) {
+    body += `<div class="search-suggest-head">매물 매칭</div>`;
+    body += matched.map((it) => {
+      const grade = it.recommendation_grade || "C";
+      return `<div class="search-suggest-row search-suggest-item" role="option" data-item-id="${escapeHtml(String(it.id))}">
+         <span class="grade-pill grade-${escapeHtml(grade)}" style="font-size:0.66rem;padding:1px 6px">${escapeHtml(grade)}</span>
+         <span class="q">${_highlightMatch(it.title || it.address || "주소 미상", currentQ)}</span>
+         <span class="search-suggest-meta">${escapeHtml(it.item_type || "")}</span>
+       </div>`;
+    }).join("");
+  }
+  if (recents.length) {
+    body += `<div class="search-suggest-head">최근 검색어</div>`;
+    body += recents.map((q) =>
+      `<div class="search-suggest-row" role="option" data-q="${escapeHtml(q)}">
+         <span class="ico">⏱</span>
+         <span class="q">${escapeHtml(q)}</span>
+         <button class="x" type="button" data-remove="${escapeHtml(q)}" aria-label="이 검색어 지우기">×</button>
+       </div>`
+    ).join("");
+    body += `<div class="search-suggest-foot">
+      <button id="search-clear-all" type="button">전체 지우기</button>
+    </div>`;
+  }
   root.innerHTML = body;
 
   // 클릭 위임 — 행 클릭/× 버튼/전체 지우기
@@ -3048,6 +3092,16 @@ function renderSearchSuggest() {
         removeSearchHistory(xBtn.dataset.remove);
         return;
       }
+      // 매물 매칭 row 면 그 매물 상세 모달 직접 오픈
+      const itemId = row.dataset.itemId;
+      if (itemId) {
+        hideSearchSuggest();
+        const inp = $("q-input");
+        if (inp) inp.blur();
+        openDetailById(itemId);
+        return;
+      }
+      // 최근 검색어 row
       const q = row.dataset.q || "";
       const input = $("q-input");
       input.value = q;
@@ -3089,6 +3143,8 @@ function bindSearch() {
   let t;
   input.addEventListener("input", () => {
     clearTimeout(t);
+    // 입력 즉시 suggest 재렌더 (debounce 없이) — 자동완성 응답성
+    if (!$("search-suggest").hidden) renderSearchSuggest();
     t = setTimeout(() => submit(false), 200);
   });
   // 포커스 시 추천 패널, blur 시 살짝 늦춰 닫음 (행 클릭 허용)

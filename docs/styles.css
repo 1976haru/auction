@@ -273,6 +273,18 @@ code {
 }
 .search-suggest-row .ico { color: var(--color-text-muted); }
 .search-suggest-row .q { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-suggest-row .q mark {
+  background: rgba(31, 119, 180, 0.18);
+  color: var(--color-primary-dark);
+  padding: 0 2px;
+  border-radius: 3px;
+}
+.search-suggest-row.search-suggest-item .grade-pill { flex-shrink: 0; }
+.search-suggest-row .search-suggest-meta {
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
 .search-suggest-row .x {
   border: 0;
   background: transparent;
