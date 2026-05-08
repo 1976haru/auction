@@ -327,6 +327,71 @@ python -m http.server 8000 -d docs
 - 권리분석 결과는 **참고용 위험 체크리스트와 추가 확인사항**으로만 제공되며, 법률·투자 판단을 단정하지 않습니다.
 - 실제 입찰 전에는 등기부등본·전입세대열람·현장조사·전문가 자문이 필요합니다.
 
+## 변경 이력 (정적 대시보드)
+
+GitHub Pages 정적 대시보드의 누적 개선을 묶음 단위로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
+
+### Phase A — 출시 + 기본 UX (`af5d50c` ~ `3af4b16`)
+- 정적 대시보드 초기 출시 (`docs/index.html` + `app.js` + `styles.css` + `mock_dashboard.json`)
+- 모바일 카드 탭 반응성 수정 (호버 stuck 방지 + 탭 지연 제거 + 우발 탭 차단)
+- URL state 동기화: 검색·필터·정렬·뷰가 querystring 에 반영, 새로고침/공유해도 복원
+- ☆ 관심 매물(localStorage) + "★ 내 관심" 칩
+- 위험 키워드 → 매물 필터 연결 (위험 요약의 칩 클릭 시 그 키워드 보유 매물만)
+- 임박 D-3 빨강 / D-7 주황 배지 + 결과 헤더 정렬 메타 칩
+- 결과 CSV / JSON 다운로드 (UTF-8 BOM, 23개 컬럼, 메타 포함)
+
+### Phase B — 시각화 + PWA + 비교 (`0ee0081` ~ `08fbd5c`)
+- **B6 미니 차트** — 등급별 평균 차익 + 지역별 위험 분포 (순수 SVG)
+- **B9 PWA** — manifest + service worker + 설치 버튼, 앱 셸 cache-first / mock JSON stale-while-revalidate, 오프라인·새 버전 토스트
+- **B8 다크 모드** — `prefers-color-scheme` 자동 + 🌙 토글, FOUC 방지 인라인 스크립트, `theme-color` 메타 동기화
+- **B5 비교 트레이** — 카드 길게 누름·⇆ 토글로 2~5건 담기, 가로 스크롤 비교 모달, ▲ 최고 / ▼ 최저 자동 마킹
+
+### Phase C — 운영 안정성 (`fa5cd6a` ~ `ace2a95`)
+- **CI 파이프라인 보강** — push/PR 마다 `pytest` + `export_static_dashboard.py` JSON 검증, daily cron 이 변경된 JSON 을 자동 커밋·푸시 (`[skip ci]`)
+- README 상단 CI / Daily / Pages 배지
+- **C11 변화 감지 배지** — 매물별 `change_events`(7일) + 데모 합성 태그(🆕 신규 / ⬇ 인하 / 📅 기일 / 🔄 유찰 / ⚠ 상태) + "🆕 변화" 칩 + 모달 "최근 변화" 섹션
+
+### Phase D — PC / 키보드 (`068dbd2` ~ `2ae4df3`)
+- **D14 키보드 단축키** — `/` 검색 / `?` 도움말 / `r` 초기화 / `t` 테마 / `1`·`2` 카드·테이블 / `c` 비교 / `g` 등급 순환 / `Esc` 닫기
+- 검색바 ⌨ 도움말 버튼 (모바일에서도 노출)
+
+### Phase E — 매물 상세 강화 (`95d76d9` ~ `2d32fad`)
+- **E18 시세 트렌드 sparkline** — 12개월 라인 + 감정가/최저가/추정시세 점선 기준선 + hover 툴팁
+- **E17 매물 인쇄/PDF** — 모달만 풀페이지로 인쇄, 다크 모드여도 흰 배경 검은 글자, `@page` 14mm
+- **E16 추천 점수 분해** — 차익(35) / 수익률(25) / 위험(20) / 신뢰도(10) / 임박(10) 가로 막대 + 합계
+
+### Phase F — 공유 · 검색 · 페이지 (`9304d1a` ~ `158f1b9`)
+- **F21 매물 공유** — Web Share API + clipboard 폴백 + `#item-N` 해시 딥링크
+- **F22 비교 모달 PDF** — best/worst 셀 색 유지, 가로 스크롤 비활성
+- **F26 필터 프리셋** — ⭐ 추천 후보 / 🚀 고수익 저위험 / ⏰ 임박 / 🏠 서울 아파트 / 🥇 A등급
+- **F25 페이지네이션** — 30개 + "더 보기 (+30 / N건 남음)"
+- **F24 최근 검색어** — 검색바 포커스 시 localStorage 최근 8개 (개별/전체 삭제)
+- **F27 Undo 토스트** — 필터 초기화/프리셋 적용 직후 "되돌리기"
+
+### Phase G — 개인화 (`7780b1e` ~ `e9965f6`)
+- **G29 입찰가 시뮬레이터** — 슬라이더로 입찰가 ↔ 차익/ROI/총비용 실시간 계산 (취득세·금융비 포함)
+- **G28 매물 메모** — textarea 자동 저장(600ms 디바운스 + blur), 카드 📝 배지, "📝 메모" 칩
+- **G30 결과 공유** — 현재 필터·정렬 URL + 한 줄 요약을 시스템 공유 시트로
+- **G31 결과 헤더 sticky** — 검색바 아래에 자동 고정 (ResizeObserver 기반 동적 offset)
+
+### Phase H — 백업·접근성·문서 (`1307078` ~ `d32c210`)
+- **H35 데이터 백업/복원** — ⚙ 설정 모달, JSON 다운로드/덮어쓰기·병합 복원, 통계 카드, 전체 지우기
+- **H36 매물 본 이력** — 모달 열 때 자동 기록(최대 20건), "👁 최근 본" 칩
+- **H33 즐겨찾기 자동 우선** — 기본 보기에서 ★ 매물을 어떤 정렬에서도 맨 위로 안정 정렬
+- **H38 Lighthouse 보강** — Open Graph + Twitter card + canonical, `:focus-visible`, `prefers-reduced-motion`, `<noscript>` 안내
+- **H37 README 기능 매트릭스** + Streamlit 풀버전과 비교 표
+- **H41 인앱 About** — ℹ 버튼 + 4개 섹션 도움말 (이 앱은 / 어떻게 쓰나 / 데이터·보안 / 면책)
+
+### 누적 사용자 데이터 키
+| 키 | 내용 | 백업 포함 |
+|---|---|---|
+| `auction:favorites:v1` | ★ 관심 매물 ID 셋 | ✅ |
+| `auction:notes:v1` | 매물별 메모 (text + updatedAt) | ✅ |
+| `auction:compare:v1` | 비교 트레이 ID 리스트 (~5) | ✅ |
+| `auction:searches:v1` | 최근 검색어 (~8) | ✅ |
+| `auction:viewed:v1` | 본 이력 (~20, ts) | ✅ |
+| `auction:theme:v1` | 라이트/다크 명시 선택 | ✅ |
+
 ## 브라우저 / 스마트폰 접속 방법 (Streamlit 풀버전)
 
 ### PC 웹브라우저
