@@ -230,6 +230,18 @@ TELEGRAM_CHAT_ID = ""
 
 > 외부 라이브러리 0 (모든 차트·sparkline·시뮬레이터·인쇄가 순수 SVG/CSS/JS). 라이브 외부 API 호출 없음 (mock JSON 만 fetch). 사용자 데이터는 자기 폰 localStorage 에만 저장.
 
+### 화면 미리보기 (자동 캡처)
+
+스크린샷은 `.github/workflows/screenshot.yml` 가 변경된 파일을 감지할 때마다 Playwright/Chromium 으로 자동 갱신합니다.
+
+| 데스크탑 (라이트, 전체 페이지) | 모바일 (라이트, 전체 페이지) |
+|---|---|
+| ![Desktop light](docs/screenshots/desktop-light.png) | ![Mobile light](docs/screenshots/mobile-light.png) |
+
+| 데스크탑 다크 (뷰포트) | 매물 상세 모달 (뷰포트) |
+|---|---|
+| ![Desktop dark](docs/screenshots/desktop-dark.png) | ![Detail modal](docs/screenshots/detail-modal.png) |
+
 ### 정적 대시보드 기능
 
 **검색 · 탐색**

@@ -1,0 +1,65 @@
+name: Screenshots
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/index.html'
+      - 'docs/styles.css'
+      - 'docs/app.js'
+      - 'docs/help.html'
+      - 'docs/data/mock_dashboard.json'
+      - 'scripts/capture_screenshots.py'
+      - '.github/workflows/screenshot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    concurrency:
+      group: screenshots-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Playwright + Chromium
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Capture screenshots
+        run: python scripts/capture_screenshots.py
+
+      - name: Upload screenshots artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: docs/screenshots/
+          if-no-files-found: ignore
+
+      - name: Commit refreshed screenshots
+        run: |
+          if git diff --quiet docs/screenshots/; then
+            echo "no changes — skipping commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/
+          git commit -m "chore(docs): refresh dashboard screenshots [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
