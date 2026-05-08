@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T10:07:10",
+  "generated_at": "2026-05-08T10:17:33",
   "source": "db",
   "summary": {
     "total_items": 100,
@@ -348,6 +348,43 @@
           "avg_price": 67520,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "56,300만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "510.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-18"
+        }
       ]
     },
     {
@@ -455,6 +492,43 @@
           "avg_price": 28288,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 6,
+          "max": 35,
+          "note": "8,652만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 20,
+          "max": 25,
+          "note": "39.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-5"
+        }
       ]
     },
     {
@@ -542,6 +616,43 @@
           "ym": "2026-04",
           "avg_price": 32659,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-394만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-1.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-12"
         }
       ]
     },
@@ -654,6 +765,43 @@
           "avg_price": 32649,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 15,
+          "max": 35,
+          "note": "21,063만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "190.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "기일 미정"
+        }
       ]
     },
     {
@@ -755,6 +903,43 @@
           "ym": "2026-03",
           "avg_price": 27291,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 2,
+          "max": 35,
+          "note": "2,748만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 6,
+          "max": 25,
+          "note": "12.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.87"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-20"
         }
       ]
     },
@@ -858,6 +1043,43 @@
           "avg_price": 17191,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-86,352만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-84.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-2"
+        }
       ]
     },
     {
@@ -942,6 +1164,43 @@
           "ym": "2025-11",
           "avg_price": 21632,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-12,028만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-36.3%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-6"
         }
       ]
     },
@@ -1047,6 +1306,43 @@
           "avg_price": 78292,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "53,036만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "184.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "기일 미정"
+        }
       ]
     },
     {
@@ -1142,6 +1438,43 @@
           "avg_price": 150729,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "94,540만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "128.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-30"
+        }
       ]
     },
     {
@@ -1217,6 +1550,43 @@
           "ym": "2026-03",
           "avg_price": 54650,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 22,
+          "max": 35,
+          "note": "31,069만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "140.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-30"
         }
       ]
     },
@@ -1320,6 +1690,43 @@
           "ym": "2026-04",
           "avg_price": 99931,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-15,382만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-12.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-0"
         }
       ]
     },
@@ -1470,6 +1877,43 @@
           "avg_price": 97309,
           "count": 4
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 1,
+          "max": 35,
+          "note": "1,650만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 1,
+          "max": 25,
+          "note": "1.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.58"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-30"
+        }
       ]
     },
     {
@@ -1566,6 +2010,43 @@
           "avg_price": 152703,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "130,453만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "532.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-9"
+        }
       ]
     },
     {
@@ -1654,6 +2135,43 @@
           "ym": "2026-04",
           "avg_price": 34322,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-110,172만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-79.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-21"
         }
       ]
     },
@@ -1771,6 +2289,43 @@
           "avg_price": 52569,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 4,
+          "max": 35,
+          "note": "5,853만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 6,
+          "max": 25,
+          "note": "12.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-23"
+        }
       ]
     },
     {
@@ -1852,6 +2407,43 @@
           "ym": "2026-01",
           "avg_price": 68977,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 19,
+          "max": 35,
+          "note": "27,494만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "83.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "기일 미정"
         }
       ]
     },
@@ -1943,6 +2535,43 @@
           "avg_price": 85578,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "75,229만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "783.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "기일 미정"
+        }
       ]
     },
     {
@@ -2021,6 +2650,43 @@
           "ym": "2025-06",
           "avg_price": 11278,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-35,472만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-77.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.65"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-2"
         }
       ]
     },
@@ -2123,6 +2789,43 @@
           "avg_price": 52815,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 24,
+          "max": 35,
+          "note": "34,593만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "180.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.76"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-14"
+        }
       ]
     },
     {
@@ -2188,6 +2891,43 @@
           "ym": "2025-07",
           "avg_price": 124466,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "95,126만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "330.3%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.60"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
         }
       ]
     },
@@ -2272,6 +3012,43 @@
           "ym": "2026-04",
           "avg_price": 21879,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-11,443만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-34.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-24"
         }
       ]
     },
@@ -2392,6 +3169,43 @@
           "avg_price": 24793,
           "count": 3
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "360만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 1,
+          "max": 25,
+          "note": "1.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.59"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-30"
+        }
       ]
     },
     {
@@ -2485,6 +3299,43 @@
           "avg_price": 30597,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 5,
+          "max": 35,
+          "note": "7,020만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 16,
+          "max": 25,
+          "note": "31.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
+        }
       ]
     },
     {
@@ -2538,6 +3389,43 @@
           "ym": "2026-03",
           "avg_price": 38431,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 11,
+          "max": 35,
+          "note": "16,111만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "73.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 20,
+          "max": 20,
+          "note": "낮음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.56"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-9"
         }
       ]
     },
@@ -2631,6 +3519,43 @@
           "avg_price": 110134,
           "count": 3
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "75,640만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "222.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.87"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-25"
+        }
       ]
     },
     {
@@ -2719,6 +3644,43 @@
           "avg_price": 11345,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-79,095만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-89.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
+        }
       ]
     },
     {
@@ -2803,6 +3765,43 @@
           "ym": "2026-03",
           "avg_price": 90761,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-30,896만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-25.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
         }
       ]
     },
@@ -2912,6 +3911,43 @@
           "avg_price": 35200,
           "count": 3
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 9,
+          "max": 35,
+          "note": "12,153만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "55.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-9"
+        }
       ]
     },
     {
@@ -3000,6 +4036,43 @@
           "ym": "2026-03",
           "avg_price": 40004,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 2,
+          "max": 35,
+          "note": "2,933만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 4,
+          "max": 25,
+          "note": "8.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-17"
         }
       ]
     },
@@ -3116,6 +4189,43 @@
           "avg_price": 33675,
           "count": 5
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "540만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 1,
+          "max": 25,
+          "note": "1.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.59"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-13"
+        }
       ]
     },
     {
@@ -3187,6 +4297,43 @@
           "ym": "2026-04",
           "avg_price": 38254,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 1,
+          "max": 35,
+          "note": "755만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 1,
+          "max": 25,
+          "note": "2.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-6"
         }
       ]
     },
@@ -3295,6 +4442,43 @@
           "ym": "2026-03",
           "avg_price": 70935,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-35,670만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-35.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-1"
         }
       ]
     },
@@ -3412,6 +4596,43 @@
           "avg_price": 52118,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 9,
+          "max": 35,
+          "note": "12,750만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 19,
+          "max": 25,
+          "note": "37.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 5,
+          "max": 10,
+          "note": "0.54"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-7"
+        }
       ]
     },
     {
@@ -3505,6 +4726,43 @@
           "ym": "2026-01",
           "avg_price": 68458,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-33,225만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-32.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
         }
       ]
     },
@@ -3608,6 +4866,43 @@
           "avg_price": 43457,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 27,
+          "max": 35,
+          "note": "38,034만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "344.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-18"
+        }
       ]
     },
     {
@@ -3691,6 +4986,43 @@
           "ym": "2026-03",
           "avg_price": 22945,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-23,805만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-51.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.74"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-10"
         }
       ]
     },
@@ -3790,6 +5122,43 @@
           "avg_price": 77321,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "61,493만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "278.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
+        }
       ]
     },
     {
@@ -3851,6 +5220,43 @@
           "ym": "2026-04",
           "avg_price": 46645,
           "count": 3
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-8,955만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-16.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-6"
         }
       ]
     },
@@ -3936,6 +5342,43 @@
           "avg_price": 22212,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-1,279만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-5.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.78"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
+        }
       ]
     },
     {
@@ -4013,6 +5456,43 @@
           "ym": "2026-02",
           "avg_price": 179776,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "131,855만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "457.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.76"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-1"
         }
       ]
     },
@@ -4109,6 +5589,43 @@
           "avg_price": 16462,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-86,748만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-85.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-10"
+        }
       ]
     },
     {
@@ -4170,6 +5687,43 @@
           "ym": "2026-01",
           "avg_price": 119633,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "102,159만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "462.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 20,
+          "max": 20,
+          "note": "낮음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.69"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-14"
         }
       ]
     },
@@ -4259,6 +5813,43 @@
           "ym": "2026-04",
           "avg_price": 36248,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-68,912만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-68.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
         }
       ]
     },
@@ -4355,6 +5946,43 @@
           "avg_price": 54832,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 11,
+          "max": 35,
+          "note": "16,110만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 24,
+          "max": 25,
+          "note": "48.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-3"
+        }
       ]
     },
     {
@@ -4399,6 +6027,43 @@
           "ym": "2025-09",
           "avg_price": 22209,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-117,291만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-85.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 20,
+          "max": 20,
+          "note": "낮음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 4,
+          "max": 10,
+          "note": "0.44"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-2"
         }
       ]
     },
@@ -4469,6 +6134,43 @@
           "avg_price": 71704,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "63,364만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "776.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.65"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
+        }
       ]
     },
     {
@@ -4518,6 +6220,43 @@
           "ym": "2025-10",
           "avg_price": 123539,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "116,412만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "1212.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 20,
+          "max": 20,
+          "note": "낮음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 5,
+          "max": 10,
+          "note": "0.53"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
         }
       ]
     },
@@ -4594,6 +6333,43 @@
           "ym": "2026-04",
           "avg_price": 52326,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 23,
+          "max": 35,
+          "note": "32,862만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "171.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-9"
         }
       ]
     },
@@ -4711,6 +6487,43 @@
           "avg_price": 154738,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "86,631만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "117.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-22"
+        }
       ]
     },
     {
@@ -4826,6 +6639,43 @@
           "avg_price": 32700,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-61,044만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-69.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "기일 미정"
+        }
       ]
     },
     {
@@ -4891,6 +6741,43 @@
           "ym": "2026-02",
           "avg_price": 31989,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-62,211만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-67.3%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-20"
         }
       ]
     },
@@ -5000,6 +6887,43 @@
           "avg_price": 37011,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 14,
+          "max": 35,
+          "note": "19,741만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "116.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.65"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-33"
+        }
       ]
     },
     {
@@ -5086,6 +7010,43 @@
           "ym": "2026-02",
           "avg_price": 25273,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-542만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-2.3%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.76"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-40"
         }
       ]
     },
@@ -5201,6 +7162,43 @@
           "avg_price": 54475,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 32,
+          "max": 35,
+          "note": "46,247만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "560.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-10"
+        }
       ]
     },
     {
@@ -5275,6 +7273,43 @@
           "ym": "2026-02",
           "avg_price": 80973,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 27,
+          "max": 35,
+          "note": "38,398만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "92.3%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.76"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-11"
         }
       ]
     },
@@ -5390,6 +7425,43 @@
           "avg_price": 86042,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "67,868만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "502.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
+        }
       ]
     },
     {
@@ -5488,6 +7560,43 @@
           "avg_price": 45225,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-5,800만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-11.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-36"
+        }
       ]
     },
     {
@@ -5585,6 +7694,43 @@
           "ym": "2026-03",
           "avg_price": 109665,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-52,592만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-32.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-35"
         }
       ]
     },
@@ -5695,6 +7841,43 @@
           "avg_price": 40558,
           "count": 3
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 1,
+          "max": 35,
+          "note": "1,575만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 2,
+          "max": 25,
+          "note": "3.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.60"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-34"
+        }
       ]
     },
     {
@@ -5770,6 +7953,43 @@
           "ym": "2026-04",
           "avg_price": 47920,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-3,105만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-6.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.69"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-6"
         }
       ]
     },
@@ -5862,6 +8082,43 @@
           "ym": "2026-04",
           "avg_price": 61672,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-19,032만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-24.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-14"
         }
       ]
     },
@@ -6003,6 +8260,43 @@
           "avg_price": 187617,
           "count": 4
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 4,
+          "max": 35,
+          "note": "6,300만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 2,
+          "max": 25,
+          "note": "3.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 5,
+          "max": 10,
+          "note": "0.54"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-17"
+        }
       ]
     },
     {
@@ -6088,6 +8382,43 @@
           "ym": "2026-04",
           "avg_price": 30929,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 2,
+          "max": 35,
+          "note": "2,562만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 4,
+          "max": 25,
+          "note": "8.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-24"
         }
       ]
     },
@@ -6185,6 +8516,43 @@
           "avg_price": 69405,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 25,
+          "max": 35,
+          "note": "36,040만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "104.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-1"
+        }
       ]
     },
     {
@@ -6245,6 +8613,43 @@
           "ym": "2026-01",
           "avg_price": 104349,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-36,951만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-26.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.69"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-37"
         }
       ]
     },
@@ -6319,6 +8724,43 @@
           "ym": "2025-12",
           "avg_price": 140410,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "116,860만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "505.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-38"
         }
       ]
     },
@@ -6400,6 +8842,43 @@
           "avg_price": 16651,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-49,346만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-75.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-5"
+        }
       ]
     },
     {
@@ -6455,6 +8934,43 @@
           "ym": "2026-03",
           "avg_price": 76446,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 25,
+          "max": 35,
+          "note": "35,271만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "87.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 7,
+          "max": 10,
+          "note": "0.69"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-24"
         }
       ]
     },
@@ -6562,6 +9078,43 @@
           "ym": "2026-04",
           "avg_price": 76103,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 9,
+          "max": 35,
+          "note": "13,291만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 11,
+          "max": 25,
+          "note": "22.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-35"
         }
       ]
     },
@@ -6672,6 +9225,43 @@
           "avg_price": 45375,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 5,
+          "max": 35,
+          "note": "7,425만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 11,
+          "max": 25,
+          "note": "21.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 5,
+          "max": 10,
+          "note": "0.54"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-31"
+        }
       ]
     },
     {
@@ -6779,6 +9369,43 @@
           "avg_price": 170028,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "126,859만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "313.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-16"
+        }
       ]
     },
     {
@@ -6880,6 +9507,43 @@
           "ym": "2026-04",
           "avg_price": 115811,
           "count": 3
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "61,420만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "112.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "기일 미정"
         }
       ]
     },
@@ -7014,6 +9678,43 @@
           "avg_price": 13400,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 3,
+          "max": 35,
+          "note": "4,425만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 23,
+          "max": 25,
+          "note": "46.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.60"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-10"
+        }
       ]
     },
     {
@@ -7145,6 +9846,43 @@
           "avg_price": 12468,
           "count": 4
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 2,
+          "max": 35,
+          "note": "2,475만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 11,
+          "max": 25,
+          "note": "21.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.59"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
+        }
       ]
     },
     {
@@ -7239,6 +9977,43 @@
           "ym": "2026-04",
           "avg_price": 31076,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 1,
+          "max": 35,
+          "note": "1,601만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 3,
+          "max": 25,
+          "note": "5.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-37"
         }
       ]
     },
@@ -7358,6 +10133,43 @@
           "ym": "2026-04",
           "avg_price": 10803,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-1,786만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-15.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-32"
         }
       ]
     },
@@ -7480,6 +10292,43 @@
           "avg_price": 67184,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 1,
+          "max": 35,
+          "note": "2,062만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 2,
+          "max": 25,
+          "note": "3.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-16"
+        }
       ]
     },
     {
@@ -7567,6 +10416,43 @@
           "ym": "2026-02",
           "avg_price": 18212,
           "count": 3
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-91,387만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-84.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-1"
         }
       ]
     },
@@ -7682,6 +10568,43 @@
           "avg_price": 55425,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 34,
+          "max": 35,
+          "note": "48,482만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "419.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-42"
+        }
       ]
     },
     {
@@ -7775,6 +10698,43 @@
           "avg_price": 9087,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-17,370만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-64.3%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 7,
+          "max": 10,
+          "note": "D-4"
+        }
       ]
     },
     {
@@ -7860,6 +10820,43 @@
           "avg_price": 138464,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "133,125만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "493.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-34"
+        }
       ]
     },
     {
@@ -7923,6 +10920,43 @@
           "ym": "2026-04",
           "avg_price": 108531,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-54,708만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-33.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 20,
+          "max": 20,
+          "note": "낮음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 5,
+          "max": 10,
+          "note": "0.53"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-24"
         }
       ]
     },
@@ -8014,6 +11048,43 @@
           "avg_price": 56850,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-62,123만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-53.9%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-12"
+        }
       ]
     },
     {
@@ -8099,6 +11170,43 @@
           "avg_price": 101323,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "83,690만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "724.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-14"
+        }
       ]
     },
     {
@@ -8167,6 +11275,43 @@
           "ym": "2025-12",
           "avg_price": 26533,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-137,267만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-84.7%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 20,
+          "max": 20,
+          "note": "낮음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 6,
+          "max": 10,
+          "note": "0.61"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
         }
       ]
     },
@@ -8246,6 +11391,43 @@
           "ym": "2026-04",
           "avg_price": 47404,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 21,
+          "max": 35,
+          "note": "30,691만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "218.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-28"
         }
       ]
     },
@@ -8355,6 +11537,43 @@
           "avg_price": 77753,
           "count": 2
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 9,
+          "max": 35,
+          "note": "12,752만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 10,
+          "max": 25,
+          "note": "19.5%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-11"
+        }
       ]
     },
     {
@@ -8423,6 +11642,43 @@
           "ym": "2025-11",
           "avg_price": 52667,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 18,
+          "max": 35,
+          "note": "25,217만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "93.4%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.75"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-45"
         }
       ]
     },
@@ -8537,6 +11793,43 @@
           "avg_price": 32212,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 14,
+          "max": 35,
+          "note": "19,531만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "169.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.88"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-2"
+        }
       ]
     },
     {
@@ -8642,6 +11935,43 @@
           "avg_price": 115602,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "75,105만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "210.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-20"
+        }
       ]
     },
     {
@@ -8717,6 +12047,43 @@
           "ym": "2026-03",
           "avg_price": 28556,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 12,
+          "max": 35,
+          "note": "17,436만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "151.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-24"
         }
       ]
     },
@@ -8823,6 +12190,43 @@
           "avg_price": 104641,
           "count": 3
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "93,242만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "662.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-26"
+        }
       ]
     },
     {
@@ -8911,6 +12315,43 @@
           "ym": "2026-03",
           "avg_price": 19065,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-6,545만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-24.2%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-11"
         }
       ]
     },
@@ -9002,6 +12443,43 @@
           "ym": "2026-04",
           "avg_price": 25327,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 11,
+          "max": 35,
+          "note": "15,992만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "166.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 9,
+          "max": 10,
+          "note": "0.85"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-38"
         }
       ]
     },
@@ -9116,6 +12594,43 @@
           "avg_price": 32942,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 11,
+          "max": 35,
+          "note": "15,266만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "90.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-40"
+        }
       ]
     },
     {
@@ -9194,6 +12709,43 @@
           "ym": "2026-03",
           "avg_price": 43762,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 12,
+          "max": 35,
+          "note": "17,849만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "62.0%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.83"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-20"
         }
       ]
     },
@@ -9284,6 +12836,43 @@
           "ym": "2026-03",
           "avg_price": 29944,
           "count": 1
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 0,
+          "max": 35,
+          "note": "-38,345만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 0,
+          "max": 25,
+          "note": "-58.6%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.81"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-33"
         }
       ]
     },
@@ -9380,6 +12969,43 @@
           "avg_price": 16240,
           "count": 1
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 6,
+          "max": 35,
+          "note": "8,558만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "89.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.77"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 10,
+          "max": 10,
+          "note": "D-2"
+        }
       ]
     },
     {
@@ -9471,6 +13097,43 @@
           "avg_price": 79820,
           "count": 3
         }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 35,
+          "max": 35,
+          "note": "65,961만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "333.1%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 0,
+          "max": 20,
+          "note": "높음"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 4,
+          "max": 10,
+          "note": "D-11"
+        }
       ]
     },
     {
@@ -9553,6 +13216,43 @@
           "ym": "2026-04",
           "avg_price": 52343,
           "count": 2
+        }
+      ],
+      "score_breakdown": [
+        {
+          "key": "profit",
+          "label": "예상 차익",
+          "contribution": 27,
+          "max": 35,
+          "note": "38,094만원 추정"
+        },
+        {
+          "key": "roi",
+          "label": "수익률",
+          "contribution": 25,
+          "max": 25,
+          "note": "396.8%"
+        },
+        {
+          "key": "risk",
+          "label": "위험도",
+          "contribution": 10,
+          "max": 20,
+          "note": "보통"
+        },
+        {
+          "key": "confidence",
+          "label": "신뢰도",
+          "contribution": 8,
+          "max": 10,
+          "note": "0.82"
+        },
+        {
+          "key": "urgency",
+          "label": "기일 임박",
+          "contribution": 1,
+          "max": 10,
+          "note": "D-34"
         }
       ]
     }

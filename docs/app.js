@@ -1181,6 +1181,48 @@ function renderCharts() {
   if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
 }
 
+/* 추천 점수 분해 — 각 기여 항목별 가로 막대 */
+const BREAKDOWN_COLOR = {
+  profit: "#1f77b4",
+  roi: "#2ca02c",
+  risk: "#f0a500",
+  confidence: "#9467bd",
+  urgency: "#d62728",
+};
+function renderScoreBreakdown(it) {
+  const parts = it && it.score_breakdown;
+  if (!Array.isArray(parts) || !parts.length) return "";
+  const sum = parts.reduce((a, p) => a + (p.contribution || 0), 0);
+  const total = parts.reduce((a, p) => a + (p.max || 0), 0) || 100;
+  const rows = parts.map((p) => {
+    const c = p.contribution || 0;
+    const m = p.max || 1;
+    const pct = Math.max(0, Math.min(100, (c / m) * 100));
+    const color = BREAKDOWN_COLOR[p.key] || "#1f77b4";
+    return `
+      <div class="bk-row">
+        <span class="bk-label">${escapeHtml(p.label || p.key || "-")}</span>
+        <span class="bk-bar" aria-hidden="true">
+          <span class="bk-fill" style="width:${pct.toFixed(1)}%; background:${color}"></span>
+        </span>
+        <span class="bk-val"><b>${c}</b><span class="bk-max">/${m}</span></span>
+        <span class="bk-note caption">${escapeHtml(p.note || "")}</span>
+      </div>`;
+  }).join("");
+  return `
+    <div class="score-breakdown" aria-label="추천 점수 분해">
+      <div class="bk-head">
+        <span class="caption">기여 항목</span>
+        <span class="bk-total">합계 <b>${sum}</b><span class="bk-max">/${total}</span></span>
+      </div>
+      ${rows}
+      <p class="caption" style="margin-top:6px">
+        ※ 각 항목은 점수 기여도이며 합계는 추천 점수와 약간 다를 수 있어요. 위험·신뢰도가 낮을수록 막대가 짧습니다.
+      </p>
+    </div>
+  `;
+}
+
 /* 매물 상세용 sparkline. price_trend = [{ym, avg_price, count}, ...] */
 function renderPriceTrendSvg(it) {
   const pts = (it && it.price_trend) || [];
@@ -1519,6 +1561,7 @@ function openDetailById(id) {
     <div class="detail-section">
       <h3>AI 추천 이유</h3>
       <p>${escapeHtml(it.recommendation_reason || "-")}</p>
+      ${renderScoreBreakdown(it)}
       <p class="caption"><b>AI 한줄 판단:</b> ${escapeHtml(aiVerdict)}</p>
     </div>
 

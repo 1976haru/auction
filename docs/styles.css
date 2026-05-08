@@ -860,6 +860,61 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   margin-top: 8px;
 }
 
+/* 추천 점수 분해 */
+.score-breakdown {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+.bk-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.bk-total {
+  font-size: 0.86rem;
+  color: var(--color-text);
+}
+.bk-total b { font-size: 1rem; }
+.bk-max { color: var(--color-text-muted); font-weight: 400; }
+.bk-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 56px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 0.86rem;
+}
+.bk-label { color: var(--color-text-muted); font-size: 0.82rem; }
+.bk-bar {
+  position: relative;
+  display: block;
+  height: 8px;
+  background: var(--color-flag-bar-track);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bk-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.18s ease;
+}
+.bk-val { text-align: right; font-variant-numeric: tabular-nums; }
+.bk-val b { font-size: 0.92rem; }
+.bk-note {
+  grid-column: 1 / -1;
+  margin: 0 0 0 80px;
+  font-size: 0.78rem;
+}
+@media (max-width: 640px) {
+  .bk-row { grid-template-columns: 70px 1fr 50px; }
+  .bk-note { margin-left: 70px; }
+}
+
 /* 시세 트렌드 sparkline */
 .trend-host {
   margin-top: 10px;

@@ -252,6 +252,43 @@ def _is_new_item(conn: sqlite3.Connection, item_id: int, hours: int = 48) -> boo
     return (datetime.now() - dt) <= timedelta(hours=hours)
 
 
+def _score_breakdown(profit: int, roi: float, risk_level: str,
+                     confidence: float, days_left: int | None) -> list[dict]:
+    """매물 추천 점수의 기여 항목별 분해. 합산은 약 0~100 범위.
+    실제 recommendation_agent 의 가중치와 정확히 같지 않더라도, 사용자가
+    '왜 이 점수인지' 한눈에 볼 수 있게 한다."""
+    pf = max(0, min(35, round((profit or 0) / 50000 * 35)))
+    rs = max(0, min(25, round((roi or 0) / 50 * 25)))
+    rk_map = {"low": 20, "medium": 10, "high": 0}
+    rk = rk_map.get(risk_level, 10)
+    cf = max(0, min(10, round((confidence or 0) * 10)))
+    if days_left is None or days_left < 0:
+        ur = 1
+    elif days_left <= 3:
+        ur = 10
+    elif days_left <= 7:
+        ur = 7
+    elif days_left <= 14:
+        ur = 4
+    else:
+        ur = 1
+    risk_label = {"low": "낮음", "medium": "보통", "high": "높음"}.get(risk_level, "-")
+    days_note = (f"D-{days_left}" if days_left is not None and days_left >= 0
+                 else "기일 미정")
+    return [
+        {"key": "profit", "label": "예상 차익", "contribution": pf, "max": 35,
+         "note": f"{(profit or 0):,}만원 추정"},
+        {"key": "roi", "label": "수익률", "contribution": rs, "max": 25,
+         "note": f"{(roi or 0):.1f}%"},
+        {"key": "risk", "label": "위험도", "contribution": rk, "max": 20,
+         "note": risk_label},
+        {"key": "confidence", "label": "신뢰도", "contribution": cf, "max": 10,
+         "note": f"{(confidence or 0):.2f}"},
+        {"key": "urgency", "label": "기일 임박", "contribution": ur, "max": 10,
+         "note": days_note},
+    ]
+
+
 def _change_tags_from_events(events: list[dict], is_new: bool) -> list[dict]:
     """change_events 와 신규 여부에서 카드용 배지 태그 목록을 추출한다."""
     tags: list[dict] = []
@@ -489,6 +526,10 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "change_tags": change_tags,
             "is_new": is_new,
             "price_trend": price_trend,
+            "score_breakdown": _score_breakdown(
+                expected_profit, expected_profit_rate, risk_level,
+                float(confidence), days_left,
+            ),
         })
     return out
 
@@ -818,6 +859,7 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
                  "count": rnd.randrange(1, 6)}
                 for k in range(11, -1, -1)
             ])(market),
+            "score_breakdown": _score_breakdown(profit, roi, risk, confidence, days_offset),
         })
     return items
 
