@@ -3038,6 +3038,24 @@ function printDetail() {
   }
   if (whenEl) whenEl.textContent = _printNow();
 
+  // 메모 textarea → 인쇄용 div 미러 (PDF 가독성)
+  const ta = document.querySelector(".note-section #note-input");
+  if (ta) {
+    let printDiv = document.querySelector(".note-section .note-print");
+    const txt = (ta.value || "").trim();
+    if (txt) {
+      if (!printDiv) {
+        printDiv = document.createElement("div");
+        printDiv.className = "note-print";
+        ta.parentNode.insertBefore(printDiv, ta);
+      }
+      printDiv.textContent = txt;
+      printDiv.hidden = false;
+    } else if (printDiv) {
+      printDiv.hidden = true;
+    }
+  }
+
   document.body.classList.add("printing-detail");
   const cleanup = () => {
     document.body.classList.remove("printing-detail");
