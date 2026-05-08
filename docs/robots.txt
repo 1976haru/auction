@@ -1,0 +1,7 @@
+# 경매·공매 지능형 에이전트 — 정적 대시보드
+# 모든 봇에게 색인 허용. mock 데이터 정적 페이지라 별도 차단 필요 없음.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://1976haru.github.io/auction/sitemap.xml
