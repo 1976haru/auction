@@ -13,6 +13,17 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="경매에이전트" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    /* FOUC 방지: 저장된 테마 / OS 다크 우선 */
+    (function () {
+      try {
+        var saved = localStorage.getItem("auction:theme:v1");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <header class="hero">
@@ -37,6 +48,7 @@
         <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" autocomplete="off" />
         <button class="btn btn-primary" id="q-submit">검색</button>
         <button class="btn btn-ghost" id="q-reset">초기화</button>
+        <button class="btn btn-ghost theme-btn" id="theme-btn" type="button" aria-label="테마 전환" title="라이트/다크 모드 전환">🌙</button>
         <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" title="홈 화면에 설치">📲 설치</button>
       </div>
       <div class="quick-chips" id="quick-chips" role="tablist" aria-label="빠른 메뉴"></div>

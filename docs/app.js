@@ -1324,6 +1324,65 @@ async function load() {
   }
 }
 
+// ── Theme (light/dark) ─────────────────────────────
+const THEME_KEY = "auction:theme:v1";
+const THEME_COLORS = { light: "#1f77b4", dark: "#0f141a" };
+
+function effectiveTheme() {
+  const stored = localStorage.getItem(THEME_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ? "dark" : "light";
+}
+function applyTheme(theme, persist) {
+  const root = document.documentElement;
+  if (theme === "dark") root.setAttribute("data-theme", "dark");
+  else if (theme === "light") root.setAttribute("data-theme", "light");
+  else root.removeAttribute("data-theme");
+  // 메타 theme-color 동기화 (모바일 브라우저 상단 바 색)
+  let meta = document.querySelector('meta[name="theme-color"]');
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("name", "theme-color");
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute("content", THEME_COLORS[theme] || THEME_COLORS.light);
+  // 토글 아이콘
+  const btn = $("theme-btn");
+  if (btn) {
+    btn.textContent = theme === "dark" ? "☀️" : "🌙";
+    btn.setAttribute("title",
+      theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환");
+  }
+  if (persist) {
+    try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+  }
+}
+
+function bindTheme() {
+  const initial = effectiveTheme();
+  applyTheme(initial, false);
+  const btn = $("theme-btn");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const cur = effectiveTheme();
+      applyTheme(cur === "dark" ? "light" : "dark", true);
+    });
+  }
+  // 사용자가 명시 저장하지 않은 경우 OS 변화 추적
+  if (window.matchMedia) {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => {
+      const stored = localStorage.getItem(THEME_KEY);
+      if (stored !== "light" && stored !== "dark") {
+        applyTheme(mq.matches ? "dark" : "light", false);
+      }
+    };
+    if (mq.addEventListener) mq.addEventListener("change", handler);
+    else if (mq.addListener) mq.addListener(handler);
+  }
+}
+
 // ── PWA: install prompt + service worker + 오프라인 토스트 ─────
 let DEFERRED_INSTALL = null;
 
@@ -1418,6 +1477,7 @@ function bindPwa() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  bindTheme();
   bindFilterEvents();
   bindSearch();
   bindAgentSearch();
