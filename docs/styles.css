@@ -791,7 +791,7 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
 .charts-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .chart-block { min-width: 0; }
 .chart-block h3 {

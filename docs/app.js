@@ -1420,10 +1420,83 @@ function renderRegionRiskChart(items) {
   host.appendChild(svg);
 }
 
+function renderPriceHistogramChart(items) {
+  const host = $("chart-price-hist");
+  if (!host) return;
+  host.innerHTML = "";
+  const prices = items.map((it) => it.min_bid_price || 0).filter((p) => p > 0);
+  if (!prices.length) {
+    host.appendChild(el(`<p class="chart-empty">가격 데이터가 없습니다.</p>`));
+    return;
+  }
+  const minP = Math.min(...prices);
+  const maxP = Math.max(...prices);
+  const N = 10;
+  const span = Math.max(1, maxP - minP);
+  const binSize = span / N;
+  const bins = new Array(N).fill(0);
+  for (const p of prices) {
+    const idx = Math.min(N - 1, Math.floor((p - minP) / binSize));
+    bins[idx]++;
+  }
+  const maxCount = Math.max(...bins);
+
+  const W = 360, H = 180;
+  const padL = 30, padR = 10, padT = 14, padB = 30;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+  const barW = innerW / N;
+
+  const svg = svgEl("svg", {
+    viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "최저가 분포",
+  });
+  svgEl("line", {
+    x1: padL, y1: H - padB, x2: W - padR, y2: H - padB, class: "axis-line",
+  }, svg);
+
+  bins.forEach((count, i) => {
+    if (count === 0) return;
+    const h = (count / maxCount) * innerH;
+    const x = padL + i * barW + barW * 0.1;
+    const y = H - padB - h;
+    const w = barW * 0.8;
+    const rect = svgEl("rect", {
+      x, y, width: w, height: Math.max(1, h),
+      fill: "#1f77b4", rx: 2, ry: 2,
+    }, svg);
+    const binMin = minP + i * binSize;
+    const binMax = minP + (i + 1) * binSize;
+    rect.appendChild(svgEl("title", {}));
+    rect.lastChild.textContent =
+      `${Math.round(binMin).toLocaleString("ko-KR")}~${Math.round(binMax).toLocaleString("ko-KR")}만원 · ${count}건`;
+    if (count >= Math.max(1, maxCount * 0.55)) {
+      svgEl("text", {
+        x: x + w / 2, y: y - 3, "text-anchor": "middle", class: "bar-label",
+      }, svg).textContent = String(count);
+    }
+  });
+
+  // x축 라벨 (시작/중간/끝, 만원 단위)
+  [0, Math.floor(N / 2), N - 1].forEach((i) => {
+    const v = minP + (i + 0.5) * binSize;
+    const x = padL + (i + 0.5) * barW;
+    svgEl("text", {
+      x, y: H - padB + 14, "text-anchor": "middle", class: "axis-label",
+    }, svg).textContent = Math.round(v).toLocaleString("ko-KR");
+  });
+  // y축 max
+  svgEl("text", {
+    x: padL - 4, y: padT + 9, "text-anchor": "end", class: "axis-label",
+  }, svg).textContent = String(maxCount);
+
+  host.appendChild(svg);
+}
+
 function renderCharts() {
   const items = STATE.filtered;
   renderGradeProfitChart(items);
   renderRegionRiskChart(items);
+  renderPriceHistogramChart(items);
   const cap = $("charts-caption");
   if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
 }
