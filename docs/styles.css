@@ -1094,6 +1094,62 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   .sim-grid { grid-template-columns: 1fr; }
 }
 
+/* 비슷한 매물 미니 카드 */
+.similar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+.similar-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(31, 119, 180, 0.12);
+  transition: background 0.12s, transform 0.05s;
+}
+.similar-card:active { transform: scale(0.99); background: var(--color-tap-bg); }
+@media (hover: hover) {
+  .similar-card:hover { background: var(--color-tap-bg); }
+}
+.similar-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.similar-score {
+  margin-left: auto;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(31, 119, 180, 0.12);
+  color: var(--color-primary);
+}
+.similar-title { font-weight: 600; font-size: 0.92rem; }
+.similar-meta { font-size: 0.78rem; color: var(--color-text-muted); }
+.similar-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+.similar-stats strong { color: var(--color-text); }
+.similar-reason {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  background: var(--color-reason-bg);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border-left: 2px solid var(--color-primary);
+}
+@media (max-width: 480px) {
+  .similar-grid { grid-template-columns: 1fr; }
+}
+
 /* 맞춤 추천 점수 칩 */
 .personal-score {
   display: inline-block;

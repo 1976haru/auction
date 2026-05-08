@@ -1516,6 +1516,83 @@ function scoreAgainstProfile(it, profile) {
   return { score, reasons };
 }
 
+/* 매물 상세용: 비슷한 매물 N개 (지역·종류·가격대) */
+function findSimilarItems(target, n) {
+  if (!target) return [];
+  const limit = n || 3;
+  const tPrice = target.min_bid_price || 0;
+  const scored = [];
+  for (const it of STATE.items) {
+    if (String(it.id) === String(target.id)) continue;
+    let score = 0;
+    const reasons = [];
+    if (target.region && it.region === target.region) {
+      score += 30; reasons.push("같은 지역");
+    }
+    if (target.item_type && it.item_type === target.item_type) {
+      score += 25; reasons.push("같은 종류");
+    }
+    if (tPrice && it.min_bid_price) {
+      const ratio = it.min_bid_price / tPrice;
+      if (ratio >= 0.8 && ratio <= 1.2) {
+        score += 15; reasons.push("비슷한 가격대");
+      } else if (ratio >= 0.6 && ratio <= 1.4) {
+        score += 6;
+      }
+    }
+    if (target.source && it.source === target.source) score += 5;
+    if (target.recommendation_grade && it.recommendation_grade === target.recommendation_grade) {
+      score += 6;
+    }
+    if (score >= 25) {
+      scored.push({ item: it, score, reasons });
+    }
+  }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit);
+}
+
+function renderSimilarItemsHtml(target) {
+  const similar = findSimilarItems(target, 3);
+  if (!similar.length) {
+    return `<p class="caption">조건이 비슷한 다른 매물이 없어요.</p>`;
+  }
+  const cards = similar.map(({ item, score, reasons }) => {
+    const grade = item.recommendation_grade || "C";
+    const risk = item.risk_level || "medium";
+    return `
+      <article class="similar-card" data-similar-id="${item.id}">
+        <div class="similar-head">
+          <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
+          <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
+          <span class="similar-score" title="유사도">${score}</span>
+        </div>
+        <div class="similar-title">${escapeHtml(item.title || item.address || "주소 미상")}</div>
+        <div class="similar-meta">${escapeHtml(item.item_type || "")} · 최저가 ${fmtMan(item.min_bid_price)}</div>
+        <div class="similar-stats">
+          <span>차익 <strong>${fmtMan(item.expected_profit)}</strong></span>
+          <span>ROI <strong>${fmtPct(item.expected_profit_rate)}</strong></span>
+          <span>점수 <strong>${escapeHtml(String(item.recommendation_score || "-"))}</strong></span>
+        </div>
+        <div class="similar-reason">${escapeHtml(reasons.slice(0,3).join(" · "))}</div>
+      </article>
+    `;
+  }).join("");
+  return `<div class="similar-grid">${cards}</div>`;
+}
+
+function wireSimilarItems() {
+  document.querySelectorAll(".similar-card").forEach((card) => {
+    const id = card.dataset.similarId;
+    bindTap(card, () => {
+      // 모달 안에서 바로 다른 매물로 이동
+      openDetailById(id);
+      const body = $("detail-body");
+      if (body) body.scrollTop = 0;
+    });
+  });
+}
+
 function renderPersonalRecs() {
   const sec = $("section-personal-recs");
   const grid = $("personal-rec-grid");
@@ -2130,6 +2207,11 @@ function openDetailById(id) {
       <p class="caption"><b>AI 한줄 판단:</b> ${escapeHtml(aiVerdict)}</p>
     </div>
 
+    <div class="detail-section">
+      <h3>비슷한 매물</h3>
+      ${renderSimilarItemsHtml(it)}
+    </div>
+
     <div class="detail-section note-section" data-note-item-id="${escapeHtml(String(it.id))}">
       <h3>내 메모 <span class="note-status caption" id="note-status"></span></h3>
       <textarea class="note-input" id="note-input" rows="3" placeholder="이 매물에 대한 메모를 남겨두세요. 예: 1차 현장조사 완료, 임차인 만남 예정, 보증금 협의 필요 등. (자기 폰에만 저장됨)" maxlength="2000">${escapeHtml((getNote(it.id) || {}).text || "")}</textarea>
@@ -2147,6 +2229,7 @@ function openDetailById(id) {
   document.body.style.overflow = "hidden";
   wireBidSimulator();
   wireNoteSection();
+  wireSimilarItems();
 }
 
 function wireNoteSection() {
