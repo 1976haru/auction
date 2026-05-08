@@ -2819,8 +2819,29 @@ function bindModalClose() {
       if (e.key === "Escape") { close(); return; }
       // 좌/우 화살표 — 입력 포커스 중엔 무시
       if (isTextFocus(e.target)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === "ArrowLeft") { e.preventDefault(); navDetail(-1); }
       else if (e.key === "ArrowRight") { e.preventDefault(); navDetail(1); }
+      else if (e.key === "f" || e.key === "F") {
+        if (CURRENT_DETAIL_ID) { e.preventDefault(); toggleFavorite(CURRENT_DETAIL_ID); }
+      }
+      else if (e.key === "b" || e.key === "B") {
+        if (CURRENT_DETAIL_ID) { e.preventDefault(); toggleCompare(CURRENT_DETAIL_ID); }
+      }
+      else if (e.key === "n" || e.key === "N") {
+        const ta = document.querySelector(".note-section #note-input");
+        if (ta) {
+          e.preventDefault();
+          ta.focus();
+          ta.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+      }
+      else if (e.key === "p" || e.key === "P") {
+        e.preventDefault(); printDetail();
+      }
+      else if (e.key === "s" || e.key === "S") {
+        e.preventDefault(); shareDetail();
+      }
     }
   });
   const printBtn = $("detail-print");
