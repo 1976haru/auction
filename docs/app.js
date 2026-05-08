@@ -800,6 +800,27 @@ function renderConfidence(c, summary) {
 }
 
 // ── Items rendering ───────────────────────────────
+function priceTrendBadge(it) {
+  const trend = it && it.price_trend;
+  if (!Array.isArray(trend) || trend.length < 4) return "";
+  const N = Math.min(3, Math.floor(trend.length / 2));
+  const head = trend.slice(0, N);
+  const tail = trend.slice(-N);
+  const headAvg = head.reduce((a, b) => a + (b.avg_price || 0), 0) / N;
+  const tailAvg = tail.reduce((a, b) => a + (b.avg_price || 0), 0) / N;
+  if (!headAvg) return "";
+  const ratio = tailAvg / headAvg;
+  let icon, cls, label;
+  if (ratio >= 1.05)      { icon = "↑↑"; cls = "trend-up-strong"; label = "강한 상승"; }
+  else if (ratio >= 1.02) { icon = "↑";  cls = "trend-up";        label = "완만한 상승"; }
+  else if (ratio >= 0.98) { icon = "→";  cls = "trend-flat";      label = "거의 평탄"; }
+  else if (ratio >= 0.95) { icon = "↓";  cls = "trend-down";      label = "완만한 하락"; }
+  else                    { icon = "↓↓"; cls = "trend-down-strong"; label = "강한 하락"; }
+  const pct = ((ratio - 1) * 100);
+  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%";
+  return `<span class="trend-badge ${cls}" title="시세 트렌드: ${label} (${pctStr}, ${trend.length}개월)">${icon}</span>`;
+}
+
 function urgencyBadge(it) {
   const d = it.days_left;
   if (d === null || d === undefined) return "";
@@ -875,6 +896,7 @@ function itemCardHtml(it) {
         <span>${escapeHtml(due)}</span>
         <span>· 유찰 ${escapeHtml(String(it.fail_count ?? 0))}회</span>
         <span>· 신뢰도 ${escapeHtml(String((it.confidence_score || 0).toFixed(2)))}</span>
+        ${priceTrendBadge(it)}
       </div>
     </article>`;
 }

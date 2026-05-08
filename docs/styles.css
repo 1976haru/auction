@@ -1981,6 +1981,22 @@ body.density-dense .item-card .fav-btn {
 .item-card[data-grade="C"] { border-left-color: var(--color-grade-c); }
 .item-card[data-grade="D"] { border-left-color: var(--color-grade-d); }
 .item-card[data-grade="X"] { border-left-color: var(--color-grade-x); }
+
+/* 가격 추세 인디케이터 */
+.trend-badge {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  margin-left: auto;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+.trend-badge.trend-up-strong   { background: rgba(214, 39, 40, 0.16); color: var(--color-high); }
+.trend-badge.trend-up          { background: rgba(240, 165, 0, 0.16); color: var(--color-medium); }
+.trend-badge.trend-flat        { background: var(--color-pill-bg); color: var(--color-text-muted); }
+.trend-badge.trend-down        { background: rgba(44, 160, 44, 0.14); color: var(--color-low); }
+.trend-badge.trend-down-strong { background: rgba(44, 160, 44, 0.22); color: var(--color-low); font-weight: 800; }
 /* 조밀 모드에서도 띠 유지 */
 body.density-dense .item-card { border-left-width: 3px; }
 @media (hover: hover) {
