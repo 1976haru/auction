@@ -1708,6 +1708,53 @@ function bindDownloads() {
     downloadBlob(buildJson(items), `auction_results_${timestampSlug()}.json`,
                  "application/json;charset=utf-8");
   });
+  const shareBtn = $("share-results");
+  if (shareBtn) shareBtn.addEventListener("click", shareResults);
+}
+
+function buildResultsSummary() {
+  const f = STATE.filters;
+  const parts = [];
+  const chip = QUICK_CHIPS.find((c) => c.id === f.chip);
+  if (chip && chip.id !== "all") parts.push(chip.label);
+  if (f.q) parts.push(`"${f.q}"`);
+  if (f.region) parts.push(`지역 ${f.region}`);
+  if (f.item_type) parts.push(f.item_type);
+  if (f.source) parts.push(SOURCE_LABEL[f.source] || f.source);
+  if (f.grade) parts.push(`${f.grade} 등급`);
+  if (f.risk) parts.push(`위험 ${RISK_LABEL[f.risk] || f.risk}`);
+  if (f.fail_min !== null && f.fail_min !== undefined) parts.push(`유찰 ${f.fail_min}+`);
+  if (f.due_max !== null && f.due_max !== undefined) parts.push(`D-${f.due_max} 이내`);
+  if (f.price_min !== null && f.price_min !== undefined) parts.push(`최저가 ${f.price_min.toLocaleString("ko-KR")}만↑`);
+  if (f.price_max !== null && f.price_max !== undefined) parts.push(`최저가 ${f.price_max.toLocaleString("ko-KR")}만↓`);
+  if (f.flag) parts.push(`키워드 ${f.flag}`);
+  parts.push(`정렬 ${SORT_LABEL[f.sort] || SORT_LABEL.score_desc}`);
+  return parts.join(" · ");
+}
+
+function shareResults() {
+  // 매물 모달이 열려 있어 #item-... 해시가 붙어 있으면 공유 URL 에서 제거
+  const url = new URL(window.location.href);
+  url.hash = "";
+  const shareUrl = url.toString();
+
+  const summary = buildResultsSummary();
+  const lines = [
+    "경매·공매 지능형 에이전트 — 검색 결과",
+    `${STATE.filtered.length}건 / ${summary}`,
+    "이 링크를 열면 동일 검색 결과가 그대로 보여요.",
+  ];
+  const text = lines.join("\n");
+  const title = "경매·공매 검색 결과";
+
+  if (navigator.share) {
+    navigator.share({ title, text, url: shareUrl }).catch((err) => {
+      if (err && err.name === "AbortError") return;
+      copyShareLink(text, shareUrl);
+    });
+  } else {
+    copyShareLink(text, shareUrl);
+  }
 }
 
 function bindViewToggle() {
