@@ -2728,8 +2728,24 @@ function fallbackCopy(text) {
   }
 }
 
+function _printNow() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function printDetail() {
   if ($("detail-modal").hidden) return;
+  // 인쇄 footer 채우기
+  const urlEl = $("pf-detail-url");
+  const whenEl = $("pf-detail-when");
+  if (urlEl) {
+    const url = new URL(window.location.href);
+    if (CURRENT_DETAIL_ID) url.hash = `item-${CURRENT_DETAIL_ID}`;
+    urlEl.textContent = url.toString();
+  }
+  if (whenEl) whenEl.textContent = _printNow();
+
   document.body.classList.add("printing-detail");
   const cleanup = () => {
     document.body.classList.remove("printing-detail");
@@ -2742,6 +2758,9 @@ function printDetail() {
 
 function printCompare() {
   if ($("compare-modal").hidden) return;
+  const whenEl = $("pf-compare-when");
+  if (whenEl) whenEl.textContent = _printNow();
+
   document.body.classList.add("printing-compare");
   const cleanup = () => {
     document.body.classList.remove("printing-compare");
