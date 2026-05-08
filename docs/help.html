@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1f77b4" />
+  <title>도움말 — 경매·공매 지능형 에이전트</title>
+  <meta name="description" content="경매·공매 정적 대시보드 사용 안내: 검색·필터·차트·매물 상세·공유·PWA·단축키. mock 데이터 기반 데모." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://1976haru.github.io/auction/help.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://1976haru.github.io/auction/help.html" />
+  <meta property="og:title" content="경매·공매 지능형 에이전트 — 도움말" />
+  <meta property="og:description" content="검색·필터·차트·시뮬레이터·공유·PWA 사용법 + 키보드 단축키 + 데이터·보안 + 면책." />
+  <meta property="og:image" content="https://1976haru.github.io/auction/icons/icon.svg" />
+  <meta property="og:locale" content="ko_KR" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <link rel="alternate" type="application/rss+xml" title="경매·공매 추천 매물 (점수순)" href="feed.xml" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("auction:theme:v1");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    /* help.html 전용 약간의 추가 스타일 */
+    .help-toc {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 0 0 24px;
+    }
+    .help-toc h2 { margin: 0 0 8px; font-size: 1rem; }
+    .help-toc ol {
+      margin: 0;
+      padding-left: 22px;
+      column-count: 2;
+      column-gap: 24px;
+    }
+    @media (max-width: 640px) {
+      .help-toc ol { column-count: 1; }
+    }
+    .help-toc li { margin-bottom: 4px; font-size: 0.9rem; break-inside: avoid; }
+    .help-section { margin-bottom: 32px; }
+    .help-section h2 {
+      margin: 0 0 12px;
+      font-size: 1.18rem;
+      letter-spacing: -0.01em;
+    }
+    .help-section h3 { margin: 16px 0 6px; font-size: 0.98rem; }
+    .help-section p { margin: 0 0 10px; line-height: 1.65; }
+    .help-section ul, .help-section ol {
+      margin: 0 0 12px;
+      padding-left: 22px;
+      line-height: 1.6;
+    }
+    .help-section li { margin-bottom: 4px; }
+    .help-section li b { color: var(--color-primary); }
+    .help-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .faq-item { margin-bottom: 14px; }
+    .faq-item .q { font-weight: 600; margin: 0 0 4px; }
+    .faq-item .a { margin: 0; font-size: 0.92rem; color: var(--color-text); }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container hero-inner">
+      <div class="hero-title">
+        <h1>도움말 · 사용 안내</h1>
+        <p class="status-line">
+          <span class="badge badge-mock">Mock API 기반 데모</span>
+        </p>
+      </div>
+      <p class="hero-caption">
+        법원경매·공매 mock 데이터를 검색·필터·차트·자연어로 탐색하는 정적 대시보드 사용 가이드입니다.
+      </p>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top:18px">
+    <a class="help-back" href="./">← 대시보드로 돌아가기</a>
+
+    <nav class="help-toc" aria-label="목차">
+      <h2>목차</h2>
+      <ol>
+        <li><a href="#about">이 앱은 무엇</a></li>
+        <li><a href="#quick">빠른 시작 (6단계)</a></li>
+        <li><a href="#search">검색 · 탐색</a></li>
+        <li><a href="#detail">매물 상세 · 시뮬레이터</a></li>
+        <li><a href="#personal">개인화 (★/📝/⇆)</a></li>
+        <li><a href="#share">공유 · 내보내기</a></li>
+        <li><a href="#system">시스템 (다크 · PWA · 단축키)</a></li>
+        <li><a href="#data">데이터 · 보안</a></li>
+        <li><a href="#faq">자주 묻는 질문</a></li>
+        <li><a href="#disclaimer">면책</a></li>
+      </ol>
+    </nav>
+
+    <section class="card help-section" id="about">
+      <h2>이 앱은 무엇</h2>
+      <p>법원경매·온비드 공매 매물을 <b>검색·필터·차트·자연어</b>로 빠르게 탐색하는 정적 데모입니다. 실제 거래 대상이 아닌 mock 데이터로 동작하며, 외부 API 호출 없이 클라이언트(브라우저)에서 모든 처리를 합니다.</p>
+      <p>PWA로 폰 홈 화면에 설치하면 standalone 앱처럼 동작하고, 오프라인에서도 마지막 로드된 데이터가 표시됩니다.</p>
+    </section>
+
+    <section class="card help-section" id="quick">
+      <h2>빠른 시작 (6단계)</h2>
+      <ol>
+        <li><b>검색바</b>에 주소·사건번호·키워드를 입력합니다 (예: 강남, 2025타경, 임차인). 입력하는 동안 자동으로 필터링됩니다.</li>
+        <li><b>빠른 메뉴 칩</b>(전체/경매/공매/아파트/...) 또는 <b>프리셋 칩</b>(🚀 고수익 저위험, ⏰ 임박 후보 등)을 한 번 눌러 결과를 좁힙니다.</li>
+        <li>관심 가는 <b>매물 카드</b>를 탭해 상세 모달을 엽니다. 시세 트렌드 곡선, 입찰가 시뮬레이터, 점수 분해, 위험·체크리스트, 비슷한 매물을 한 화면에서 봅니다.</li>
+        <li><b>★ 관심</b>·<b>📝 메모</b>로 매물별 정리, <b>⇆ 비교</b> 트레이로 2~5건을 나란히 봅니다.</li>
+        <li><b>🔗 공유</b>로 매물·결과를 카톡 등으로 보냅니다 (받은 사람도 같은 화면).</li>
+        <li><b>⚙ 설정</b>에서 데이터 백업/복원, <b>🌙</b>로 다크 모드, <b>🖨</b>로 인쇄/PDF.</li>
+      </ol>
+    </section>
+
+    <section class="card help-section" id="search">
+      <h2>검색 · 탐색</h2>
+
+      <h3>통합 검색</h3>
+      <p>검색바 한 칸에서 주소·사건번호·물건명·키워드를 모두 검색합니다. 200ms 디바운스로 입력하는 즉시 결과가 갱신됩니다. <b>Enter</b>나 검색 버튼을 누르면 최근 검색어에도 저장됩니다.</p>
+
+      <h3>최근 검색어</h3>
+      <p>검색바를 클릭하면 localStorage에 저장된 최근 8개 검색어가 드롭다운으로 노출됩니다. 행 클릭 시 그 검색어로 즉시 재검색되고, 행의 ×로 개별 삭제·하단의 "전체 지우기"로 일괄 삭제할 수 있습니다.</p>
+
+      <h3>빠른 메뉴 칩</h3>
+      <p>전체 / ★ 내 관심 / 📝 메모 / 👁 최근 본 / 🆕 변화 / 경매 / 공매 / 아파트 / 오피스텔 / 빌라 / 상가 / 토지 / 고수익 / 저위험 / 입찰임박 / 고위험. 한 번에 하나만 활성화됩니다.</p>
+
+      <h3>필터 프리셋 (1클릭 다중 필터)</h3>
+      <ul>
+        <li><b>⭐ 추천 후보</b>: 점수 60+, 추천점수 정렬</li>
+        <li><b>🚀 고수익 저위험</b>: 위험 낮음 + 차익 큰순</li>
+        <li><b>⏰ 임박 후보</b>: D-7 이내 + 임박순</li>
+        <li><b>🏠 서울 아파트</b>: 지역 + 종류 + 추천 정렬</li>
+        <li><b>🥇 A등급만</b>: A 등급 + 점수순</li>
+      </ul>
+      <p>프리셋을 누르면 토스트가 뜨고 "되돌리기"로 직전 상태로 복귀할 수 있습니다.</p>
+
+      <h3>상세 필터</h3>
+      <p>지역, 물건종류, 경매·공매, 최저가 범위, 유찰횟수, 입찰기일(D-N), 위험도, 추천등급으로 좁힙니다. 정렬은 추천점수·차익·수익률·기일·최저가·위험 6종.</p>
+
+      <h3>AI 에이전트 검색</h3>
+      <p>"시세차익 큰 물건 5개", "서울 아파트 중 위험 낮은 물건", "입찰기일 7일 이내 후보", "오늘 뭐부터 봐야 돼?" 같은 한국어 자연어를 rule-based로 해석해 즉시 재정렬·재필터합니다. 외부 API 호출은 하지 않습니다.</p>
+
+      <h3>URL 동기화 / 결과 공유</h3>
+      <p>검색·필터·정렬·뷰가 querystring에 반영됩니다. 새로고침해도 그대로 복원되며, 헤더의 🔗 버튼으로 현재 결과 URL을 공유 시트로 보낼 수 있습니다.</p>
+    </section>
+
+    <section class="card help-section" id="detail">
+      <h2>매물 상세 · 시뮬레이터</h2>
+
+      <h3>기본 정보 + 시세 트렌드</h3>
+      <p>구분·사건번호·주소·종류·감정가·최저가·예상시세·유찰·입찰기일·위험·등급·신뢰도가 한눈에. 12개월 시세 sparkline에 감정가/최저가/추정시세 점선 기준선이 함께 표시됩니다.</p>
+
+      <h3>예상 입찰가 + 시뮬레이터</h3>
+      <p>정적 보수/기준/공격 카드 아래에 인터랙티브 시뮬레이터가 있습니다. 슬라이더를 좌우로 끌면:
+      </p>
+      <ul>
+        <li>입찰가별 차익·ROI·총 비용이 즉시 계산됨</li>
+        <li>입찰가-차익 곡선이 슬라이더 위에 표시 (양/음 영역 음영, 손익분기점 자동 표시)</li>
+        <li>현재 입찰가 마커 색이 양수=초록 / 음수=빨강으로 즉시 전환</li>
+      </ul>
+      <p>비용은 취득세(아파트·오피스텔 6억↓ 1%, 9억까지 3.5%, 9억↑ 3% / 그 외 3.5%) + 수리 500만 + 명도 300만 + 금융(연 4% × 6개월) 가정입니다.</p>
+
+      <h3>위험 분석 · 추가 확인사항 · 다음 액션</h3>
+      <p>매물별 위험 키워드(임차인·대항력·유치권 등)와 키워드별 체크리스트, 다음에 해야 할 액션이 정리됩니다.</p>
+
+      <h3>추천 점수 분해</h3>
+      <p>추천 점수가 어떻게 만들어졌는지 5개 가로 막대로 분해 — 차익(35) / 수익률(25) / 위험(20) / 신뢰도(10) / 기일 임박(10) + 합계.</p>
+
+      <h3>최근 변화 (7일)</h3>
+      <p>최저가·유찰·기일·상태 변화 이력 + 카드 헤더의 색깔 배지(🆕 신규 / ⬇ 인하 / 📅 기일 / 🔄 유찰 / ⚠ 상태).</p>
+
+      <h3>비슷한 매물</h3>
+      <p>같은 지역(30) + 종류(25) + 가격대 ±20%(15) + 등급(6) 점수로 매칭된 다른 매물 3건. 카드 탭 시 같은 모달 안에서 매끄럽게 다른 매물로 이동합니다.</p>
+    </section>
+
+    <section class="card help-section" id="personal">
+      <h2>개인화 (★ / 📝 / ⇆ / 👁)</h2>
+      <p>모든 개인 데이터는 자기 폰 브라우저(localStorage)에만 저장됩니다. 서버로 전송되지 않습니다.</p>
+
+      <h3>★ 관심 매물</h3>
+      <p>카드/모달의 ★ 버튼으로 토글. "★ 내 관심" 칩으로 모아 보기. 기본 보기에선 ★ 매물이 어떤 정렬에서도 자동으로 맨 위에 표시됩니다.</p>
+
+      <h3>📝 매물 메모</h3>
+      <p>모달 하단 textarea에 메모를 적으면 600ms 디바운스 + blur 시 자동 저장됩니다. 메모가 있는 매물 카드 헤더에 📝 배지가 붙고, "📝 메모" 칩으로 모아 볼 수 있습니다.</p>
+
+      <h3>⇆ 비교 트레이</h3>
+      <p>카드의 ⇆ 토글이나 카드를 0.5초 길게 눌러 2~5건을 트레이에 담습니다. 트레이에서 "비교하기"를 누르면 표 형식의 비교 모달이 열리고, 등급·점수·차익·ROI·신뢰도 등에서 ▲ 최고 / ▼ 최저가 자동 마킹됩니다. 🖨로 비교표 PDF 저장도 가능합니다.</p>
+
+      <h3>👁 최근 본 매물</h3>
+      <p>매물 모달을 열 때마다 자동 기록되며 최대 20건이 저장됩니다. "👁 최근 본" 칩으로 본 순서대로 정렬해 빠르게 다시 찾을 수 있습니다.</p>
+
+      <h3>✨ 맞춤 추천</h3>
+      <p>★/📝/👁 시그널이 3건 이상 모이면 추천 TOP 5 아래에 "맞춤 추천" 카드가 자동 노출됩니다. 사용자 선호 지역·종류·가격대를 분석해 비슷한 매물 5개를 점수순으로 보여줍니다.</p>
+    </section>
+
+    <section class="card help-section" id="share">
+      <h2>공유 · 내보내기</h2>
+
+      <h3>🔗 매물 공유</h3>
+      <p>매물 모달의 🔗 버튼은 시스템 공유 시트(카톡/메시지/AirDrop 등)를 열고 제목·요약·URL을 함께 보냅니다. URL에는 <code>#item-N</code> 해시 딥링크가 포함돼 있어 받은 사람이 링크를 누르면 바로 그 매물 모달이 열립니다.</p>
+
+      <h3>🔗 결과 공유</h3>
+      <p>전체 물건 헤더의 🔗 버튼은 현재 적용된 검색·필터·정렬 URL을 한 줄 요약과 함께 공유합니다. 받은 사람도 같은 검색 화면을 그대로 볼 수 있습니다.</p>
+
+      <h3>CSV / JSON 다운로드</h3>
+      <p>현재 필터된 결과를 23개 컬럼 CSV(UTF-8 BOM, 엑셀에서 한글 깨지지 않음) 또는 메타 포함 JSON으로 저장합니다. 파일명에 timestamp가 포함됩니다.</p>
+
+      <h3>🖨 매물·비교 PDF</h3>
+      <p>매물 모달과 비교 모달의 🖨 버튼을 누르면 그 모달만 풀페이지로 인쇄됩니다. iOS Safari·Android Chrome의 시스템 인쇄 시트에서 "PDF로 저장"을 선택하면 파일이 저장됩니다.</p>
+
+      <h3>📡 RSS 피드</h3>
+      <p><a href="feed.xml">/feed.xml</a> — 추천 점수순 상위 50건의 RSS 피드. Feedly·Inoreader 같은 외부 피드 리더에 등록하면 매일 자동 갱신된 추천을 받을 수 있습니다.</p>
+    </section>
+
+    <section class="card help-section" id="system">
+      <h2>시스템 (다크 · PWA · 단축키)</h2>
+
+      <h3>다크 모드</h3>
+      <p>OS의 <code>prefers-color-scheme: dark</code>를 자동 감지하며, 검색바의 🌙/☀️ 버튼으로 명시 토글할 수 있습니다. 명시 선택은 OS 설정보다 우선하며 localStorage에 영구 저장됩니다.</p>
+
+      <h3>PWA 설치</h3>
+      <p>Android Chrome: 검색바의 "📲 설치" 버튼 또는 브라우저 메뉴 → "앱 설치" → 홈 화면 추가. iOS Safari: 공유 시트 → "홈 화면에 추가". 설치 후 standalone 모드(주소창 없는 전체 화면)로 실행됩니다.</p>
+      <p>오프라인에서도 마지막 로드된 데이터가 표시되며, 새 버전이 배포되면 토스트로 알려줍니다.</p>
+
+      <h3>키보드 단축키 (PC)</h3>
+      <table class="kbd-table">
+        <tbody>
+          <tr><th><kbd>/</kbd></th><td>통합 검색창 포커스</td></tr>
+          <tr><th><kbd>r</kbd></th><td>검색·필터 초기화</td></tr>
+          <tr><th><kbd>t</kbd></th><td>라이트/다크 모드 전환</td></tr>
+          <tr><th><kbd>1</kbd></th><td>전체 물건 — 카드 보기</td></tr>
+          <tr><th><kbd>2</kbd></th><td>전체 물건 — 테이블 보기</td></tr>
+          <tr><th><kbd>c</kbd></th><td>비교 트레이가 비어 있지 않으면 비교 모달 열기</td></tr>
+          <tr><th><kbd>g</kbd></th><td>다음 추천등급 필터로 순환 (전체→A→B→C→D→X)</td></tr>
+          <tr><th><kbd>?</kbd></th><td>키보드 단축키 도움말</td></tr>
+          <tr><th><kbd>Esc</kbd></th><td>열린 모달 / 도움말 닫기, 검색 포커스 해제</td></tr>
+        </tbody>
+      </table>
+      <p class="caption">입력창에 포커스가 있을 때는 단축키가 동작하지 않습니다.</p>
+    </section>
+
+    <section class="card help-section" id="data">
+      <h2>데이터 · 보안</h2>
+      <ul>
+        <li>모든 매물은 <b>mock 데이터</b>로, 실제 거래 대상이 아닙니다.</li>
+        <li>실 법원경매·온비드·국토부 API 호출, 실제 입찰·금전거래·외부 전송은 <b>하지 않습니다</b>.</li>
+        <li>관심·메모·비교·검색어·본 이력·테마는 <b>자기 폰 브라우저(localStorage)에만</b> 저장되며 서버로 전송되지 않습니다.</li>
+        <li>외부 라이브러리 0, 외부 API 호출 0 (mock JSON과 RSS만 같은 출처에서 fetch).</li>
+        <li><b>⚙ 설정</b>에서 6종 키를 한 JSON 파일로 백업/복원할 수 있습니다 (덮어쓰기·병합 모드).</li>
+      </ul>
+      <p class="caption">localStorage 키 목록: <code>auction:favorites:v1</code> · <code>auction:notes:v1</code> · <code>auction:compare:v1</code> · <code>auction:searches:v1</code> · <code>auction:viewed:v1</code> · <code>auction:theme:v1</code></p>
+    </section>
+
+    <section class="card help-section" id="faq">
+      <h2>자주 묻는 질문</h2>
+
+      <div class="faq-item">
+        <p class="q">Q. 데이터는 실제인가요?</p>
+        <p class="a">A. 모두 mock 데이터입니다. 실제 매물·시세·실거래·등기부등본과 무관하며, 데모와 UX 테스트 목적으로만 제공됩니다.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 데이터는 어떻게 갱신되나요?</p>
+        <p class="a">A. GitHub Actions의 daily cron이 매일 새벽(한국 시간 7시)에 mock 파이프라인을 다시 돌려 <code>docs/data/mock_dashboard.json</code>과 <code>docs/feed.xml</code>을 자동 커밋합니다. push 후 GitHub Pages가 자동 재배포합니다.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 폰을 바꾸면 ★/📝가 사라지나요?</p>
+        <p class="a">A. localStorage는 폰·브라우저별로 분리됩니다. <b>⚙ 설정 → 백업 파일 다운로드</b>로 JSON을 받아두고 새 폰에서 같은 메뉴로 복원하면 옮길 수 있습니다.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 비밀번호나 로그인이 필요한가요?</p>
+        <p class="a">A. 필요 없습니다. 로그인·계정·서버 저장이 일체 없습니다.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 광고나 추적이 있나요?</p>
+        <p class="a">A. 광고·외부 추적 스크립트가 없습니다. GitHub Pages 호스팅 자체의 표준 액세스 로그만 발생할 수 있습니다.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 실제 입찰을 해도 되나요?</p>
+        <p class="a">A. 안 됩니다. 표시된 모든 매물은 가공된 mock이며, 실제 입찰 전에는 등기부등본·전입세대열람·현장조사·전문가 자문이 필요합니다.</p>
+      </div>
+    </section>
+
+    <section class="card help-section" id="disclaimer">
+      <h2>면책</h2>
+      <ul>
+        <li>본 대시보드는 데모용 정적 페이지입니다. 표시된 모든 매물은 mock 데이터이며 실제 거래 대상이 아닙니다.</li>
+        <li>권리분석 표시는 참고용 위험 체크리스트와 추가 확인사항으로만 제공되며, 법률·투자 판단을 대체하지 않습니다.</li>
+        <li>실제 입찰 전에는 등기부등본·전입세대열람·현장조사 등 직접 확인이 필요합니다.</li>
+        <li>실 API 연동 시점에는 데이터 제공처 정책과 개인정보 보호 의무를 따릅니다.</li>
+      </ul>
+      <p class="caption">소스: <a href="https://github.com/1976haru/auction" target="_blank" rel="noopener">github.com/1976haru/auction</a> · Streamlit 풀버전: <code>streamlit run dashboard/app.py</code></p>
+    </section>
+
+    <a class="help-back" href="./">← 대시보드로 돌아가기</a>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p class="caption">
+        Source: <a href="https://github.com/1976haru/auction" target="_blank" rel="noopener">github.com/1976haru/auction</a>
+        — 도움말은 정적 페이지로 검색엔진에 색인됩니다. JavaScript 없이도 모든 내용을 읽을 수 있습니다.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
