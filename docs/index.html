@@ -49,6 +49,7 @@
         <button class="btn btn-primary" id="q-submit">검색</button>
         <button class="btn btn-ghost" id="q-reset">초기화</button>
         <button class="btn btn-ghost theme-btn" id="theme-btn" type="button" aria-label="테마 전환" title="라이트/다크 모드 전환">🌙</button>
+        <button class="btn btn-ghost kbd-help-btn" id="kbd-help-btn" type="button" aria-label="키보드 단축키" title="키보드 단축키 (?)">⌨</button>
         <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" title="홈 화면에 설치">📲 설치</button>
       </div>
       <div class="quick-chips" id="quick-chips" role="tablist" aria-label="빠른 메뉴"></div>
@@ -252,6 +253,33 @@
       </ul>
     </section>
   </main>
+
+  <!-- 키보드 단축키 도움말 모달 -->
+  <div class="modal" id="kbd-modal" hidden role="dialog" aria-modal="true" aria-labelledby="kbd-title">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-panel">
+      <header class="modal-head">
+        <h2 id="kbd-title">키보드 단축키</h2>
+        <button class="icon-btn" id="kbd-close" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body">
+        <table class="kbd-table">
+          <tbody>
+            <tr><th><kbd>/</kbd></th><td>통합 검색창 포커스</td></tr>
+            <tr><th><kbd>r</kbd></th><td>검색·필터 초기화</td></tr>
+            <tr><th><kbd>t</kbd></th><td>라이트/다크 모드 전환</td></tr>
+            <tr><th><kbd>1</kbd></th><td>전체 물건 — 카드 보기</td></tr>
+            <tr><th><kbd>2</kbd></th><td>전체 물건 — 테이블 보기</td></tr>
+            <tr><th><kbd>c</kbd></th><td>비교 트레이가 비어 있지 않으면 비교 모달 열기</td></tr>
+            <tr><th><kbd>g</kbd></th><td>다음 추천등급 필터로 순환 (전체→A→B→C→D→X)</td></tr>
+            <tr><th><kbd>?</kbd></th><td>이 도움말 열기</td></tr>
+            <tr><th><kbd>Esc</kbd></th><td>열린 모달 / 도움말 닫기, 검색 포커스 해제</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:12px">입력창에 포커스가 있을 때는 단축키가 동작하지 않아요.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- 비교 트레이 (하단 고정, 1건 이상일 때 노출) -->
   <div class="compare-tray" id="compare-tray" hidden>

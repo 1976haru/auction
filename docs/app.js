@@ -1673,6 +1673,119 @@ async function load() {
   }
 }
 
+// ── 키보드 단축키 ────────────────────────────────
+const GRADE_ROTATION = ["", "A", "B", "C", "D", "X"];
+
+function isTextFocus(target) {
+  if (!target) return false;
+  const tag = (target.tagName || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (target.isContentEditable) return true;
+  return false;
+}
+
+function openKbdModal() {
+  $("kbd-modal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeKbdModal() {
+  $("kbd-modal").hidden = true;
+  // 다른 모달이 열려 있을 수 있어 무조건 본문 스크롤 복구는 안 한다
+  if ($("detail-modal").hidden && $("compare-modal").hidden) {
+    document.body.style.overflow = "";
+  }
+}
+
+function bindKbdShortcuts() {
+  // 모달 닫기 버튼/배경
+  const closeBtn = $("kbd-close");
+  if (closeBtn) closeBtn.addEventListener("click", closeKbdModal);
+  const modal = $("kbd-modal");
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target instanceof HTMLElement && e.target.dataset.close === "1") closeKbdModal();
+    });
+  }
+  const helpBtn = $("kbd-help-btn");
+  if (helpBtn) helpBtn.addEventListener("click", openKbdModal);
+
+  document.addEventListener("keydown", (e) => {
+    // 모달 열려 있으면 Esc 만 처리하고 종료
+    const anyModalOpen = !$("detail-modal").hidden ||
+                         !$("compare-modal").hidden ||
+                         !$("kbd-modal").hidden;
+    if (e.key === "Escape") {
+      if (!$("kbd-modal").hidden) { closeKbdModal(); return; }
+      // 다른 모달은 각자 핸들러가 담당
+      if (!anyModalOpen && document.activeElement === $("q-input")) {
+        $("q-input").blur();
+      }
+      return;
+    }
+    if (anyModalOpen) return;
+    if (isTextFocus(e.target)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    switch (e.key) {
+      case "/":
+        e.preventDefault();
+        $("q-input").focus();
+        $("q-input").select();
+        break;
+      case "?":
+        e.preventDefault();
+        openKbdModal();
+        break;
+      case "r":
+      case "R":
+        e.preventDefault();
+        resetFilters();
+        break;
+      case "t":
+      case "T": {
+        e.preventDefault();
+        const cur = effectiveTheme();
+        applyTheme(cur === "dark" ? "light" : "dark", true);
+        break;
+      }
+      case "1": {
+        e.preventDefault();
+        STATE.view = "card";
+        syncControlsFromState();
+        pushUrlState();
+        break;
+      }
+      case "2": {
+        e.preventDefault();
+        STATE.view = "table";
+        syncControlsFromState();
+        pushUrlState();
+        break;
+      }
+      case "c":
+      case "C":
+        if (STATE.compare.length >= COMPARE_MIN) {
+          e.preventDefault();
+          openCompareModal();
+        }
+        break;
+      case "g":
+      case "G": {
+        e.preventDefault();
+        const cur = STATE.filters.grade || "";
+        const nextIdx = (GRADE_ROTATION.indexOf(cur) + 1) % GRADE_ROTATION.length;
+        STATE.filters.grade = GRADE_ROTATION[nextIdx];
+        $("f-grade").value = STATE.filters.grade;
+        applyFilters();
+        const label = STATE.filters.grade || "전체";
+        showToast(`등급 필터: ${label}`, null);
+        setTimeout(hideToast, 1500);
+        break;
+      }
+    }
+  });
+}
+
 // ── Theme (light/dark) ─────────────────────────────
 const THEME_KEY = "auction:theme:v1";
 const THEME_COLORS = { light: "#1f77b4", dark: "#0f141a" };
@@ -1834,6 +1947,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindDownloads();
   bindModalClose();
   bindCompareTray();
+  bindKbdShortcuts();
   bindPwa();
   load();
 });
