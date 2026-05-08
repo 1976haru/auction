@@ -67,6 +67,7 @@
         <button class="btn btn-primary" id="q-submit">검색</button>
         <button class="btn btn-ghost" id="q-reset">초기화</button>
         <button class="btn btn-ghost theme-btn" id="theme-btn" type="button" aria-label="테마 전환" title="라이트/다크 모드 전환">🌙</button>
+        <button class="btn btn-ghost about-btn" id="about-btn" type="button" aria-label="이 앱 안내" title="이 앱은 무엇 / 어떻게 쓰나">ℹ</button>
         <button class="btn btn-ghost kbd-help-btn" id="kbd-help-btn" type="button" aria-label="키보드 단축키" title="키보드 단축키 (?)">⌨</button>
         <button class="btn btn-ghost settings-btn" id="settings-btn" type="button" aria-label="설정 / 데이터 백업" title="설정 (데이터 백업·복원)">⚙</button>
         <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" aria-label="홈 화면에 설치" title="홈 화면에 설치">📲 설치</button>
@@ -278,6 +279,48 @@
       </ul>
     </section>
   </main>
+
+  <!-- About / 이 앱은 무엇 -->
+  <div class="modal" id="about-modal" hidden role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-panel">
+      <header class="modal-head">
+        <h2 id="about-title">경매·공매 지능형 에이전트</h2>
+        <button class="icon-btn" id="about-close" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="about-section">
+          <h3>이 앱은 무엇?</h3>
+          <p>법원경매·온비드 공매 매물을 <b>검색·필터·차트·자연어</b> 로 빠르게 탐색하는 정적 데모입니다. PWA 로 홈 화면에 설치하면 standalone 앱처럼 동작해요.</p>
+        </div>
+        <div class="about-section">
+          <h3>어떻게 쓰나</h3>
+          <ol class="about-list">
+            <li><b>검색바</b> 에 주소·사건번호·키워드 입력 (예: <code>강남</code>, <code>2025타경</code>, <code>임차인</code>)</li>
+            <li><b>빠른 메뉴 칩</b> 또는 <b>프리셋 칩</b> 으로 한 번에 좁히기 (예: 🚀 고수익 저위험)</li>
+            <li><b>매물 카드</b> 탭 → 상세 모달에서 시세 트렌드, 입찰가 시뮬레이터, 점수 분해, 위험·체크리스트 확인</li>
+            <li><b>★ 관심</b> · <b>📝 메모</b> 로 매물별 정리, <b>⇆ 비교</b> 트레이로 2~5개 나란히 보기</li>
+            <li><b>🔗 공유</b> 로 매물·결과를 카톡 등으로 (받은 사람도 같은 화면)</li>
+            <li><b>⚙ 설정</b> 에서 데이터 백업/복원, <b>🌙</b> 다크 모드, <b>🖨</b> 인쇄/PDF</li>
+          </ol>
+        </div>
+        <div class="about-section">
+          <h3>데이터 · 보안</h3>
+          <ul class="about-list">
+            <li>모든 매물은 <b>mock 데이터</b> — 실제 거래 대상이 아닙니다.</li>
+            <li>실 법원경매·온비드·국토부 API 호출, 실제 입찰·금전거래·외부 전송은 <b>하지 않습니다</b>.</li>
+            <li>관심·메모·비교·검색어·본 이력은 <b>자기 폰 브라우저(localStorage) 에만</b> 저장 — 서버로 전송 없음.</li>
+            <li>외부 라이브러리 0, 외부 API 호출 0 (mock JSON 만 fetch).</li>
+          </ul>
+        </div>
+        <div class="about-section">
+          <h3>면책</h3>
+          <p class="caption">권리분석 결과는 참고용 위험 체크리스트와 추가 확인사항으로만 제공되며, 법률·투자 판단을 단정하지 않습니다. 실제 입찰 전에는 등기부등본·전입세대열람·현장조사·전문가 자문이 필요합니다.</p>
+          <p class="caption">소스: <a href="https://github.com/1976haru/auction" target="_blank" rel="noopener">github.com/1976haru/auction</a> · Streamlit 풀버전: <code>streamlit run dashboard/app.py</code></p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 설정 / 데이터 백업 모달 -->
   <div class="modal" id="settings-modal" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">

@@ -361,7 +361,8 @@ code {
 .install-btn { display: inline-flex; align-items: center; gap: 4px; }
 .theme-btn,
 .kbd-help-btn,
-.settings-btn {
+.settings-btn,
+.about-btn {
   width: 44px;
   padding: 0;
   display: inline-flex;
@@ -1172,6 +1173,27 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   margin-right: 5px;
   vertical-align: middle;
 }
+
+/* About / 이 앱은 모달 */
+.about-section {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+.about-section:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+.about-section h3 {
+  margin: 0 0 8px;
+  font-size: 0.96rem;
+}
+.about-section p { margin: 0 0 8px; font-size: 0.9rem; line-height: 1.55; }
+.about-list {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.about-list li { margin-bottom: 4px; }
+.about-list li b { color: var(--color-primary); }
 
 /* 설정 모달 */
 .settings-section {

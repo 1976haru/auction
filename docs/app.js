@@ -2655,9 +2655,38 @@ function openSettingsModal() {
 }
 function closeSettingsModal() {
   $("settings-modal").hidden = true;
-  if ($("detail-modal").hidden && $("compare-modal").hidden && $("kbd-modal").hidden) {
-    document.body.style.overflow = "";
-  }
+  if (allModalsClosed()) document.body.style.overflow = "";
+}
+
+function allModalsClosed() {
+  return $("detail-modal").hidden &&
+         $("compare-modal").hidden &&
+         $("kbd-modal").hidden &&
+         $("settings-modal").hidden &&
+         $("about-modal").hidden;
+}
+
+function openAboutModal() {
+  $("about-modal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeAboutModal() {
+  $("about-modal").hidden = true;
+  if (allModalsClosed()) document.body.style.overflow = "";
+}
+
+function bindAbout() {
+  const openBtn = $("about-btn");
+  if (openBtn) openBtn.addEventListener("click", openAboutModal);
+  const closeBtn = $("about-close");
+  if (closeBtn) closeBtn.addEventListener("click", closeAboutModal);
+  const modal = $("about-modal");
+  if (modal) modal.addEventListener("click", (e) => {
+    if (e.target instanceof HTMLElement && e.target.dataset.close === "1") closeAboutModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("about-modal").hidden) closeAboutModal();
+  });
 }
 
 function bindSettings() {
@@ -3019,6 +3048,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindCompareTray();
   bindKbdShortcuts();
   bindSettings();
+  bindAbout();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
