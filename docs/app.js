@@ -2398,6 +2398,194 @@ async function load() {
   }
 }
 
+// ── 설정 / 데이터 백업·복원 ─────────────────────────
+const BACKUP_VERSION = 1;
+
+function buildBackup() {
+  return {
+    version: BACKUP_VERSION,
+    exported_at: new Date().toISOString(),
+    favorites: Array.from(STATE.favorites),
+    notes: STATE.notes,
+    compare: STATE.compare,
+    searches: STATE.recentSearches,
+    theme: localStorage.getItem(THEME_KEY) || null,
+  };
+}
+
+function applyBackup(payload, mode) {
+  if (!payload || typeof payload !== "object") {
+    throw new Error("형식이 잘못된 백업 파일입니다.");
+  }
+  if (payload.version && payload.version > BACKUP_VERSION) {
+    throw new Error("이 백업 파일은 더 새로운 버전입니다. 페이지를 새로고침해 주세요.");
+  }
+  const merge = mode === "merge";
+
+  // favorites
+  if (Array.isArray(payload.favorites)) {
+    const incoming = payload.favorites.map(String);
+    if (merge) {
+      incoming.forEach((id) => STATE.favorites.add(id));
+    } else {
+      STATE.favorites = new Set(incoming);
+    }
+    saveFavorites(STATE.favorites);
+  }
+  // notes
+  if (payload.notes && typeof payload.notes === "object" && !Array.isArray(payload.notes)) {
+    if (merge) {
+      Object.entries(payload.notes).forEach(([k, v]) => {
+        if (!v || typeof v.text !== "string") return;
+        const existing = STATE.notes[k];
+        // 같은 키는 더 최근 updatedAt 가 이김
+        if (!existing || (v.updatedAt && (!existing.updatedAt || v.updatedAt > existing.updatedAt))) {
+          STATE.notes[k] = { text: v.text, updatedAt: v.updatedAt || new Date().toISOString() };
+        }
+      });
+    } else {
+      const cleaned = {};
+      Object.entries(payload.notes).forEach(([k, v]) => {
+        if (v && typeof v.text === "string") {
+          cleaned[k] = { text: v.text, updatedAt: v.updatedAt || new Date().toISOString() };
+        }
+      });
+      STATE.notes = cleaned;
+    }
+    saveNotes(STATE.notes);
+  }
+  // compare
+  if (Array.isArray(payload.compare)) {
+    const incoming = payload.compare.map(String).slice(0, COMPARE_MAX);
+    if (merge) {
+      const existing = new Set(STATE.compare);
+      incoming.forEach((id) => { if (!existing.has(id) && STATE.compare.length < COMPARE_MAX) STATE.compare.push(id); });
+    } else {
+      STATE.compare = incoming;
+    }
+    saveCompare(STATE.compare);
+  }
+  // searches
+  if (Array.isArray(payload.searches)) {
+    const incoming = payload.searches.filter((x) => typeof x === "string" && x.trim());
+    if (merge) {
+      const seen = new Set(STATE.recentSearches);
+      incoming.forEach((q) => { if (!seen.has(q)) { STATE.recentSearches.unshift(q); seen.add(q); }});
+      if (STATE.recentSearches.length > SEARCHES_MAX) STATE.recentSearches.length = SEARCHES_MAX;
+    } else {
+      STATE.recentSearches = incoming.slice(0, SEARCHES_MAX);
+    }
+    saveSearches(STATE.recentSearches);
+  }
+  // theme
+  if (typeof payload.theme === "string" && (payload.theme === "light" || payload.theme === "dark")) {
+    applyTheme(payload.theme, true);
+  }
+}
+
+function clearAllUserData() {
+  STATE.favorites = new Set();
+  STATE.notes = {};
+  STATE.compare = [];
+  STATE.recentSearches = [];
+  saveFavorites(STATE.favorites);
+  saveNotes(STATE.notes);
+  saveCompare(STATE.compare);
+  saveSearches(STATE.recentSearches);
+}
+
+function renderSettingsStats() {
+  const root = $("settings-stats");
+  if (!root) return;
+  const noteCount = Object.keys(STATE.notes).length;
+  root.innerHTML = `
+    <div class="stat"><span class="k">★ 관심 매물</span><span class="v">${STATE.favorites.size}</span></div>
+    <div class="stat"><span class="k">📝 메모</span><span class="v">${noteCount}</span></div>
+    <div class="stat"><span class="k">⇆ 비교 트레이</span><span class="v">${STATE.compare.length} / ${COMPARE_MAX}</span></div>
+    <div class="stat"><span class="k">🔍 최근 검색어</span><span class="v">${STATE.recentSearches.length}</span></div>
+  `;
+}
+
+function openSettingsModal() {
+  renderSettingsStats();
+  $("settings-modal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeSettingsModal() {
+  $("settings-modal").hidden = true;
+  if ($("detail-modal").hidden && $("compare-modal").hidden && $("kbd-modal").hidden) {
+    document.body.style.overflow = "";
+  }
+}
+
+function bindSettings() {
+  const openBtn = $("settings-btn");
+  if (openBtn) openBtn.addEventListener("click", openSettingsModal);
+
+  const closeBtn = $("settings-close");
+  if (closeBtn) closeBtn.addEventListener("click", closeSettingsModal);
+  const modal = $("settings-modal");
+  if (modal) modal.addEventListener("click", (e) => {
+    if (e.target instanceof HTMLElement && e.target.dataset.close === "1") closeSettingsModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("settings-modal").hidden) closeSettingsModal();
+  });
+
+  // 백업 다운로드
+  const exportBtn = $("settings-export");
+  if (exportBtn) exportBtn.addEventListener("click", () => {
+    const payload = buildBackup();
+    const fname = `auction_backup_${timestampSlug()}.json`;
+    downloadBlob(JSON.stringify(payload, null, 2), fname,
+                 "application/json;charset=utf-8");
+    showToast("백업 파일을 다운로드했어요.", null);
+    setTimeout(hideToast, 2500);
+  });
+
+  // 복원 업로드
+  const importBtn = $("settings-import");
+  const importFile = $("settings-import-file");
+  if (importBtn && importFile) {
+    importBtn.addEventListener("click", () => importFile.click());
+    importFile.addEventListener("change", async () => {
+      const file = importFile.files && importFile.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const payload = JSON.parse(text);
+        const mode = (document.querySelector('input[name="restore-mode"]:checked') || {}).value || "overwrite";
+        applyBackup(payload, mode);
+        renderSettingsStats();
+        // 화면 즉시 갱신
+        renderQuickChips();
+        applyFilters();
+        renderCompareTray();
+        showToast(`복원 완료 (${mode === "merge" ? "추가" : "덮어쓰기"})`, null);
+        setTimeout(hideToast, 3000);
+      } catch (e) {
+        showToast(`복원 실패: ${e && e.message ? e.message : e}`, null);
+        setTimeout(hideToast, 4000);
+      } finally {
+        importFile.value = "";
+      }
+    });
+  }
+
+  // 전체 지우기
+  const clearBtn = $("settings-clear-all");
+  if (clearBtn) clearBtn.addEventListener("click", () => {
+    if (!confirm("정말 관심·메모·비교·최근 검색어를 모두 지울까요? 이 작업은 되돌릴 수 없어요.")) return;
+    clearAllUserData();
+    renderSettingsStats();
+    renderQuickChips();
+    applyFilters();
+    renderCompareTray();
+    showToast("내 데이터를 모두 비웠어요.", null);
+    setTimeout(hideToast, 2500);
+  });
+}
+
 // ── 키보드 단축키 ────────────────────────────────
 const GRADE_ROTATION = ["", "A", "B", "C", "D", "X"];
 
@@ -2673,6 +2861,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindModalClose();
   bindCompareTray();
   bindKbdShortcuts();
+  bindSettings();
   bindMoreButton();
   bindPwa();
   load();

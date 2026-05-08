@@ -332,7 +332,8 @@ code {
 
 .install-btn { display: inline-flex; align-items: center; gap: 4px; }
 .theme-btn,
-.kbd-help-btn {
+.kbd-help-btn,
+.settings-btn {
   width: 44px;
   padding: 0;
   display: inline-flex;
@@ -1142,6 +1143,53 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   border-radius: 50%;
   margin-right: 5px;
   vertical-align: middle;
+}
+
+/* 설정 모달 */
+.settings-section {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+.settings-section:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+.settings-section h3 {
+  margin: 0 0 6px;
+  font-size: 0.96rem;
+}
+.settings-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.settings-stats .stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.settings-stats .stat .k { font-size: 0.84rem; color: var(--color-text-muted); }
+.settings-stats .stat .v { font-size: 1.05rem; font-weight: 700; }
+.settings-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.settings-row .radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.settings-row .radio input { accent-color: var(--color-primary); }
+.settings-section .btn { height: 40px; padding: 0 18px; border-radius: 20px; }
+.btn.danger {
+  color: var(--color-high);
+  border-color: var(--color-warn-bd);
+}
+.btn.danger:active { background: var(--color-warn-bg); }
+@media (hover: hover) {
+  .btn.danger:hover { background: var(--color-warn-bg); }
 }
 
 /* 키보드 단축키 표 */
