@@ -478,6 +478,15 @@
       <header class="modal-head">
         <h2 id="compare-title">물건 비교</h2>
         <div class="modal-head-actions">
+          <select class="compare-sort" id="compare-sort" aria-label="컬럼 정렬 기준">
+            <option value="">담은 순서</option>
+            <option value="grade">등급</option>
+            <option value="score">점수</option>
+            <option value="profit">차익</option>
+            <option value="roi">수익률</option>
+            <option value="price_asc">최저가 ↑</option>
+            <option value="risk_asc">위험 ↑</option>
+          </select>
           <button class="icon-btn" id="compare-print" type="button" aria-label="비교표 인쇄/PDF 저장" title="비교표를 인쇄 또는 PDF 로 저장">🖨</button>
           <button class="icon-btn" id="compare-close" aria-label="닫기">×</button>
         </div>

@@ -1169,6 +1169,34 @@ function closeCompareModal() {
   document.body.style.overflow = "";
 }
 
+function _sortedCompareItems(items, mode) {
+  if (!mode) return items.slice();
+  const RISK_RANK = { low: 0, medium: 1, high: 2 };
+  const GRADE_RANK = { A: 4, B: 3, C: 2, D: 1, X: 0 };
+  const cmp = {
+    grade:    (a, b) => (GRADE_RANK[b.recommendation_grade] ?? -1) - (GRADE_RANK[a.recommendation_grade] ?? -1),
+    score:    (a, b) => (b.recommendation_score || 0) - (a.recommendation_score || 0),
+    profit:   (a, b) => (b.expected_profit || 0) - (a.expected_profit || 0),
+    roi:      (a, b) => (b.expected_profit_rate || 0) - (a.expected_profit_rate || 0),
+    price_asc:(a, b) => (a.min_bid_price || 0) - (b.min_bid_price || 0),
+    risk_asc: (a, b) => (RISK_RANK[a.risk_level] ?? 1) - (RISK_RANK[b.risk_level] ?? 1),
+  }[mode];
+  return cmp ? items.slice().sort(cmp) : items.slice();
+}
+
+function _renderCompareWithSort() {
+  const ids = STATE.compare.slice();
+  const items = ids
+    .map((id) => STATE.items.find((x) => String(x.id) === id))
+    .filter(Boolean);
+  if (items.length < COMPARE_MIN) return;
+  const sortSel = $("compare-sort");
+  const mode = sortSel ? sortSel.value : "";
+  const sorted = _sortedCompareItems(items, mode);
+  $("compare-title").textContent = `물건 비교 (${items.length}건)`;
+  $("compare-body").innerHTML = renderCompareTable(sorted);
+}
+
 function openCompareModal() {
   const ids = STATE.compare.slice();
   if (ids.length < COMPARE_MIN) return;
@@ -1177,8 +1205,15 @@ function openCompareModal() {
     .filter(Boolean);
   if (items.length < COMPARE_MIN) return;
 
-  $("compare-title").textContent = `물건 비교 (${items.length}건)`;
-  $("compare-body").innerHTML = renderCompareTable(items);
+  // 정렬 select 초기화 (모달 처음 열 때 '담은 순서')
+  const sortSel = $("compare-sort");
+  if (sortSel && !sortSel.dataset.bound) {
+    sortSel.value = "";
+    sortSel.addEventListener("change", _renderCompareWithSort);
+    sortSel.dataset.bound = "1";
+  }
+
+  _renderCompareWithSort();
   $("compare-modal").hidden = false;
   document.body.style.overflow = "hidden";
 }
