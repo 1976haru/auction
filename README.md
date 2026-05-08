@@ -341,7 +341,7 @@ python -m http.server 8000 -d docs
 
 ## 변경 이력 (정적 대시보드)
 
-GitHub Pages 정적 대시보드의 누적 개선을 17개 Phase (A ~ Q) 로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
+GitHub Pages 정적 대시보드의 누적 개선을 18개 Phase (A ~ R) 로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
 
 ### Phase A — 출시 + 기본 UX (`af5d50c` ~ `3af4b16`)
 - 정적 대시보드 초기 출시 (`docs/index.html` + `app.js` + `styles.css` + `mock_dashboard.json`)
@@ -435,8 +435,11 @@ GitHub Pages 정적 대시보드의 누적 개선을 17개 Phase (A ~ Q) 로 정
 ### Phase P — 비교 세부 (`d5a2340`)
 - **P102 비교 모달 컬럼 정렬** — 비교 모달 헤더 dropdown 으로 컬럼을 담은 순서 / 등급 / 점수 / 차익 / 수익률 / 최저가↑ / 위험↑ 으로 즉시 재정렬. ▲/▼ best·worst 마킹은 상대값이라 자동 갱신. 모달 다시 열면 '담은 순서' 로 초기화
 
-### Phase Q — 입력·접근성 (`13bb43c` ~ 최신)
+### Phase Q — 입력·접근성 (`13bb43c`)
 - **Q103 음성 검색 (🎤)** — Web Speech API 기반 검색바 마이크 버튼. 한국어(ko-KR), 중간 결과 즉시 입력창 반영, 최종 시 필터+히스토리 저장. 듣는 중 빨강 펄스 (prefers-reduced-motion 대응), 권한 거부/오류 명확한 토스트, 미지원 브라우저(Firefox 등)는 자동 숨김
+
+### Phase R — 카드 시각 미세조정 (`eb58863` ~ 최신)
+- **R104 카드 등급 색 좌측 바** — 매물 카드 좌측에 3px 등급 색 띠 (A=초록 / B=파랑 / C=주황 / D=회색 / X=빨강). data-grade / data-risk 속성 + CSS 속성 선택자로 조건 적용. 조밀 모드에서도 두께 유지. 기존 등급 pill 과 결합돼 한 페이지에서 A 등급만 빠르게 스캔하기 쉬움
 
 ### 누적 사용자 데이터 키
 | 키 | 내용 | 백업 포함 |
