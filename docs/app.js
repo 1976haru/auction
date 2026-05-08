@@ -896,7 +896,11 @@ function renderItems() {
   const list = fullList.slice(0, STATE.pageShown);
   list.forEach((it, idx) => {
     const card = el(itemCardHtml(it));
-    bindTap(card, () => openDetailById(it.id), {
+    if (SELECTED.has(String(it.id))) card.classList.add("selected");
+    bindTap(card, () => {
+      if (SELECTING) toggleSelected(it.id);
+      else openDetailById(it.id);
+    }, {
       onLongPress: () => toggleCompare(it.id),
     });
     wireFavoriteButtons(card);
@@ -1622,6 +1626,97 @@ function renderClusters() {
       setTimeout(hideToast, 4000);
     });
     grid.appendChild(card);
+  });
+}
+
+/* 카드 다중 선택 모드 */
+const SELECTED = new Set();
+let SELECTING = false;
+
+function setSelectionMode(on) {
+  SELECTING = !!on;
+  document.body.classList.toggle("selecting", SELECTING);
+  $("select-bar").hidden = !SELECTING;
+  $("select-mode").classList.toggle("on", SELECTING);
+  if (!SELECTING) {
+    SELECTED.clear();
+    document.querySelectorAll(".item-card.selected").forEach((c) => c.classList.remove("selected"));
+  }
+  updateSelectionBar();
+}
+
+function toggleSelected(id) {
+  const key = String(id);
+  if (SELECTED.has(key)) SELECTED.delete(key);
+  else SELECTED.add(key);
+  document.querySelectorAll(`.item-card[data-item-id="${key}"]`)
+    .forEach((c) => c.classList.toggle("selected", SELECTED.has(key)));
+  updateSelectionBar();
+}
+
+function updateSelectionBar() {
+  const c = $("select-count");
+  if (c) c.textContent = `선택 ${SELECTED.size}개`;
+}
+
+function bindSelectionMode() {
+  const btn = $("select-mode");
+  if (btn) btn.addEventListener("click", () => setSelectionMode(!SELECTING));
+
+  $("sel-exit").addEventListener("click", () => setSelectionMode(false));
+  $("sel-clear").addEventListener("click", () => {
+    SELECTED.clear();
+    document.querySelectorAll(".item-card.selected").forEach((c) => c.classList.remove("selected"));
+    updateSelectionBar();
+  });
+  $("sel-fav").addEventListener("click", () => {
+    if (!SELECTED.size) return;
+    // 모두 ★ 가 아니면 일괄 ★, 모두 ★ 면 일괄 해제 (toggle)
+    const allFav = Array.from(SELECTED).every((id) => STATE.favorites.has(id));
+    SELECTED.forEach((id) => {
+      if (allFav) STATE.favorites.delete(id);
+      else STATE.favorites.add(id);
+    });
+    saveFavorites(STATE.favorites);
+    showToast(allFav ? `${SELECTED.size}개 매물 관심 해제` : `${SELECTED.size}개 매물 관심 등록`, null);
+    setTimeout(hideToast, 2500);
+    applyFilters();  // ★ 우선 정렬 갱신
+    // 카드 ☆ 표시 즉시 갱신
+    document.querySelectorAll(".fav-btn").forEach((fb) => {
+      const id = fb.dataset.fav;
+      const on = STATE.favorites.has(String(id));
+      fb.classList.toggle("on", on);
+      fb.textContent = on ? "★" : "☆";
+      fb.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  });
+  $("sel-compare").addEventListener("click", () => {
+    if (!SELECTED.size) return;
+    let added = 0, skipped = 0;
+    SELECTED.forEach((id) => {
+      if (STATE.compare.includes(id)) { skipped++; return; }
+      if (STATE.compare.length >= COMPARE_MAX) { skipped++; return; }
+      STATE.compare.push(id);
+      added++;
+    });
+    saveCompare(STATE.compare);
+    document.querySelectorAll(".cmp-btn").forEach((cb) => {
+      const id = cb.dataset.cmp;
+      const on = STATE.compare.includes(String(id));
+      cb.classList.toggle("on", on);
+      cb.textContent = on ? "⇆ 담김" : "⇆ 비교";
+      cb.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    renderCompareTray();
+    showToast(`비교에 ${added}개 추가, ${skipped}개 스킵 (한도 ${COMPARE_MAX})`, null);
+    setTimeout(hideToast, 3000);
+  });
+  $("sel-csv").addEventListener("click", () => {
+    if (!SELECTED.size) return;
+    const items = STATE.items.filter((it) => SELECTED.has(String(it.id)));
+    if (!items.length) return;
+    downloadBlob(buildCsv(items), `auction_selected_${timestampSlug()}.csv`,
+                 "text/csv;charset=utf-8");
   });
 }
 
@@ -3631,6 +3726,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindSettings();
   bindAbout();
   bindCardKbdNav();
+  bindSelectionMode();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
