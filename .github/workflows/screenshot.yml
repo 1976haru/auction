@@ -54,12 +54,13 @@ jobs:
 
       - name: Commit refreshed screenshots
         run: |
-          if git diff --quiet docs/screenshots/; then
-            echo "no changes — skipping commit"
-            exit 0
-          fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/screenshots/
+          # tracked changes(diff --cached) 또는 새 untracked 파일 모두 감지
+          if git diff --cached --quiet; then
+            echo "no changes — skipping commit"
+            exit 0
+          fi
           git commit -m "chore(docs): refresh dashboard screenshots [skip ci]"
           git push origin HEAD:${GITHUB_REF_NAME}
