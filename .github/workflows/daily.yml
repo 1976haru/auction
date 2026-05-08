@@ -54,10 +54,10 @@ jobs:
       - name: Refresh static dashboard JSON
         run: python scripts/export_static_dashboard.py
 
-      - name: Validate static dashboard JSON
+      - name: Validate static dashboard JSON / RSS
         run: |
           python - <<'PY'
-          import json, sys, pathlib
+          import json, sys, pathlib, xml.etree.ElementTree as ET
           p = pathlib.Path("docs/data/mock_dashboard.json")
           assert p.exists(), "mock_dashboard.json missing"
           d = json.loads(p.read_text(encoding="utf-8"))
@@ -66,25 +66,30 @@ jobs:
               assert k in d, f"missing top-level key: {k}"
           assert len(d["items"]) >= 1
           assert len(d["recommendations"]) >= 1
-          # 필수 필드 일부 검사
           item_required = ["id", "source", "address", "item_type",
                            "min_bid_price", "expected_profit", "recommendation_score",
                            "recommendation_grade", "risk_level", "confidence_score"]
           missing = [k for k in item_required if k not in d["items"][0]]
           assert not missing, f"first item missing keys: {missing}"
           print(f"[OK] {p} items={len(d['items'])} recs={len(d['recommendations'])}")
+          rss = pathlib.Path("docs/feed.xml")
+          if rss.exists():
+              tree = ET.parse(rss)
+              items = tree.getroot().find("channel").findall("item")
+              assert len(items) >= 1, "RSS empty"
+              print(f"[OK] {rss} items={len(items)}")
           PY
 
-      - name: Commit refreshed static dashboard JSON
+      - name: Commit refreshed static dashboard JSON / feed
         run: |
-          if git diff --quiet docs/data/mock_dashboard.json; then
+          if git diff --quiet docs/data/mock_dashboard.json docs/feed.xml; then
             echo "no changes — skipping commit"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/mock_dashboard.json
-          git commit -m "chore(docs): refresh static dashboard JSON [skip ci]"
+          git add docs/data/mock_dashboard.json docs/feed.xml
+          git commit -m "chore(docs): refresh static dashboard JSON + RSS [skip ci]"
           git push origin HEAD:${GITHUB_REF_NAME}
 
       - name: Upload outputs
@@ -95,6 +100,7 @@ jobs:
           path: |
             data/exports/
             docs/data/mock_dashboard.json
+            docs/feed.xml
             logs/
           retention-days: 7
           if-no-files-found: ignore

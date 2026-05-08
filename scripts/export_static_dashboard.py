@@ -34,6 +34,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "auction_agent.db"
 OUT_PATH = ROOT / "docs" / "data" / "mock_dashboard.json"
+RSS_PATH = ROOT / "docs" / "feed.xml"
+RSS_BASE_URL = "https://1976haru.github.io/auction/"
+RSS_LIMIT = 50
 SAMPLE_LIMIT = 120
 TOP_LIMIT = 5
 
@@ -983,6 +986,118 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     }
 
 
+def _xml_escape(s: Any) -> str:
+    if s is None:
+        return ""
+    return (str(s)
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+            .replace("'", "&apos;"))
+
+
+def _rfc822(dt: datetime) -> str:
+    # 간단 RFC 822 (RSS pubDate 표준)
+    return dt.strftime("%a, %d %b %Y %H:%M:%S +0900")
+
+
+def _build_rss(items: list[dict], base_url: str = RSS_BASE_URL,
+               limit: int = RSS_LIMIT) -> str:
+    """추천 점수순 상위 N개 매물을 RSS 2.0 피드로 직렬화."""
+    sorted_items = sorted(
+        items, key=lambda it: (it.get("recommendation_score") or 0), reverse=True
+    )[:limit]
+    now = datetime.now()
+    last_build = _rfc822(now)
+    feed_url = base_url.rstrip("/") + "/feed.xml"
+    site_url = base_url.rstrip("/") + "/"
+
+    lines = []
+    lines.append('<?xml version="1.0" encoding="UTF-8" ?>')
+    lines.append('<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">')
+    lines.append("<channel>")
+    lines.append("<title>경매·공매 지능형 에이전트 — 추천 후보</title>")
+    lines.append(f'<link>{_xml_escape(site_url)}</link>')
+    lines.append(
+        f'<atom:link href="{_xml_escape(feed_url)}" rel="self" type="application/rss+xml" />'
+    )
+    lines.append("<description>법원경매·공매 mock 데이터 기반 추천 매물 (점수순). "
+                 "실제 거래 대상이 아닌 데모 피드입니다.</description>")
+    lines.append("<language>ko-KR</language>")
+    lines.append(f"<lastBuildDate>{last_build}</lastBuildDate>")
+    lines.append(f"<generator>export_static_dashboard.py</generator>")
+
+    # 안정적인 pubDate: rank 순으로 1분씩 뒤로 — 피드 리더가 새 항목 정렬을 유지
+    for i, it in enumerate(sorted_items):
+        pub = now - timedelta(minutes=i)
+        item_url = site_url + f"#item-{it.get('id')}"
+        grade = it.get("recommendation_grade") or "C"
+        score = it.get("recommendation_score") or 0
+        title = (
+            f"[{grade}] {it.get('title') or it.get('address') or '주소 미상'} "
+            f"(점수 {round(float(score), 1)})"
+        )
+        risk = {"low": "낮음", "medium": "보통", "high": "높음"}.get(
+            it.get("risk_level"), "-"
+        )
+        source = {"auction": "경매", "public_sale": "공매"}.get(it.get("source"), it.get("source") or "-")
+        profit = it.get("expected_profit")
+        profit_rate = it.get("expected_profit_rate")
+        market = it.get("market_price")
+        minb = it.get("min_bid_price")
+        confidence = it.get("confidence_score")
+        reason = it.get("recommendation_reason") or ""
+        # description: 한 줄 요약 + 이유
+        desc_parts = [
+            f"{source} · {it.get('item_type') or '-'}",
+            f"감정가 {(it.get('appraisal_price') or 0):,}만원",
+            f"최저가 {(minb or 0):,}만원",
+        ]
+        if market:
+            desc_parts.append(f"시세 {market:,}만원")
+        if profit is not None:
+            desc_parts.append(f"차익 {profit:,}만원")
+        if profit_rate is not None:
+            desc_parts.append(f"ROI {round(profit_rate, 1)}%")
+        desc_parts.append(f"위험 {risk}")
+        if confidence is not None:
+            desc_parts.append(f"신뢰도 {round(float(confidence), 2)}")
+        if it.get("bid_date"):
+            desc_parts.append(f"입찰 {it.get('bid_date')}")
+        desc_text = " / ".join(desc_parts)
+        if reason:
+            desc_text += "\n" + reason
+
+        lines.append("<item>")
+        lines.append(f"<title>{_xml_escape(title)}</title>")
+        lines.append(f"<link>{_xml_escape(item_url)}</link>")
+        lines.append(f'<guid isPermaLink="true">{_xml_escape(item_url)}</guid>')
+        lines.append(f"<pubDate>{_rfc822(pub)}</pubDate>")
+        lines.append(f"<category>{_xml_escape(it.get('item_type') or '기타')}</category>")
+        lines.append(f"<category>{_xml_escape(grade)}</category>")
+        lines.append(f"<description>{_xml_escape(desc_text)}</description>")
+        lines.append("</item>")
+
+    lines.append("</channel>")
+    lines.append("</rss>")
+    return "\n".join(lines) + "\n"
+
+
+def _write_rss(payload: dict[str, Any]) -> None:
+    items = payload.get("items") or []
+    if not items:
+        return
+    try:
+        xml = _build_rss(items)
+    except Exception as e:
+        print(f"[warn] RSS 직렬화 실패: {e}", file=sys.stderr)
+        return
+    RSS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with RSS_PATH.open("w", encoding="utf-8") as f:
+        f.write(xml)
+
+
 def export() -> Path:
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     payload: dict[str, Any] | None = None
@@ -1014,6 +1129,8 @@ def export() -> Path:
     with OUT_PATH.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
+    _write_rss(payload)
+
     return OUT_PATH
 
 
@@ -1021,6 +1138,9 @@ def main() -> None:
     out = export()
     size = out.stat().st_size
     print(f"[OK] {out.relative_to(ROOT)} ({size:,} bytes)")
+    if RSS_PATH.exists():
+        rsize = RSS_PATH.stat().st_size
+        print(f"[OK] {RSS_PATH.relative_to(ROOT)} ({rsize:,} bytes)")
 
 
 if __name__ == "__main__":
