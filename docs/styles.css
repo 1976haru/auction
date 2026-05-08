@@ -1964,6 +1964,7 @@ body.density-dense .item-card .fav-btn {
 }
 .item-card {
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-border);
   border-radius: 10px;
   padding: 14px;
   background: var(--color-input);
@@ -1973,8 +1974,15 @@ body.density-dense .item-card .fav-btn {
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(31, 119, 180, 0.12);
-  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease, border-left-color 0.15s ease;
 }
+.item-card[data-grade="A"] { border-left-color: var(--color-grade-a); }
+.item-card[data-grade="B"] { border-left-color: var(--color-grade-b); }
+.item-card[data-grade="C"] { border-left-color: var(--color-grade-c); }
+.item-card[data-grade="D"] { border-left-color: var(--color-grade-d); }
+.item-card[data-grade="X"] { border-left-color: var(--color-grade-x); }
+/* 조밀 모드에서도 띠 유지 */
+body.density-dense .item-card { border-left-width: 3px; }
 @media (hover: hover) {
   .item-card:hover {
     box-shadow: var(--shadow-hover);

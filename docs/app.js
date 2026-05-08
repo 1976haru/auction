@@ -847,7 +847,7 @@ function itemCardHtml(it) {
     ? `D-${it.days_left}`
     : (it.bid_date ? "기일 " + (it.bid_date.split("~")[0] || it.bid_date) : "기일 미정");
   return `
-    <article class="item-card" data-item-id="${it.id}" tabindex="0" role="button" aria-label="물건 상세 보기">
+    <article class="item-card" data-item-id="${it.id}" data-grade="${escapeHtml(grade)}" data-risk="${escapeHtml(risk)}" tabindex="0" role="button" aria-label="물건 상세 보기">
       <div class="item-head">
         <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
         <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
