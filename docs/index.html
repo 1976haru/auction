@@ -79,6 +79,16 @@
     </div>
   </section>
 
+  <!-- ★ 매물 임박 배너 (D-3 이내가 있을 때만) -->
+  <div class="urgent-banner" id="urgent-banner" hidden role="status" aria-live="polite">
+    <div class="container urgent-banner-inner">
+      <span class="urgent-banner-icon" aria-hidden="true">⏰</span>
+      <span class="urgent-banner-msg" id="urgent-banner-msg"></span>
+      <button class="urgent-banner-action" id="urgent-banner-action" type="button">관심 매물만 보기</button>
+      <button class="urgent-banner-close" id="urgent-banner-close" type="button" aria-label="닫기">×</button>
+    </div>
+  </div>
+
   <main class="container">
     <!-- 필터 영역 -->
     <section class="card filter-card" id="section-filters">

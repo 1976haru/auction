@@ -983,6 +983,7 @@ function toggleFavorite(id) {
   if (f.chip === "favorites" || (f.chip === "all" && !f.flag)) {
     applyFilters();
   }
+  refreshUrgentBanner();
 }
 
 function wireFavoriteButtons(root) {
@@ -3185,6 +3186,7 @@ function render(data) {
   renderCompareTray();
 
   renderClusters();
+  refreshUrgentBanner();
   renderAgents(data.agent_status);
 
   // 뒤로가기/앞으로가기 시 URL → state 복원
@@ -3834,6 +3836,51 @@ function bindPwa() {
   }
 }
 
+/* ★ 매물 중 D-3 이내가 있으면 배너 노출 */
+let URGENT_BANNER_DISMISSED = false;
+
+function refreshUrgentBanner() {
+  const banner = $("urgent-banner");
+  if (!banner) return;
+  if (URGENT_BANNER_DISMISSED) { banner.hidden = true; return; }
+  if (!STATE.favorites.size) { banner.hidden = true; return; }
+  const favItems = STATE.items.filter((it) => STATE.favorites.has(String(it.id)));
+  const urgent = favItems.filter((it) =>
+    it.days_left !== null && it.days_left !== undefined &&
+    it.days_left >= 0 && it.days_left <= 3
+  );
+  if (!urgent.length) { banner.hidden = true; return; }
+  const msg = $("urgent-banner-msg");
+  if (msg) {
+    msg.textContent = `★ 관심 매물 ${favItems.length}건 중 ${urgent.length}건이 D-3 이내 임박입니다.`;
+  }
+  banner.hidden = false;
+}
+
+function bindUrgentBanner() {
+  const action = $("urgent-banner-action");
+  if (action) {
+    action.addEventListener("click", () => {
+      // 관심 칩 + 기일 임박 정렬
+      STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
+      STATE.filters.chip = "favorites";
+      STATE.filters.sort = "due_asc";
+      syncControlsFromState();
+      renderQuickChips();
+      applyFilters();
+      const items = $("section-items");
+      if (items) items.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+  const close = $("urgent-banner-close");
+  if (close) {
+    close.addEventListener("click", () => {
+      URGENT_BANNER_DISMISSED = true;
+      $("urgent-banner").hidden = true;
+    });
+  }
+}
+
 function setupStickyOffset() {
   const sec = document.querySelector(".search-section");
   if (!sec) return;
@@ -3863,6 +3910,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindAbout();
   bindCardKbdNav();
   bindSelectionMode();
+  bindUrgentBanner();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
