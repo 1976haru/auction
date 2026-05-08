@@ -1516,6 +1516,114 @@ function scoreAgainstProfile(it, profile) {
   return { score, reasons };
 }
 
+/* 동·구 클러스터: 같은 위치(시/도 + 구 + 동)에 2건 이상 모인 곳 top 5 */
+function _parseLocation(address) {
+  if (!address) return null;
+  const tokens = address.split(/\s+/);
+  let region = null, gu = null, dong = null;
+  for (const t of tokens) {
+    if (!region && /(특별시|광역시|특별자치시|특별자치도|도|시)$/.test(t)) {
+      region = t;
+    } else if (!gu && /(시|군|구)$/.test(t)) {
+      gu = t;
+    } else if (!dong && /(동|읍|면|가|리)$/.test(t)) {
+      dong = t;
+    }
+  }
+  if (!region || !dong) return null;
+  return { region, gu, dong, key: [region, gu, dong].filter(Boolean).join(" ") };
+}
+
+function buildClusters(items) {
+  const map = new Map();
+  for (const it of items) {
+    const loc = _parseLocation(it.address);
+    if (!loc) continue;
+    if (!map.has(loc.key)) {
+      map.set(loc.key, { key: loc.key, region: loc.region, gu: loc.gu, dong: loc.dong, items: [] });
+    }
+    map.get(loc.key).items.push(it);
+  }
+  const clusters = Array.from(map.values())
+    .filter((c) => c.items.length >= 2)
+    .map((c) => {
+      const grades = { A: 0, B: 0, C: 0, D: 0, X: 0 };
+      let totalProfit = 0;
+      let totalPrice = 0;
+      let totalScore = 0;
+      let highRisk = 0;
+      for (const it of c.items) {
+        grades[it.recommendation_grade || "C"] = (grades[it.recommendation_grade || "C"] || 0) + 1;
+        totalProfit += it.expected_profit || 0;
+        totalPrice += it.min_bid_price || 0;
+        totalScore += it.recommendation_score || 0;
+        if (it.risk_level === "high") highRisk++;
+      }
+      return {
+        ...c,
+        count: c.items.length,
+        grades,
+        avgProfit: Math.round(totalProfit / c.items.length),
+        avgPrice: Math.round(totalPrice / c.items.length),
+        avgScore: c.items.length ? totalScore / c.items.length : 0,
+        highRisk,
+      };
+    });
+  clusters.sort((a, b) => b.count - a.count || b.avgScore - a.avgScore);
+  return clusters;
+}
+
+function renderClusters() {
+  const sec = $("section-clusters");
+  const grid = $("clusters-grid");
+  const cap = $("clusters-caption");
+  if (!sec || !grid) return;
+  const clusters = buildClusters(STATE.items).slice(0, 5);
+  if (!clusters.length) {
+    sec.hidden = true;
+    return;
+  }
+  sec.hidden = false;
+  cap.textContent = `같은 동에 2건 이상 모인 위치 — 클릭하면 그 동 매물만 필터`;
+  grid.innerHTML = "";
+  clusters.forEach((c) => {
+    const gradeStr = ["A","B","C","D","X"]
+      .map((g) => c.grades[g] ? `<span class="grade-pill grade-${g}">${g} ${c.grades[g]}</span>` : "")
+      .filter(Boolean).join("");
+    const card = el(
+      `<article class="cluster-card" data-cluster-key="${escapeHtml(c.key)}" tabindex="0" role="button" aria-label="${escapeHtml(c.key)} 매물 ${c.count}건 보기">
+         <div class="cluster-head">
+           <span class="cluster-count">${c.count}건</span>
+           <span class="cluster-loc">${escapeHtml(c.key)}</span>
+         </div>
+         <div class="cluster-grades">${gradeStr}</div>
+         <div class="cluster-stats">
+           <span>평균 점수 <strong>${c.avgScore.toFixed(1)}</strong></span>
+           <span>평균 차익 <strong>${fmtMan(c.avgProfit)}</strong></span>
+           <span>평균 최저가 <strong>${fmtMan(c.avgPrice)}</strong></span>
+           ${c.highRisk ? `<span class="cluster-warn">고위험 ${c.highRisk}건</span>` : ""}
+         </div>
+       </article>`
+    );
+    bindTap(card, () => {
+      // 검색바에 위치 키워드 넣고 적용 → 그 동 매물만 노출
+      $("q-input").value = c.dong || c.gu || c.region;
+      STATE.filters.q = $("q-input").value;
+      pushSearchHistory(STATE.filters.q);
+      applyFilters();
+      const items = $("section-items");
+      if (items) items.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast(`'${c.key}' 매물 ${c.count}건만 봅니다.`, "되돌리기", () => {
+        $("q-input").value = "";
+        STATE.filters.q = "";
+        applyFilters();
+      });
+      setTimeout(hideToast, 4000);
+    });
+    grid.appendChild(card);
+  });
+}
+
 /* 매물 상세용: 비슷한 매물 N개 (지역·종류·가격대) */
 function findSimilarItems(target, n) {
   if (!target) return [];
@@ -2799,6 +2907,7 @@ function render(data) {
   saveCompare(STATE.compare);
   renderCompareTray();
 
+  renderClusters();
   renderAgents(data.agent_status);
 
   // 뒤로가기/앞으로가기 시 URL → state 복원

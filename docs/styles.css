@@ -1102,6 +1102,67 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   .sim-grid { grid-template-columns: 1fr; }
 }
 
+/* 동·구 클러스터 카드 */
+.clusters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.cluster-card {
+  background: var(--color-card-inset);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(31, 119, 180, 0.12);
+  transition: background 0.12s, transform 0.05s, box-shadow 0.15s ease;
+}
+.cluster-card:active { transform: scale(0.99); background: var(--color-tap-bg); }
+@media (hover: hover) {
+  .cluster-card:hover { background: var(--color-tap-bg); box-shadow: var(--shadow-hover); }
+}
+.cluster-head { display: flex; align-items: center; gap: 8px; }
+.cluster-count {
+  display: inline-block;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: white;
+}
+.cluster-loc {
+  font-size: 0.94rem;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cluster-grades { display: flex; gap: 4px; flex-wrap: wrap; }
+.cluster-grades .grade-pill { font-size: 0.7rem; padding: 1px 7px; }
+.cluster-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+.cluster-stats strong { color: var(--color-text); }
+.cluster-warn {
+  color: var(--color-high);
+  background: var(--color-warn-bg);
+  border: 1px solid var(--color-warn-bd);
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
 /* 비슷한 매물 미니 카드 */
 .similar-grid {
   display: grid;
