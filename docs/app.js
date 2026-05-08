@@ -13,6 +13,7 @@ const QUICK_CHIPS = [
   { id: "all",      label: "전체" },
   { id: "favorites",label: "★ 내 관심" },
   { id: "notes",    label: "📝 메모" },
+  { id: "viewed",   label: "👁 최근 본" },
   { id: "changes",  label: "🆕 변화" },
   { id: "auction",  label: "경매" },
   { id: "public",   label: "공매" },
@@ -113,6 +114,33 @@ function saveSearches(arr) {
   try { localStorage.setItem(SEARCHES_KEY, JSON.stringify(arr)); } catch {}
 }
 
+const VIEWED_KEY = "auction:viewed:v1";
+const VIEWED_MAX = 20;
+function loadViewed() {
+  try {
+    const raw = localStorage.getItem(VIEWED_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter((x) => x && (typeof x.id === "string" || typeof x.id === "number"))
+      .map((x) => ({ id: String(x.id), ts: Number(x.ts) || 0 }))
+      .slice(0, VIEWED_MAX);
+  } catch { return []; }
+}
+function saveViewed(arr) {
+  try { localStorage.setItem(VIEWED_KEY, JSON.stringify(arr)); } catch {}
+}
+function recordViewed(id) {
+  const k = String(id);
+  const now = Date.now();
+  let arr = STATE.viewed.filter((x) => x.id !== k);
+  arr.unshift({ id: k, ts: now });
+  if (arr.length > VIEWED_MAX) arr.length = VIEWED_MAX;
+  STATE.viewed = arr;
+  saveViewed(arr);
+}
+
 const NOTES_KEY = "auction:notes:v1";
 function loadNotes() {
   try {
@@ -168,6 +196,7 @@ const STATE = {
   compare: loadCompare(),  // ordered list of item ids (string)
   recentSearches: loadSearches(),
   notes: loadNotes(),
+  viewed: loadViewed(),
   filters: {
     q: "",
     chip: "all",
@@ -461,6 +490,7 @@ function chipMatch(chip, it) {
     case "all":       return true;
     case "favorites": return STATE.favorites.has(String(it.id));
     case "notes":     return !!getNote(it.id);
+    case "viewed":    return STATE.viewed.some((v) => v.id === String(it.id));
     case "changes":   return Array.isArray(it.change_tags) && it.change_tags.length > 0;
     case "auction":   return it.source === "auction";
     case "public":    return it.source === "public_sale";
@@ -505,7 +535,17 @@ function applyFilters() {
   if (f._scoreMin !== undefined && f._scoreMin !== null)
     out = out.filter((it) => (it.recommendation_score || 0) >= f._scoreMin);
 
-  out = sortItems(out, f.sort);
+  // '최근 본' 칩일 땐 본 순서대로 정렬을 강제 (사용자가 명시 정렬을 바꾸면 그대로 따름)
+  if (f.chip === "viewed" && f.sort === "score_desc") {
+    const order = new Map(STATE.viewed.map((v, i) => [v.id, i]));
+    out = out.slice().sort((a, b) => {
+      const ai = order.has(String(a.id)) ? order.get(String(a.id)) : Infinity;
+      const bi = order.has(String(b.id)) ? order.get(String(b.id)) : Infinity;
+      return ai - bi;
+    });
+  } else {
+    out = sortItems(out, f.sort);
+  }
   STATE.filtered = out;
   STATE.pageShown = PAGE_SIZE;  // 필터/검색 바뀌면 항상 처음부터
   renderItems();
@@ -1798,6 +1838,9 @@ function openDetailById(id) {
   const it = STATE.items.find((x) => String(x.id) === String(id));
   if (!it) return;
   CURRENT_DETAIL_ID = String(it.id);
+  recordViewed(it.id);
+  // '최근 본' 칩이 활성화돼 있으면 새로 본 매물이 즉시 위로 올라오도록 재필터
+  if (STATE.filters.chip === "viewed") applyFilters();
   // 공유 가능한 해시 딥링크 동기화 (사이드 효과로 popstate 가 일어나면 무시)
   const wantHash = `#item-${it.id}`;
   if (window.location.hash !== wantHash) {
@@ -2456,6 +2499,7 @@ function buildBackup() {
     notes: STATE.notes,
     compare: STATE.compare,
     searches: STATE.recentSearches,
+    viewed: STATE.viewed,
     theme: localStorage.getItem(THEME_KEY) || null,
   };
 }
@@ -2512,6 +2556,21 @@ function applyBackup(payload, mode) {
     }
     saveCompare(STATE.compare);
   }
+  // viewed history
+  if (Array.isArray(payload.viewed)) {
+    const incoming = payload.viewed
+      .filter((x) => x && (typeof x.id === "string" || typeof x.id === "number"))
+      .map((x) => ({ id: String(x.id), ts: Number(x.ts) || 0 }));
+    if (merge) {
+      const seen = new Set(STATE.viewed.map((v) => v.id));
+      incoming.forEach((v) => { if (!seen.has(v.id)) STATE.viewed.push(v); });
+      STATE.viewed.sort((a, b) => b.ts - a.ts);
+      if (STATE.viewed.length > VIEWED_MAX) STATE.viewed.length = VIEWED_MAX;
+    } else {
+      STATE.viewed = incoming.slice(0, VIEWED_MAX);
+    }
+    saveViewed(STATE.viewed);
+  }
   // searches
   if (Array.isArray(payload.searches)) {
     const incoming = payload.searches.filter((x) => typeof x === "string" && x.trim());
@@ -2535,10 +2594,12 @@ function clearAllUserData() {
   STATE.notes = {};
   STATE.compare = [];
   STATE.recentSearches = [];
+  STATE.viewed = [];
   saveFavorites(STATE.favorites);
   saveNotes(STATE.notes);
   saveCompare(STATE.compare);
   saveSearches(STATE.recentSearches);
+  saveViewed(STATE.viewed);
 }
 
 function renderSettingsStats() {
@@ -2550,6 +2611,7 @@ function renderSettingsStats() {
     <div class="stat"><span class="k">📝 메모</span><span class="v">${noteCount}</span></div>
     <div class="stat"><span class="k">⇆ 비교 트레이</span><span class="v">${STATE.compare.length} / ${COMPARE_MAX}</span></div>
     <div class="stat"><span class="k">🔍 최근 검색어</span><span class="v">${STATE.recentSearches.length}</span></div>
+    <div class="stat"><span class="k">👁 최근 본 매물</span><span class="v">${STATE.viewed.length} / ${VIEWED_MAX}</span></div>
   `;
 }
 
