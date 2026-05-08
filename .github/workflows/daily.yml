@@ -6,6 +6,9 @@ on:
     - cron: '0 22 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   daily-pipeline:
     runs-on: ubuntu-latest
@@ -23,6 +26,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -45,6 +51,42 @@ jobs:
         run: python -m agents.daily_recommendation_agent
         continue-on-error: true
 
+      - name: Refresh static dashboard JSON
+        run: python scripts/export_static_dashboard.py
+
+      - name: Validate static dashboard JSON
+        run: |
+          python - <<'PY'
+          import json, sys, pathlib
+          p = pathlib.Path("docs/data/mock_dashboard.json")
+          assert p.exists(), "mock_dashboard.json missing"
+          d = json.loads(p.read_text(encoding="utf-8"))
+          for k in ("summary", "items", "recommendations", "agent_status",
+                    "risk_summary", "confidence_summary"):
+              assert k in d, f"missing top-level key: {k}"
+          assert len(d["items"]) >= 1
+          assert len(d["recommendations"]) >= 1
+          # 필수 필드 일부 검사
+          item_required = ["id", "source", "address", "item_type",
+                           "min_bid_price", "expected_profit", "recommendation_score",
+                           "recommendation_grade", "risk_level", "confidence_score"]
+          missing = [k for k in item_required if k not in d["items"][0]]
+          assert not missing, f"first item missing keys: {missing}"
+          print(f"[OK] {p} items={len(d['items'])} recs={len(d['recommendations'])}")
+          PY
+
+      - name: Commit refreshed static dashboard JSON
+        run: |
+          if git diff --quiet docs/data/mock_dashboard.json; then
+            echo "no changes — skipping commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/mock_dashboard.json
+          git commit -m "chore(docs): refresh static dashboard JSON [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
+
       - name: Upload outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,6 +94,7 @@ jobs:
           name: auction-runtime-${{ github.run_number }}
           path: |
             data/exports/
+            docs/data/mock_dashboard.json
             logs/
           retention-days: 7
           if-no-files-found: ignore

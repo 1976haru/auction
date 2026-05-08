@@ -42,10 +42,31 @@ jobs:
       - name: Run pytest
         run: python -m pytest tests/ -v --tb=short
 
+      - name: Validate static dashboard export
+        run: |
+          python scripts/export_static_dashboard.py
+          python - <<'PY'
+          import json, pathlib
+          d = json.loads(pathlib.Path("docs/data/mock_dashboard.json").read_text(encoding="utf-8"))
+          for k in ("summary","items","recommendations","agent_status",
+                    "risk_summary","confidence_summary"):
+              assert k in d, f"missing key: {k}"
+          assert len(d["items"]) >= 1
+          required = ["id","source","address","item_type","min_bid_price",
+                      "expected_profit","recommendation_score","recommendation_grade",
+                      "risk_level","confidence_score","case_no","region",
+                      "checklist","next_actions","detail_summary"]
+          missing = [k for k in required if k not in d["items"][0]]
+          assert not missing, f"first item missing keys: {missing}"
+          print(f"[OK] static export — items={len(d['items'])} keys ok")
+          PY
+
       - name: Upload exports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: exports
-          path: data/exports/
+          path: |
+            data/exports/
+            docs/data/mock_dashboard.json
           if-no-files-found: ignore
