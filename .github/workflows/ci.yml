@@ -43,35 +43,7 @@ jobs:
         run: python -m pytest tests/ -v --tb=short
 
       - name: Validate static dashboard export
-        run: |
-          python scripts/export_static_dashboard.py
-          python - <<'PY'
-          import json, pathlib, xml.etree.ElementTree as ET
-          d = json.loads(pathlib.Path("docs/data/mock_dashboard.json").read_text(encoding="utf-8"))
-          for k in ("summary","items","recommendations","agent_status",
-                    "risk_summary","confidence_summary"):
-              assert k in d, f"missing key: {k}"
-          assert len(d["items"]) >= 1
-          required = ["id","source","address","item_type","min_bid_price",
-                      "expected_profit","recommendation_score","recommendation_grade",
-                      "risk_level","confidence_score","case_no","region",
-                      "checklist","next_actions","detail_summary"]
-          missing = [k for k in required if k not in d["items"][0]]
-          assert not missing, f"first item missing keys: {missing}"
-          print(f"[OK] static export — items={len(d['items'])} keys ok")
-          # RSS 검증
-          rss = pathlib.Path("docs/feed.xml")
-          assert rss.exists(), "feed.xml missing"
-          tree = ET.parse(rss)
-          ch = tree.getroot().find("channel")
-          assert ch is not None, "no <channel>"
-          items = ch.findall("item")
-          assert len(items) >= 1, "no <item> in feed"
-          for it in items[:3]:
-              for tag in ("title","link","guid","pubDate","description"):
-                  assert it.find(tag) is not None, f"item missing <{tag}>"
-          print(f"[OK] RSS feed — {len(items)} items")
-          PY
+        run: python scripts/validate_static_dashboard.py --export
 
       - name: Upload exports
         if: always()

@@ -55,30 +55,7 @@ jobs:
         run: python scripts/export_static_dashboard.py
 
       - name: Validate static dashboard JSON / RSS
-        run: |
-          python - <<'PY'
-          import json, sys, pathlib, xml.etree.ElementTree as ET
-          p = pathlib.Path("docs/data/mock_dashboard.json")
-          assert p.exists(), "mock_dashboard.json missing"
-          d = json.loads(p.read_text(encoding="utf-8"))
-          for k in ("summary", "items", "recommendations", "agent_status",
-                    "risk_summary", "confidence_summary"):
-              assert k in d, f"missing top-level key: {k}"
-          assert len(d["items"]) >= 1
-          assert len(d["recommendations"]) >= 1
-          item_required = ["id", "source", "address", "item_type",
-                           "min_bid_price", "expected_profit", "recommendation_score",
-                           "recommendation_grade", "risk_level", "confidence_score"]
-          missing = [k for k in item_required if k not in d["items"][0]]
-          assert not missing, f"first item missing keys: {missing}"
-          print(f"[OK] {p} items={len(d['items'])} recs={len(d['recommendations'])}")
-          rss = pathlib.Path("docs/feed.xml")
-          if rss.exists():
-              tree = ET.parse(rss)
-              items = tree.getroot().find("channel").findall("item")
-              assert len(items) >= 1, "RSS empty"
-              print(f"[OK] {rss} items={len(items)}")
-          PY
+        run: python scripts/validate_static_dashboard.py
 
       - name: Commit refreshed static dashboard JSON / feed
         run: |
