@@ -546,6 +546,16 @@ function applyFilters() {
   } else {
     out = sortItems(out, f.sort);
   }
+
+  // 기본 보기(전체 칩 + 키워드 필터 없음)에서는 ★ 관심 매물을 맨 위로
+  // — JS Array.sort 는 안정 정렬이라 내부 순서는 직전 sortItems 결과 유지
+  if (f.chip === "all" && !f.flag && STATE.favorites.size > 0) {
+    out = out.slice().sort((a, b) => {
+      const af = STATE.favorites.has(String(a.id)) ? 0 : 1;
+      const bf = STATE.favorites.has(String(b.id)) ? 0 : 1;
+      return af - bf;
+    });
+  }
   STATE.filtered = out;
   STATE.pageShown = PAGE_SIZE;  // 필터/검색 바뀌면 항상 처음부터
   renderItems();
@@ -935,15 +945,19 @@ function toggleFavorite(id) {
   if (STATE.favorites.has(key)) STATE.favorites.delete(key);
   else STATE.favorites.add(key);
   saveFavorites(STATE.favorites);
-  // 즉시 시각 갱신: 관심 칩 활성 시에는 목록 자체에서 빠질 수 있어 재필터
-  if (STATE.filters.chip === "favorites") applyFilters();
-  // 그렇지 않으면 해당 카드/모달 버튼만 새로고침
+  // 모든 fav-btn 시각 갱신
   document.querySelectorAll(`[data-fav="${key}"]`).forEach((btn) => {
     const on = STATE.favorites.has(key);
     btn.classList.toggle("on", on);
     btn.textContent = on ? "★" : "☆";
     btn.setAttribute("aria-pressed", on ? "true" : "false");
   });
+  // 칩이 'favorites' 면 목록 자체에서 빠지거나 들어오므로 재필터,
+  // 'all' + 키워드 필터 없음(=즐겨찾기 우선 모드)이면 매물 순서가 바뀌므로 재필터
+  const f = STATE.filters;
+  if (f.chip === "favorites" || (f.chip === "all" && !f.flag)) {
+    applyFilters();
+  }
 }
 
 function wireFavoriteButtons(root) {
