@@ -6,6 +6,18 @@
   <meta name="theme-color" content="#1f77b4" />
   <title>경매·공매 지능형 에이전트 — 탐색형 대시보드</title>
   <meta name="description" content="법원경매·공매 mock 데이터를 검색·필터·AI 추천으로 탐색하는 정적 대시보드. 실제 입찰/금전거래는 하지 않습니다." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://1976haru.github.io/auction/" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://1976haru.github.io/auction/" />
+  <meta property="og:title" content="경매·공매 지능형 에이전트" />
+  <meta property="og:description" content="법원경매·공매 mock 데이터를 검색·필터·AI 자연어로 탐색하는 정적 대시보드. PWA 설치 지원, 라이브러리 0." />
+  <meta property="og:image" content="https://1976haru.github.io/auction/icons/icon.svg" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="경매·공매 지능형 에이전트" />
+  <meta name="twitter:description" content="법원경매·공매 mock 데이터를 검색·필터·AI로 탐색하는 정적 대시보드." />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
@@ -26,6 +38,12 @@
   </script>
 </head>
 <body>
+  <noscript>
+    <div style="padding:18px 20px; background:#fdf2f4; color:#b1303a; border-bottom:1px solid #f5d6da; font-family:-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+      이 대시보드는 클라이언트(브라우저)에서 검색·필터·차트를 처리하므로 JavaScript 가 필요합니다.
+      브라우저 설정에서 JavaScript 를 켜거나 다른 브라우저로 열어 주세요.
+    </div>
+  </noscript>
   <header class="hero">
     <div class="container hero-inner">
       <div class="hero-title">
@@ -45,13 +63,13 @@
   <section class="search-section">
     <div class="container search-inner">
       <div class="search-bar">
-        <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" autocomplete="off" aria-haspopup="listbox" aria-controls="search-suggest" />
+        <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" aria-label="통합 검색 (주소·사건번호·물건명·키워드)" autocomplete="off" aria-haspopup="listbox" aria-controls="search-suggest" />
         <button class="btn btn-primary" id="q-submit">검색</button>
         <button class="btn btn-ghost" id="q-reset">초기화</button>
         <button class="btn btn-ghost theme-btn" id="theme-btn" type="button" aria-label="테마 전환" title="라이트/다크 모드 전환">🌙</button>
         <button class="btn btn-ghost kbd-help-btn" id="kbd-help-btn" type="button" aria-label="키보드 단축키" title="키보드 단축키 (?)">⌨</button>
         <button class="btn btn-ghost settings-btn" id="settings-btn" type="button" aria-label="설정 / 데이터 백업" title="설정 (데이터 백업·복원)">⚙</button>
-        <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" title="홈 화면에 설치">📲 설치</button>
+        <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" aria-label="홈 화면에 설치" title="홈 화면에 설치">📲 설치</button>
         <div class="search-suggest" id="search-suggest" role="listbox" hidden></div>
       </div>
       <div class="quick-chips" id="quick-chips" role="tablist" aria-label="빠른 메뉴"></div>
@@ -201,7 +219,7 @@
       <h2>AI 에이전트 검색</h2>
       <p class="caption">자연어 한 줄로 mock 데이터를 다시 필터·정렬합니다. (rule-based 해석, 외부 API 호출 없음)</p>
       <div class="agent-search">
-        <input type="search" id="agent-q" placeholder='예) "서울 아파트 중 위험 낮은 물건 보여줘"' />
+        <input type="search" id="agent-q" placeholder='예) "서울 아파트 중 위험 낮은 물건 보여줘"' aria-label="AI 에이전트 자연어 검색" />
         <button class="btn btn-primary" id="agent-go">실행</button>
       </div>
       <div class="agent-examples" id="agent-examples"></div>
@@ -354,7 +372,7 @@
   </div>
 
   <!-- PWA 토스트 (오프라인 / 새 버전) -->
-  <div class="pwa-toast" id="pwa-toast" hidden>
+  <div class="pwa-toast" id="pwa-toast" hidden role="status" aria-live="polite">
     <span id="pwa-toast-msg"></span>
     <button class="link-btn" id="pwa-toast-action" hidden></button>
     <button class="link-btn" id="pwa-toast-close" aria-label="닫기">×</button>

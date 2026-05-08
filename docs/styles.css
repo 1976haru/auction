@@ -133,6 +133,34 @@ html, body {
 
 a { color: var(--color-primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* 키보드 사용자에게 명확한 포커스 표시 (마우스 사용자엔 기본 outline 그대로 두지 않음) */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus-visible,
+.chip:focus-visible,
+.preset-chip:focus-visible,
+.dl-btn:focus-visible,
+.view-btn:focus-visible,
+.cmp-btn:focus-visible,
+.fav-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 모션 줄이기 사용자 환경에서 트랜지션·애니메이션 최소화 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 code {
   background: var(--color-pill-bg);
   color: var(--color-text);
