@@ -885,7 +885,7 @@ function renderItems() {
 
   const fullList = STATE.filtered;
   if (!fullList.length) {
-    cardRoot.appendChild(el(`<p class="caption">조건에 맞는 물건이 없습니다.</p>`));
+    cardRoot.appendChild(buildZeroState());
     const tr = document.createElement("tr");
     tr.innerHTML = `<td colspan="13" class="caption">조건에 맞는 물건이 없습니다.</td>`;
     tableBody.appendChild(tr);
@@ -936,6 +936,75 @@ function renderItems() {
     tableBody.appendChild(tr);
   });
   updateMoreRow();
+}
+
+function _activeFilterChips() {
+  const f = STATE.filters;
+  const chips = [];
+  if (f.q) chips.push({ key: "q", label: `검색 "${f.q}"`, clear: () => { STATE.filters.q = ""; $("q-input").value = ""; } });
+  if (f.chip && f.chip !== "all") {
+    const c = QUICK_CHIPS.find((x) => x.id === f.chip);
+    if (c) chips.push({ key: "chip", label: c.label, clear: () => { STATE.filters.chip = "all"; renderQuickChips(); } });
+  }
+  if (f.region) chips.push({ key: "region", label: `지역 ${f.region}`, clear: () => { STATE.filters.region = ""; $("f-region").value = ""; } });
+  if (f.item_type) chips.push({ key: "item_type", label: f.item_type, clear: () => { STATE.filters.item_type = ""; $("f-type").value = ""; } });
+  if (f.source) chips.push({ key: "source", label: SOURCE_LABEL[f.source] || f.source, clear: () => { STATE.filters.source = ""; $("f-source").value = ""; } });
+  if (f.grade) chips.push({ key: "grade", label: `${f.grade} 등급`, clear: () => { STATE.filters.grade = ""; $("f-grade").value = ""; } });
+  if (f.risk) chips.push({ key: "risk", label: `위험 ${RISK_LABEL[f.risk] || f.risk}`, clear: () => { STATE.filters.risk = ""; $("f-risk").value = ""; } });
+  if (f.fail_min !== null && f.fail_min !== undefined) chips.push({ key: "fail_min", label: `유찰 ${f.fail_min}+`, clear: () => { STATE.filters.fail_min = null; $("f-fail").value = ""; } });
+  if (f.due_max !== null && f.due_max !== undefined) chips.push({ key: "due_max", label: `D-${f.due_max} 이내`, clear: () => { STATE.filters.due_max = null; $("f-due").value = ""; } });
+  if (f.price_min !== null && f.price_min !== undefined) chips.push({ key: "price_min", label: `최저가 ${f.price_min.toLocaleString("ko-KR")}만↑`, clear: () => { STATE.filters.price_min = null; $("f-price-min").value = ""; } });
+  if (f.price_max !== null && f.price_max !== undefined) chips.push({ key: "price_max", label: `최저가 ${f.price_max.toLocaleString("ko-KR")}만↓`, clear: () => { STATE.filters.price_max = null; $("f-price-max").value = ""; } });
+  if (f.flag) chips.push({ key: "flag", label: `키워드 ${f.flag}`, clear: () => { STATE.filters.flag = ""; } });
+  if (f._scoreMin !== undefined && f._scoreMin !== null) chips.push({ key: "_scoreMin", label: `점수 ${f._scoreMin}+`, clear: () => { delete STATE.filters._scoreMin; } });
+  return chips;
+}
+
+function buildZeroState() {
+  const wrap = document.createElement("div");
+  wrap.className = "zero-state";
+  const chips = _activeFilterChips();
+  let chipsHtml = "";
+  if (chips.length) {
+    chipsHtml = `
+      <p class="zero-msg">아래 조건이 적용돼 있어요. 칩의 ×로 하나씩 풀거나 한 번에 초기화해 보세요.</p>
+      <div class="zero-chips">
+        ${chips.map((c, i) =>
+          `<button class="zero-chip" data-zero-idx="${i}" type="button">${escapeHtml(c.label)} <span class="x">×</span></button>`
+        ).join("")}
+      </div>
+    `;
+  } else {
+    chipsHtml = `<p class="zero-msg">표시할 매물이 없어요. 데이터가 비어 있을 수 있습니다.</p>`;
+  }
+  wrap.innerHTML = `
+    <div class="zero-icon" aria-hidden="true">🔎</div>
+    <h3 class="zero-title">조건에 맞는 매물이 없어요</h3>
+    ${chipsHtml}
+    <div class="zero-actions">
+      <button class="btn btn-primary" type="button" data-zero-action="reset">필터 초기화</button>
+      ${STATE.filters.q ? `<button class="btn btn-ghost" type="button" data-zero-action="clear-q">검색어만 지우기</button>` : ""}
+    </div>
+  `;
+  // 이벤트 — 클로저로 chips 캡처
+  wrap.querySelectorAll(".zero-chip").forEach((btn) => {
+    const idx = Number(btn.dataset.zeroIdx);
+    btn.addEventListener("click", () => {
+      const c = chips[idx];
+      if (c && c.clear) {
+        c.clear();
+        applyFilters();
+      }
+    });
+  });
+  wrap.querySelector('[data-zero-action="reset"]').addEventListener("click", resetFilters);
+  const clearQ = wrap.querySelector('[data-zero-action="clear-q"]');
+  if (clearQ) clearQ.addEventListener("click", () => {
+    STATE.filters.q = "";
+    $("q-input").value = "";
+    applyFilters();
+  });
+  return wrap;
 }
 
 function updateMoreRow() {

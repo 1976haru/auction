@@ -1802,6 +1802,59 @@ kbd {
 }
 .dl-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
 
+/* 결과 0건 zero state */
+.zero-state {
+  padding: 28px 16px 24px;
+  text-align: center;
+  background: var(--color-surface-2);
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+}
+.zero-state .zero-icon { font-size: 2.2rem; margin-bottom: 6px; }
+.zero-state .zero-title { margin: 0 0 8px; font-size: 1.05rem; }
+.zero-state .zero-msg { margin: 0 0 12px; color: var(--color-text-muted); font-size: 0.9rem; }
+.zero-state .zero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 0 0 16px;
+}
+.zero-state .zero-chip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  touch-action: manipulation;
+}
+.zero-state .zero-chip:active { background: var(--color-tap-bg); }
+@media (hover: hover) {
+  .zero-state .zero-chip:hover { background: var(--color-tap-bg); border-color: var(--color-primary); }
+}
+.zero-state .zero-chip .x {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  margin-left: 2px;
+}
+.zero-state .zero-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.zero-state .zero-actions .btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 19px;
+  font-size: 0.9rem;
+}
+
 .more-row {
   display: flex;
   justify-content: center;
