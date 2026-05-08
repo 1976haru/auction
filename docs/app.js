@@ -1543,6 +1543,21 @@ function bindModalClose() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !$("detail-modal").hidden) close();
   });
+  const printBtn = $("detail-print");
+  if (printBtn) printBtn.addEventListener("click", printDetail);
+}
+
+function printDetail() {
+  if ($("detail-modal").hidden) return;
+  document.body.classList.add("printing-detail");
+  const cleanup = () => {
+    document.body.classList.remove("printing-detail");
+    window.removeEventListener("afterprint", cleanup);
+  };
+  window.addEventListener("afterprint", cleanup);
+  // 일부 브라우저는 afterprint 를 늦게 부르므로 안전망
+  setTimeout(cleanup, 5000);
+  try { window.print(); } catch (_) { cleanup(); }
 }
 
 // ── Search bar ───────────────────────────────────
