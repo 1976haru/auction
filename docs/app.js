@@ -1311,6 +1311,118 @@ function renderCharts() {
   if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
 }
 
+/* 입찰가 시뮬레이터 — modules/profit_calculator.py 의 JS 미러 */
+const ACQUISITION_TAX_RATE = 0.035;
+const DEFAULT_REPAIR_COST = 500;
+const DEFAULT_EVICTION_COST = 300;
+const FINANCE_RATE = 0.04;
+const FINANCE_MONTHS = 6;
+
+function calcAcquisitionTax(priceMan, itemType) {
+  const eok = priceMan / 10000;
+  let rate = ACQUISITION_TAX_RATE;
+  if (itemType === "아파트" || itemType === "오피스텔") {
+    if (eok <= 6) rate = 0.01;
+    else if (eok <= 9) rate = ACQUISITION_TAX_RATE;
+    else rate = 0.03;
+  }
+  return Math.round(priceMan * rate);
+}
+
+function calcProfit(marketMan, bidMan, itemType, opts) {
+  const repair = (opts && opts.repair !== undefined) ? opts.repair : DEFAULT_REPAIR_COST;
+  const eviction = (opts && opts.eviction !== undefined) ? opts.eviction : DEFAULT_EVICTION_COST;
+  const acq = calcAcquisitionTax(bidMan, itemType);
+  const finance = Math.round(bidMan * FINANCE_RATE * (FINANCE_MONTHS / 12));
+  const totalCost = acq + repair + eviction + finance;
+  const invested = bidMan + totalCost;
+  const profit = marketMan - invested;
+  const roi = invested > 0 ? (profit / invested * 100) : 0;
+  return {
+    bidMan, marketMan, itemType,
+    acq, repair, eviction, finance,
+    totalCost, invested, profit, roi,
+  };
+}
+
+function renderBidSimulator(it) {
+  const market = Math.max(0, it.market_price || 0);
+  const minBid = Math.max(1, it.min_bid_price || 0);
+  if (!market || !minBid) {
+    return `<div class="detail-section">
+      <h3>입찰가 시뮬레이터</h3>
+      <p class="caption">시세 또는 최저가 데이터가 부족해 시뮬레이션을 표시하지 못했어요.</p>
+    </div>`;
+  }
+  const slMax = Math.max(minBid + 1, Math.round(market * 0.95));
+  const initial = Math.min(slMax, Math.max(minBid, Math.round(minBid * 1.05)));
+  return `
+    <div class="detail-section sim-section" data-sim-market="${market}" data-sim-min="${minBid}" data-sim-type="${escapeHtml(it.item_type || "아파트")}">
+      <h3>입찰가 시뮬레이터</h3>
+      <div class="sim-row">
+        <label class="sim-label">입찰가
+          <input type="number" class="sim-num" id="sim-bid-num" min="${minBid}" max="${slMax}" step="100" value="${initial}" />
+          <span class="sim-unit">만원</span>
+        </label>
+        <input type="range" class="sim-range" id="sim-bid-range" min="${minBid}" max="${slMax}" step="100" value="${initial}" />
+        <div class="sim-bounds">
+          <span>최저가 ${fmtMan(minBid)}</span>
+          <span>시세 95% ${fmtMan(slMax)}</span>
+        </div>
+      </div>
+      <div class="sim-grid" id="sim-out"></div>
+      <p class="caption" style="margin-top:6px">
+        ※ 취득세(아파트·오피스텔 6억↓ 1%, ~9억 ${(ACQUISITION_TAX_RATE*100).toFixed(1)}%, 9억↑ 3%) +
+        수리 ${DEFAULT_REPAIR_COST}만 + 명도 ${DEFAULT_EVICTION_COST}만 +
+        금융 ${(FINANCE_RATE*100).toFixed(1)}% × ${FINANCE_MONTHS}개월 가정. mock 추정치이며 실제와 다를 수 있어요.
+      </p>
+    </div>
+  `;
+}
+
+function wireBidSimulator() {
+  const sec = document.querySelector(".sim-section");
+  if (!sec) return;
+  const market = Number(sec.dataset.simMarket) || 0;
+  const itemType = sec.dataset.simType || "아파트";
+  const numEl = sec.querySelector("#sim-bid-num");
+  const rangeEl = sec.querySelector("#sim-bid-range");
+  const out = sec.querySelector("#sim-out");
+
+  const refresh = (v) => {
+    const bid = Math.max(0, Math.round(Number(v) || 0));
+    numEl.value = bid;
+    rangeEl.value = bid;
+    const r = calcProfit(market, bid, itemType);
+    const profitClass = r.profit >= 0 ? "sim-profit-pos" : "sim-profit-neg";
+    out.innerHTML = `
+      <div class="sim-card sim-bid">
+        <div class="sim-k">입찰가</div>
+        <div class="sim-v">${fmtMan(r.bidMan)}</div>
+        <div class="sim-sub">시세 ${fmtMan(market)}</div>
+      </div>
+      <div class="sim-card ${profitClass}">
+        <div class="sim-k">예상 차익</div>
+        <div class="sim-v">${fmtMan(r.profit)}</div>
+        <div class="sim-sub">ROI ${fmtPct(r.roi)}</div>
+      </div>
+      <div class="sim-card">
+        <div class="sim-k">총 투자</div>
+        <div class="sim-v">${fmtMan(r.invested)}</div>
+        <div class="sim-sub">입찰가 + 비용</div>
+      </div>
+      <div class="sim-card sim-cost">
+        <div class="sim-k">총 비용</div>
+        <div class="sim-v">${fmtMan(r.totalCost)}</div>
+        <div class="sim-sub">취득세 ${r.acq.toLocaleString("ko-KR")} · 수리 ${r.repair} · 명도 ${r.eviction} · 금융 ${r.finance}</div>
+      </div>
+    `;
+  };
+  rangeEl.addEventListener("input", () => refresh(rangeEl.value));
+  numEl.addEventListener("input", () => refresh(numEl.value));
+  refresh(rangeEl.value);
+}
+
 /* 추천 점수 분해 — 각 기여 항목별 가로 막대 */
 const BREAKDOWN_COLOR = {
   profit: "#1f77b4",
@@ -1666,6 +1778,8 @@ function openDetailById(id) {
       <p class="caption">예상 입찰가는 mock 데이터 기반 단순 추정치입니다.</p>
     </div>
 
+    ${renderBidSimulator(it)}
+
     <div class="detail-section">
       <h3>최근 변화 (7일)</h3>
       ${(it.change_events || []).length
@@ -1708,6 +1822,7 @@ function openDetailById(id) {
   `;
   $("detail-modal").hidden = false;
   document.body.style.overflow = "hidden";
+  wireBidSimulator();
 }
 
 let CURRENT_DETAIL_ID = null;

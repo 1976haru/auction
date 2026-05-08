@@ -971,6 +971,63 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   margin-top: 8px;
 }
 
+/* 입찰가 시뮬레이터 */
+.sim-section { /* 일반 detail-section 스타일 외 추가 여백만 */ }
+.sim-row { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 12px; }
+.sim-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+}
+.sim-num {
+  width: 130px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--color-input);
+  color: var(--color-text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sim-num:focus { outline: none; border-color: var(--color-primary); }
+.sim-unit { color: var(--color-text-muted); }
+.sim-range {
+  width: 100%;
+  accent-color: var(--color-primary);
+  height: 28px;
+}
+.sim-bounds {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+.sim-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.sim-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.sim-card .sim-k { font-size: 0.78rem; color: var(--color-text-muted); }
+.sim-card .sim-v { font-size: 1.1rem; font-weight: 700; margin-top: 2px; }
+.sim-card .sim-sub { font-size: 0.74rem; color: var(--color-text-muted); margin-top: 2px; }
+.sim-profit-pos .sim-v { color: var(--color-low); }
+.sim-profit-neg .sim-v { color: var(--color-high); }
+.sim-bid .sim-v { color: var(--color-primary); }
+@media (max-width: 480px) {
+  .sim-grid { grid-template-columns: 1fr; }
+}
+
 /* 추천 점수 분해 */
 .score-breakdown {
   margin-top: 10px;
