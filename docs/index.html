@@ -253,6 +253,30 @@
     </section>
   </main>
 
+  <!-- 비교 트레이 (하단 고정, 1건 이상일 때 노출) -->
+  <div class="compare-tray" id="compare-tray" hidden>
+    <div class="container compare-tray-inner">
+      <div class="tray-chips" id="tray-chips" aria-label="비교 대상"></div>
+      <div class="tray-actions">
+        <span class="tray-count" id="tray-count"></span>
+        <button class="btn btn-primary" id="tray-open" type="button">비교하기</button>
+        <button class="btn btn-ghost" id="tray-clear" type="button">비우기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 비교 모달 -->
+  <div class="modal" id="compare-modal" hidden role="dialog" aria-modal="true" aria-labelledby="compare-title">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-panel modal-panel-wide">
+      <header class="modal-head">
+        <h2 id="compare-title">물건 비교</h2>
+        <button class="icon-btn" id="compare-close" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body" id="compare-body"></div>
+    </div>
+  </div>
+
   <!-- PWA 토스트 (오프라인 / 새 버전) -->
   <div class="pwa-toast" id="pwa-toast" hidden>
     <span id="pwa-toast-msg"></span>

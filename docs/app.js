@@ -56,6 +56,21 @@ function saveFavorites(set) {
   catch {}
 }
 
+const COMPARE_KEY = "auction:compare:v1";
+const COMPARE_MAX = 5;
+const COMPARE_MIN = 2;
+function loadCompare() {
+  try {
+    const raw = localStorage.getItem(COMPARE_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.map(String).slice(0, COMPARE_MAX) : [];
+  } catch { return []; }
+}
+function saveCompare(list) {
+  try { localStorage.setItem(COMPARE_KEY, JSON.stringify(list)); } catch {}
+}
+
 // ── 글로벌 상태 ──────────────────────────────────────
 const STATE = {
   data: null,
@@ -63,6 +78,7 @@ const STATE = {
   filtered: [],
   view: "card",          // card | table
   favorites: loadFavorites(),
+  compare: loadCompare(),  // ordered list of item ids (string)
   filters: {
     q: "",
     chip: "all",
@@ -182,18 +198,45 @@ function el(html) {
 function clearChildren(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
 /* 모바일 스크롤 중 우발 탭을 흡수하지 않으면서, 일반 탭/클릭/키보드 모두로
-   상세를 열 수 있게 한다. pointerdown 좌표와 pointerup 좌표 차이가 크면 무시. */
-function bindTap(node, handler) {
-  let sx = 0, sy = 0, moved = false;
+   상세를 열 수 있게 한다. pointerdown 좌표와 pointerup 좌표 차이가 크면 무시.
+   opts.onLongPress 가 있으면 길게 누름(>=550ms) 시 호출, 이때 click 은 발화하지 않는다. */
+function bindTap(node, handler, opts) {
+  let sx = 0, sy = 0, moved = false, longPressed = false;
+  let timer = null;
+  const longMs = (opts && opts.longPressMs) || 550;
+  const onLongPress = opts && opts.onLongPress;
+
+  const cancelTimer = () => {
+    if (timer) { clearTimeout(timer); timer = null; }
+  };
+
   node.addEventListener("pointerdown", (e) => {
-    sx = e.clientX; sy = e.clientY; moved = false;
+    sx = e.clientX; sy = e.clientY; moved = false; longPressed = false;
+    if (onLongPress) {
+      timer = setTimeout(() => {
+        if (!moved) {
+          longPressed = true;
+          onLongPress(e);
+        }
+      }, longMs);
+    }
   }, { passive: true });
   node.addEventListener("pointermove", (e) => {
-    if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) moved = true;
+    if (Math.abs(e.clientX - sx) > 8 || Math.abs(e.clientY - sy) > 8) {
+      moved = true;
+      cancelTimer();
+    }
   }, { passive: true });
+  node.addEventListener("pointerup", cancelTimer, { passive: true });
+  node.addEventListener("pointercancel", cancelTimer, { passive: true });
+  node.addEventListener("pointerleave", cancelTimer, { passive: true });
   node.addEventListener("click", (e) => {
-    if (moved) { moved = false; return; }
+    if (moved || longPressed) { moved = false; longPressed = false; return; }
     handler(e);
+  });
+  node.addEventListener("contextmenu", (e) => {
+    // 길게 누르면 일부 폰에서 컨텍스트 메뉴가 뜨는 것 방지 (onLongPress 가 있을 때만)
+    if (onLongPress) e.preventDefault();
   });
   node.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -450,7 +493,9 @@ function renderRecs(recs) {
     if (r.item_id) {
       card.setAttribute("tabindex", "0");
       card.setAttribute("role", "button");
-      bindTap(card, () => openDetailById(r.item_id));
+      bindTap(card, () => openDetailById(r.item_id), {
+        onLongPress: () => toggleCompare(r.item_id),
+      });
     }
     g.appendChild(card);
   });
@@ -560,6 +605,10 @@ function favoriteBtnHtml(it) {
   const on = STATE.favorites.has(String(it.id));
   return `<button class="fav-btn${on ? " on" : ""}" data-fav="${it.id}" aria-pressed="${on ? "true" : "false"}" aria-label="관심 매물 ${on ? "해제" : "등록"}">${on ? "★" : "☆"}</button>`;
 }
+function compareBtnHtml(it) {
+  const on = STATE.compare.includes(String(it.id));
+  return `<button class="cmp-btn${on ? " on" : ""}" data-cmp="${it.id}" aria-pressed="${on ? "true" : "false"}" aria-label="비교에 ${on ? "제거" : "담기"}" title="비교 트레이에 ${on ? "제거" : "담기"} (카드 길게 눌러도 동일)">${on ? "⇆ 담김" : "⇆ 비교"}</button>`;
+}
 function itemCardHtml(it) {
   const grade = it.recommendation_grade || "C";
   const risk = it.risk_level || "medium";
@@ -575,6 +624,7 @@ function itemCardHtml(it) {
         ${urgencyBadge(it)}
         <span class="caption">${escapeHtml(it.item_type || "")}</span>
         <span class="head-spacer"></span>
+        ${compareBtnHtml(it)}
         ${favoriteBtnHtml(it)}
       </div>
       <div class="item-title">${escapeHtml(it.title || "주소 미상")}</div>
@@ -612,8 +662,11 @@ function renderItems() {
   }
   list.forEach((it, idx) => {
     const card = el(itemCardHtml(it));
-    bindTap(card, () => openDetailById(it.id));
+    bindTap(card, () => openDetailById(it.id), {
+      onLongPress: () => toggleCompare(it.id),
+    });
     wireFavoriteButtons(card);
+    wireCompareButtons(card);
     cardRoot.appendChild(card);
 
     const tr = document.createElement("tr");
@@ -638,7 +691,9 @@ function renderItems() {
     `;
     tr.setAttribute("tabindex", "0");
     tr.setAttribute("role", "button");
-    bindTap(tr, () => openDetailById(it.id));
+    bindTap(tr, () => openDetailById(it.id), {
+      onLongPress: () => toggleCompare(it.id),
+    });
     tableBody.appendChild(tr);
   });
 }
@@ -670,6 +725,252 @@ function wireFavoriteButtons(root) {
     btn.addEventListener("click", handler);
     btn.addEventListener("pointerdown", (e) => e.stopPropagation());
   });
+}
+
+function toggleCompare(id) {
+  const key = String(id);
+  const idx = STATE.compare.indexOf(key);
+  if (idx >= 0) {
+    STATE.compare.splice(idx, 1);
+  } else {
+    if (STATE.compare.length >= COMPARE_MAX) {
+      showToast(`비교는 최대 ${COMPARE_MAX}개까지 담을 수 있어요.`, null);
+      setTimeout(hideToast, 2500);
+      return;
+    }
+    STATE.compare.push(key);
+  }
+  saveCompare(STATE.compare);
+  // 모든 cmp-btn / 카드 시각 갱신
+  document.querySelectorAll(`[data-cmp="${key}"]`).forEach((btn) => {
+    const on = STATE.compare.includes(key);
+    btn.classList.toggle("on", on);
+    btn.textContent = on ? "⇆ 담김" : "⇆ 비교";
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  renderCompareTray();
+}
+
+function wireCompareButtons(root) {
+  root.querySelectorAll(".cmp-btn").forEach((btn) => {
+    const id = btn.dataset.cmp;
+    const handler = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      toggleCompare(id);
+    };
+    btn.addEventListener("click", handler);
+    btn.addEventListener("pointerdown", (e) => e.stopPropagation());
+  });
+}
+
+function renderCompareTray() {
+  const tray = $("compare-tray");
+  if (!tray) return;
+  const ids = STATE.compare.slice();
+  if (!ids.length) { tray.hidden = true; return; }
+  tray.hidden = false;
+
+  const chipsRoot = $("tray-chips");
+  chipsRoot.innerHTML = "";
+  ids.forEach((id) => {
+    const it = STATE.items.find((x) => String(x.id) === id);
+    const label = it ? (it.title || it.address || `#${id}`) : `#${id}`;
+    const grade = (it && it.recommendation_grade) || "?";
+    const chip = el(
+      `<span class="tray-chip" data-id="${escapeHtml(id)}">
+         <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
+         <span>${escapeHtml(label.length > 24 ? label.slice(0,24) + "…" : label)}</span>
+         <button class="tray-chip-x" type="button" aria-label="비교에서 제거">×</button>
+       </span>`
+    );
+    chip.querySelector(".tray-chip-x").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleCompare(id);
+    });
+    chipsRoot.appendChild(chip);
+  });
+  $("tray-count").textContent = `${ids.length}/${COMPARE_MAX}`;
+  $("tray-open").disabled = ids.length < COMPARE_MIN;
+}
+
+function bindCompareTray() {
+  const closeBtn = $("compare-close");
+  if (closeBtn) closeBtn.addEventListener("click", closeCompareModal);
+  const modal = $("compare-modal");
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target instanceof HTMLElement && e.target.dataset.close === "1") closeCompareModal();
+    });
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("compare-modal").hidden) closeCompareModal();
+  });
+  $("tray-clear").addEventListener("click", () => {
+    STATE.compare = [];
+    saveCompare(STATE.compare);
+    document.querySelectorAll(".cmp-btn.on").forEach((btn) => {
+      btn.classList.remove("on");
+      btn.textContent = "⇆ 비교";
+      btn.setAttribute("aria-pressed", "false");
+    });
+    renderCompareTray();
+  });
+  $("tray-open").addEventListener("click", openCompareModal);
+}
+
+function closeCompareModal() {
+  $("compare-modal").hidden = true;
+  document.body.style.overflow = "";
+}
+
+function openCompareModal() {
+  const ids = STATE.compare.slice();
+  if (ids.length < COMPARE_MIN) return;
+  const items = ids
+    .map((id) => STATE.items.find((x) => String(x.id) === id))
+    .filter(Boolean);
+  if (items.length < COMPARE_MIN) return;
+
+  $("compare-title").textContent = `물건 비교 (${items.length}건)`;
+  $("compare-body").innerHTML = renderCompareTable(items);
+  $("compare-modal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function renderCompareTable(items) {
+  const RISK_RANK = { low: 0, medium: 1, high: 2 };
+  // 각 row 의 best/worst 마킹 정의: dir = "max" | "min"
+  const rows = [
+    { section: "기본" },
+    { key: "grade",       label: "추천등급", dir: null,
+      get: (it) => it.recommendation_grade || "-",
+      cmp: (it) => ({ A: 4, B: 3, C: 2, D: 1, X: 0 }[it.recommendation_grade] ?? -1), bestDir: "max" },
+    { key: "score",       label: "추천점수", dir: "max",
+      get: (it) => Number(it.recommendation_score || 0).toFixed(1),
+      cmp: (it) => Number(it.recommendation_score || 0) },
+    { key: "risk",        label: "위험도",   dir: "min",
+      get: (it) => RISK_LABEL[it.risk_level] || it.risk_level || "-",
+      cmp: (it) => RISK_RANK[it.risk_level] ?? 1 },
+    { key: "source",      label: "구분",     dir: null,
+      get: (it) => SOURCE_LABEL[it.source] || it.source || "-" },
+
+    { section: "가격" },
+    { key: "appraisal",   label: "감정가",   dir: null,
+      get: (it) => fmtMan(it.appraisal_price) },
+    { key: "min_bid",     label: "최저가",   dir: "min",
+      get: (it) => fmtMan(it.min_bid_price), cmp: (it) => it.min_bid_price || Infinity },
+    { key: "market",      label: "예상시세", dir: null,
+      get: (it) => fmtMan(it.market_price) },
+    { key: "profit",      label: "예상차익", dir: "max",
+      get: (it) => fmtMan(it.expected_profit), cmp: (it) => it.expected_profit || 0 },
+    { key: "roi",         label: "예상수익률", dir: "max",
+      get: (it) => fmtPct(it.expected_profit_rate), cmp: (it) => it.expected_profit_rate || 0 },
+
+    { section: "일정" },
+    { key: "bid_date",    label: "입찰기일", dir: null,
+      get: (it) => it.bid_date || "-" },
+    { key: "days_left",   label: "D-N",      dir: "min",
+      get: (it) => (it.days_left === null || it.days_left === undefined) ? "-"
+                   : (it.days_left < 0 ? "지남" : `D-${it.days_left}`),
+      cmp: (it) => (it.days_left === null || it.days_left === undefined || it.days_left < 0) ? Infinity : it.days_left },
+    { key: "fail_count",  label: "유찰",     dir: "min",
+      get: (it) => `${it.fail_count ?? 0}회`, cmp: (it) => it.fail_count || 0 },
+    { key: "case_no",     label: "사건번호", dir: null,
+      get: (it) => it.case_no || "-" },
+
+    { section: "위험·신뢰도" },
+    { key: "flags",       label: "위험 키워드", dir: null,
+      get: (it) => {
+        const arr = (it.risk_flags || []).map((f) => f.keyword || f.flag_type).filter(Boolean);
+        return arr.length ? arr.slice(0, 4).map(escapeHtml).join(", ") : "—";
+      }, html: true },
+    { key: "confidence",  label: "신뢰도",   dir: "max",
+      get: (it) => Number(it.confidence_score || 0).toFixed(2),
+      cmp: (it) => Number(it.confidence_score || 0) },
+
+    { section: "추천 / 액션" },
+    { key: "reason",      label: "추천 이유", dir: null,
+      get: (it) => it.recommendation_reason || "-" },
+    { key: "next",        label: "다음 액션", dir: null,
+      get: (it) => (it.next_actions || []).length
+                   ? "<ul style='margin:0;padding-left:18px'>" +
+                     it.next_actions.slice(0, 4).map((c) => `<li>${escapeHtml(c)}</li>`).join("") +
+                     "</ul>"
+                   : "—",
+      html: true },
+    { key: "checklist",   label: "추가 확인",  dir: null,
+      get: (it) => (it.checklist || []).length
+                   ? "<ul style='margin:0;padding-left:18px'>" +
+                     it.checklist.slice(0, 4).map((c) => `<li>${escapeHtml(c)}</li>`).join("") +
+                     "</ul>"
+                   : "—",
+      html: true },
+  ];
+
+  // 헤더 (각 매물 컬럼)
+  const colHeads = items.map((it) => {
+    const grade = it.recommendation_grade || "C";
+    const risk = it.risk_level || "medium";
+    const u = urgencyBadge(it);
+    return `<th>
+      <div class="compare-col-head">
+        <div class="pills">
+          <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
+          <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
+          <span class="source-pill">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</span>
+          ${u}
+        </div>
+        <div class="ttl">${escapeHtml(it.title || "주소 미상")}</div>
+        <div class="meta">${escapeHtml(it.address || "")} · ${escapeHtml(it.item_type || "")}</div>
+      </div>
+    </th>`;
+  }).join("");
+
+  // 본문
+  let body = "";
+  rows.forEach((row) => {
+    if (row.section) {
+      body += `<tr class="compare-section-row">
+        <th colspan="${items.length + 1}">${escapeHtml(row.section)}</th>
+      </tr>`;
+      return;
+    }
+    let bestIdx = -1, worstIdx = -1;
+    if (row.cmp && (row.dir || row.bestDir)) {
+      const dir = row.dir || row.bestDir;
+      const vals = items.map((it) => row.cmp(it));
+      const numeric = vals.filter((v) => Number.isFinite(v));
+      if (numeric.length >= 2) {
+        const best = (dir === "min") ? Math.min(...numeric) : Math.max(...numeric);
+        const worst = (dir === "min") ? Math.max(...numeric) : Math.min(...numeric);
+        bestIdx = vals.findIndex((v) => v === best);
+        worstIdx = (best !== worst) ? vals.findIndex((v) => v === worst) : -1;
+      }
+    }
+    const cells = items.map((it, idx) => {
+      const v = row.get(it);
+      const safe = row.html ? v : escapeHtml(v);
+      let cls = "";
+      let mark = "";
+      if (idx === bestIdx) { cls = "best"; mark = `<span class="mark-best" title="이 비교에서 최고">▲</span>`; }
+      else if (idx === worstIdx) { cls = "worst"; mark = `<span class="mark-worst" title="이 비교에서 최저">▼</span>`; }
+      return `<td class="${cls}">${mark}${safe}</td>`;
+    }).join("");
+    body += `<tr><th scope="row">${escapeHtml(row.label)}</th>${cells}</tr>`;
+  });
+
+  return `
+    <p class="caption" style="margin:0 0 10px">
+      ▲ 이 비교에서 최고값 / ▼ 최저값 — mock 데이터 기반 단순 비교이며 법률·투자 판단을 대체하지 않습니다.
+    </p>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead><tr><th></th>${colHeads}</tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>
+  `;
 }
 
 // ── Mini charts (pure SVG, no deps) ───────────────
@@ -1227,8 +1528,11 @@ function runAgentSearch(text) {
   }
   result.forEach((it) => {
     const card = el(itemCardHtml(it));
-    bindTap(card, () => openDetailById(it.id));
+    bindTap(card, () => openDetailById(it.id), {
+      onLongPress: () => toggleCompare(it.id),
+    });
     wireFavoriteButtons(card);
+    wireCompareButtons(card);
     grid.appendChild(card);
   });
 }
@@ -1299,6 +1603,12 @@ function render(data) {
   URL_SYNC_ENABLED = true;
   renderQuickChips();
   applyFilters();
+
+  // 비교 트레이: 데이터에 더 이상 없는 id 는 제거
+  const validIds = new Set(STATE.items.map((it) => String(it.id)));
+  STATE.compare = STATE.compare.filter((id) => validIds.has(id));
+  saveCompare(STATE.compare);
+  renderCompareTray();
 
   renderAgents(data.agent_status);
 
@@ -1484,6 +1794,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindViewToggle();
   bindDownloads();
   bindModalClose();
+  bindCompareTray();
   bindPwa();
   load();
 });
