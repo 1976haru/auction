@@ -1873,6 +1873,40 @@ kbd {
   gap: 14px;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
 }
+
+/* 조밀 모드: 더 작은 카드, 더 많이 한 화면에 */
+body.density-dense .items-card-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+body.density-dense .item-card {
+  padding: 10px 12px;
+  gap: 5px;
+}
+body.density-dense .item-card .item-title { font-size: 0.88rem; }
+body.density-dense .item-card .item-sub { font-size: 0.76rem; }
+body.density-dense .item-card .item-stats { font-size: 0.78rem; gap: 2px 8px; }
+body.density-dense .item-card .item-foot { font-size: 0.72rem; gap: 4px; }
+body.density-dense .item-card .item-reason {
+  font-size: 0.76rem;
+  padding: 4px 6px;
+}
+body.density-dense .item-card .grade-pill,
+body.density-dense .item-card .risk-pill,
+body.density-dense .item-card .source-pill,
+body.density-dense .item-card .badge-change {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+}
+body.density-dense .item-card .cmp-btn,
+body.density-dense .item-card .fav-btn {
+  font-size: 0.78rem;
+  padding: 2px 6px;
+}
+.density-btn.on {
+  background: var(--color-primary);
+  color: white;
+}
 .item-card {
   border: 1px solid var(--color-border);
   border-radius: 10px;

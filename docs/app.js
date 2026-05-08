@@ -141,6 +141,8 @@ function recordViewed(id) {
   saveViewed(arr);
 }
 
+const DENSITY_KEY = "auction:density:v1";
+
 const NOTES_KEY = "auction:notes:v1";
 function loadNotes() {
   try {
@@ -2532,6 +2534,31 @@ function shareResults() {
   }
 }
 
+function applyDensity(mode) {
+  const dense = mode === "dense";
+  document.body.classList.toggle("density-dense", dense);
+  const btn = $("density-btn");
+  if (btn) {
+    btn.classList.toggle("on", dense);
+    btn.title = dense ? "조밀 → 표준 으로 전환" : "표준 → 조밀 (더 많이 한 화면에)";
+    btn.setAttribute("aria-pressed", dense ? "true" : "false");
+  }
+  try { localStorage.setItem(DENSITY_KEY, dense ? "dense" : "normal"); } catch (_) {}
+}
+
+function bindDensity() {
+  const btn = $("density-btn");
+  if (!btn) return;
+  // 초기 상태 복원
+  let saved = "normal";
+  try { saved = localStorage.getItem(DENSITY_KEY) || "normal"; } catch (_) {}
+  applyDensity(saved);
+  btn.addEventListener("click", () => {
+    const next = document.body.classList.contains("density-dense") ? "normal" : "dense";
+    applyDensity(next);
+  });
+}
+
 function bindViewToggle() {
   document.querySelectorAll(".view-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -3980,6 +4007,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindCardKbdNav();
   bindSelectionMode();
   bindUrgentBanner();
+  bindDensity();
   bindMoreButton();
   bindPwa();
   setupStickyOffset();
