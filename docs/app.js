@@ -3122,8 +3122,61 @@ function renderSettingsStats() {
   `;
 }
 
+function renderMemoList(filterText) {
+  const root = $("memo-list");
+  if (!root) return;
+  const q = (filterText || "").trim().toLowerCase();
+  const entries = Object.entries(STATE.notes)
+    .map(([id, n]) => {
+      const it = STATE.items.find((x) => String(x.id) === String(id));
+      return {
+        id,
+        title: (it && (it.title || it.address)) || `#${id}`,
+        text: (n && n.text) || "",
+        updatedAt: (n && n.updatedAt) || "",
+      };
+    })
+    .filter((e) => e.text);
+  if (!entries.length) {
+    root.innerHTML = `<div class="memo-empty">아직 메모가 없어요. 매물 상세 모달의 '내 메모' 에 적으면 여기 모입니다.</div>`;
+    return;
+  }
+  let filtered = entries;
+  if (q) {
+    filtered = entries.filter((e) =>
+      e.title.toLowerCase().includes(q) || e.text.toLowerCase().includes(q)
+    );
+  }
+  // 최근 수정 desc
+  filtered.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+  if (!filtered.length) {
+    root.innerHTML = `<div class="memo-empty">'${escapeHtml(q)}' 검색 결과가 없어요.</div>`;
+    return;
+  }
+  root.innerHTML = filtered.map((e) =>
+    `<a class="memo-row" data-memo-id="${escapeHtml(e.id)}" tabindex="0" role="button">
+       <span class="memo-title">${escapeHtml(e.title)}</span>
+       <span class="memo-snippet">${escapeHtml(e.text)}</span>
+       <span class="memo-when">${escapeHtml(formatRelative(e.updatedAt))}</span>
+     </a>`
+  ).join("");
+  root.querySelectorAll(".memo-row").forEach((row) => {
+    bindTap(row, () => {
+      const id = row.dataset.memoId;
+      closeSettingsModal();
+      openDetailById(id);
+    });
+  });
+}
+
 function openSettingsModal() {
   renderSettingsStats();
+  renderMemoList("");
+  const search = $("memo-search");
+  if (search) {
+    search.value = "";
+    search.oninput = () => renderMemoList(search.value);
+  }
   $("settings-modal").hidden = false;
   document.body.style.overflow = "hidden";
 }

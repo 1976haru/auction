@@ -375,6 +375,12 @@
           <button class="btn btn-ghost" id="settings-import" type="button">백업 파일 불러오기</button>
         </div>
         <div class="settings-section">
+          <h3>📝 내 메모 모아보기</h3>
+          <p class="caption">메모를 적어둔 모든 매물을 한 곳에서 검색·확인합니다. 항목 클릭 시 그 매물의 상세 모달을 엽니다.</p>
+          <input type="search" id="memo-search" class="memo-search" placeholder="매물 제목·메모 내용으로 검색" aria-label="메모 검색" />
+          <div class="memo-list" id="memo-list"></div>
+        </div>
+        <div class="settings-section">
           <h3>전체 지우기</h3>
           <p class="caption">관심·메모·비교·최근 검색어를 한 번에 비웁니다. 백업해 두지 않으면 복구 불가.</p>
           <button class="btn btn-ghost danger" id="settings-clear-all" type="button">전체 지우기</button>
