@@ -1712,6 +1712,7 @@ function renderBidSimulator(it) {
           <span>시세 95% ${fmtMan(slMax)}</span>
         </div>
       </div>
+      <div class="sim-curve-host" id="sim-curve"></div>
       <div class="sim-grid" id="sim-out"></div>
       <p class="caption" style="margin-top:6px">
         ※ 취득세(아파트·오피스텔 6억↓ 1%, ~9억 ${(ACQUISITION_TAX_RATE*100).toFixed(1)}%, 9억↑ 3%) +
@@ -1722,14 +1723,90 @@ function renderBidSimulator(it) {
   `;
 }
 
+function buildProfitCurve(market, minBid, slMax, itemType, currentBid) {
+  const N = 30;
+  const samples = [];
+  for (let i = 0; i <= N; i++) {
+    const bid = Math.round(minBid + (slMax - minBid) * (i / N));
+    const r = calcProfit(market, bid, itemType);
+    samples.push({ bid, profit: r.profit });
+  }
+  if (!samples.length) return "";
+  const profits = samples.map((s) => s.profit);
+  const maxP = Math.max(...profits, 0);
+  const minP = Math.min(...profits, 0);
+  const range = Math.max(1, maxP - minP);
+
+  const W = 360, H = 110;
+  const padL = 6, padR = 64, padT = 10, padB = 18;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+  const xAt = (bid) => padL + ((bid - minBid) / Math.max(1, slMax - minBid)) * innerW;
+  const yAt = (profit) => padT + (1 - (profit - minP) / range) * innerH;
+  const yZero = yAt(0);
+
+  // 라인 path
+  let d = "";
+  samples.forEach((s, i) => {
+    const x = xAt(s.bid).toFixed(2);
+    const y = yAt(s.profit).toFixed(2);
+    d += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+  });
+
+  // 손익 분기점 (보간)
+  let breakEven = null;
+  for (let i = 1; i < samples.length; i++) {
+    const a = samples[i - 1], b = samples[i];
+    if ((a.profit >= 0) !== (b.profit >= 0)) {
+      // linear interp
+      const t = a.profit / (a.profit - b.profit);
+      breakEven = Math.round(a.bid + (b.bid - a.bid) * t);
+      break;
+    }
+  }
+
+  // 현재 입찰가 마커
+  const cx = xAt(currentBid).toFixed(2);
+  const curR = calcProfit(market, currentBid, itemType);
+  const cy = yAt(curR.profit).toFixed(2);
+  const profitColor = curR.profit >= 0 ? "#2ca02c" : "#d62728";
+
+  // 영역(양/음) 음영
+  const profitArea = `M ${padL} ${yZero} L ${samples.map((s,i)=> xAt(s.bid).toFixed(2)+' '+yAt(s.profit).toFixed(2)).join(' L ')} L ${xAt(samples[samples.length-1].bid).toFixed(2)} ${yZero} Z`;
+
+  const beLabel = breakEven
+    ? `<g>
+         <line x1="${xAt(breakEven).toFixed(2)}" x2="${xAt(breakEven).toFixed(2)}" y1="${padT}" y2="${H - padB}" stroke="#888" stroke-width="1" stroke-dasharray="2,3"/>
+         <text x="${xAt(breakEven).toFixed(2)}" y="${padT + 8}" text-anchor="middle" font-size="9" fill="var(--color-text-muted)">손익분기 ${breakEven.toLocaleString("ko-KR")}</text>
+       </g>` : "";
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="입찰가-차익 곡선">
+      <path d="${profitArea}" fill="rgba(31,119,180,0.10)" stroke="none"/>
+      <line x1="${padL}" x2="${W - padR}" y1="${yZero}" y2="${yZero}" stroke="#888" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="${W - padR + 4}" y="${yZero + 3}" font-size="9" fill="var(--color-text-muted)">손익 0</text>
+      <path d="${d}" fill="none" stroke="#1f77b4" stroke-width="1.6" stroke-linejoin="round"/>
+      ${beLabel}
+      <line x1="${cx}" x2="${cx}" y1="${padT}" y2="${H - padB}" stroke="${profitColor}" stroke-width="1.5"/>
+      <circle cx="${cx}" cy="${cy}" r="3.5" fill="${profitColor}"/>
+      <text x="${cx}" y="${H - padB + 12}" text-anchor="middle" font-size="9" fill="${profitColor}" font-weight="700">${currentBid.toLocaleString("ko-KR")}</text>
+      <text x="${W - padR + 4}" y="${padT + 8}" font-size="9" fill="#2ca02c">+${Math.max(0, maxP).toLocaleString("ko-KR")}</text>
+      <text x="${W - padR + 4}" y="${H - padB - 2}" font-size="9" fill="#d62728">${Math.min(0, minP).toLocaleString("ko-KR")}</text>
+    </svg>
+  `;
+}
+
 function wireBidSimulator() {
   const sec = document.querySelector(".sim-section");
   if (!sec) return;
   const market = Number(sec.dataset.simMarket) || 0;
+  const minBid = Number(sec.dataset.simMin) || 0;
   const itemType = sec.dataset.simType || "아파트";
   const numEl = sec.querySelector("#sim-bid-num");
   const rangeEl = sec.querySelector("#sim-bid-range");
   const out = sec.querySelector("#sim-out");
+  const curve = sec.querySelector("#sim-curve");
+  const slMax = Number(rangeEl.max) || (market || minBid);
 
   const refresh = (v) => {
     const bid = Math.max(0, Math.round(Number(v) || 0));
@@ -1737,6 +1814,9 @@ function wireBidSimulator() {
     rangeEl.value = bid;
     const r = calcProfit(market, bid, itemType);
     const profitClass = r.profit >= 0 ? "sim-profit-pos" : "sim-profit-neg";
+    if (curve && market && minBid) {
+      curve.innerHTML = buildProfitCurve(market, minBid, slMax, itemType, bid);
+    }
     out.innerHTML = `
       <div class="sim-card sim-bid">
         <div class="sim-k">입찰가</div>
