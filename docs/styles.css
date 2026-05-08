@@ -265,10 +265,6 @@ code {
   justify-content: center;
   font-size: 1.05rem;
 }
-@media (max-width: 640px) {
-  /* 모바일에선 키보드가 없으니 ? 버튼은 숨김 */
-  .kbd-help-btn { display: none; }
-}
 
 /* 비교 트레이 (하단 고정) */
 .compare-tray {
