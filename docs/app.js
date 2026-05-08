@@ -1578,6 +1578,49 @@ function buildClusters(items) {
   return clusters;
 }
 
+function renderClusterDonut(grades, total) {
+  const order = ["A", "B", "C", "D", "X"];
+  const nonZero = order.filter((g) => (grades[g] || 0) > 0);
+  if (!nonZero.length || !total) return "";
+  const cx = 25, cy = 25, r = 22, innerR = 13;
+  let parts = "";
+  if (nonZero.length === 1) {
+    const g = nonZero[0];
+    parts = `<circle cx="${cx}" cy="${cy}" r="${(r + innerR) / 2}" fill="none"
+              stroke="${GRADE_COLOR[g]}" stroke-width="${r - innerR}">
+              <title>${g} 등급 ${grades[g]}건</title>
+            </circle>`;
+  } else {
+    let cumAngle = -Math.PI / 2;
+    for (const g of order) {
+      const v = grades[g] || 0;
+      if (v === 0) continue;
+      const angle = (v / total) * Math.PI * 2;
+      const a1 = cumAngle, a2 = cumAngle + angle;
+      const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+      const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+      const ix2 = cx + innerR * Math.cos(a2), iy2 = cy + innerR * Math.sin(a2);
+      const ix1 = cx + innerR * Math.cos(a1), iy1 = cy + innerR * Math.sin(a1);
+      const large = angle > Math.PI ? 1 : 0;
+      const d =
+        `M ${x1.toFixed(2)} ${y1.toFixed(2)} ` +
+        `A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} ` +
+        `L ${ix2.toFixed(2)} ${iy2.toFixed(2)} ` +
+        `A ${innerR} ${innerR} 0 ${large} 0 ${ix1.toFixed(2)} ${iy1.toFixed(2)} Z`;
+      parts += `<path d="${d}" fill="${GRADE_COLOR[g] || '#999'}">
+                  <title>${g} 등급 ${v}건</title>
+                </path>`;
+      cumAngle = a2;
+    }
+  }
+  return `
+    <svg viewBox="0 0 50 50" class="cluster-donut" aria-hidden="true">
+      ${parts}
+      <text x="25" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">${total}</text>
+    </svg>
+  `;
+}
+
 function renderClusters() {
   const sec = $("section-clusters");
   const grid = $("clusters-grid");
@@ -1597,6 +1640,7 @@ function renderClusters() {
       .filter(Boolean).join("");
     const card = el(
       `<article class="cluster-card" data-cluster-key="${escapeHtml(c.key)}" tabindex="0" role="button" aria-label="${escapeHtml(c.key)} 매물 ${c.count}건 보기">
+         ${renderClusterDonut(c.grades, c.count)}
          <div class="cluster-head">
            <span class="cluster-count">${c.count}건</span>
            <span class="cluster-loc">${escapeHtml(c.key)}</span>

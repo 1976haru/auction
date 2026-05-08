@@ -1186,11 +1186,12 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   background: var(--color-card-inset);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  padding: 12px 14px;
+  padding: 12px 14px 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   cursor: pointer;
+  position: relative;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(31, 119, 180, 0.12);
   transition: background 0.12s, transform 0.05s, box-shadow 0.15s ease;
@@ -1235,6 +1236,19 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   padding: 1px 8px;
   border-radius: 999px;
   font-weight: 600;
+}
+.cluster-donut {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 50px;
+  height: 50px;
+  color: var(--color-text);
+  pointer-events: none;
+}
+.cluster-card .cluster-loc {
+  /* 도넛 영역 침범 방지 */
+  padding-right: 56px;
 }
 
 /* 비슷한 매물 미니 카드 */
