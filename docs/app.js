@@ -1324,6 +1324,99 @@ async function load() {
   }
 }
 
+// ── PWA: install prompt + service worker + 오프라인 토스트 ─────
+let DEFERRED_INSTALL = null;
+
+function showToast(message, actionLabel, onAction) {
+  const toast = $("pwa-toast");
+  if (!toast) return;
+  $("pwa-toast-msg").textContent = message;
+  const action = $("pwa-toast-action");
+  if (actionLabel) {
+    action.textContent = actionLabel;
+    action.hidden = false;
+    action.onclick = () => { try { onAction && onAction(); } finally { hideToast(); } };
+  } else {
+    action.hidden = true;
+    action.onclick = null;
+  }
+  toast.hidden = false;
+}
+function hideToast() {
+  const toast = $("pwa-toast");
+  if (toast) toast.hidden = true;
+}
+
+function bindPwa() {
+  const closeBtn = $("pwa-toast-close");
+  if (closeBtn) closeBtn.addEventListener("click", hideToast);
+
+  const installBtn = $("install-btn");
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    DEFERRED_INSTALL = e;
+    if (installBtn) installBtn.hidden = false;
+  });
+  if (installBtn) {
+    installBtn.addEventListener("click", async () => {
+      if (!DEFERRED_INSTALL) return;
+      installBtn.hidden = true;
+      try {
+        await DEFERRED_INSTALL.prompt();
+        await DEFERRED_INSTALL.userChoice;
+      } catch (_) { /* 사용자 취소 등 */ }
+      DEFERRED_INSTALL = null;
+    });
+  }
+  window.addEventListener("appinstalled", () => {
+    if (installBtn) installBtn.hidden = true;
+    DEFERRED_INSTALL = null;
+    showToast("앱으로 설치 완료. 홈 화면에서 바로 열 수 있어요.", null);
+    setTimeout(hideToast, 3500);
+  });
+
+  // 오프라인 / 온라인
+  window.addEventListener("offline", () => {
+    showToast("오프라인 — 캐시된 데이터를 표시합니다.", null);
+  });
+  window.addEventListener("online", () => {
+    showToast("온라인 복귀 — 데이터를 새로 받아옵니다.", "새로고침", () => location.reload());
+  });
+
+  // 서비스 워커 등록
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js", { scope: "./" }).then((reg) => {
+        // 새 SW 가 대기 중이면 사용자에게 새로고침 옵션 노출
+        const handleWaiting = () => {
+          if (reg.waiting) {
+            showToast("새 버전이 준비됐어요.", "새로고침", () => {
+              reg.waiting.postMessage("SKIP_WAITING");
+            });
+          }
+        };
+        if (reg.waiting) handleWaiting();
+        reg.addEventListener("updatefound", () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener("statechange", () => {
+            if (sw.state === "installed" && navigator.serviceWorker.controller) {
+              handleWaiting();
+            }
+          });
+        });
+      }).catch(() => { /* SW 등록 실패는 무시 */ });
+
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (reloaded) return;
+        reloaded = true;
+        location.reload();
+      });
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   bindFilterEvents();
   bindSearch();
@@ -1331,5 +1424,6 @@ document.addEventListener("DOMContentLoaded", () => {
   bindViewToggle();
   bindDownloads();
   bindModalClose();
+  bindPwa();
   load();
 });

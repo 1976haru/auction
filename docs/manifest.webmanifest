@@ -1,0 +1,21 @@
+{
+  "name": "경매·공매 지능형 에이전트",
+  "short_name": "경매에이전트",
+  "description": "법원경매·공매 mock 데이터를 검색·필터·AI 자연어로 탐색하는 정적 대시보드.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#1f77b4",
+  "background_color": "#f5f7fa",
+  "categories": ["finance", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

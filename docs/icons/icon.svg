@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="경매·공매 지능형 에이전트">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f77b4"/>
+      <stop offset="100%" stop-color="#155a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- 집(매물) 실루엣 -->
+  <path d="M148 244 L256 156 L364 244 V356 H148 Z"
+        fill="none" stroke="#ffffff" stroke-width="20" stroke-linejoin="round"/>
+  <rect x="232" y="280" width="48" height="76" fill="#ffffff"/>
+  <!-- 의사봉(망치) 헤드 -->
+  <rect x="86" y="350" width="156" height="48" rx="10" fill="#ffffff"
+        transform="rotate(-30 164 374)"/>
+  <!-- 의사봉 손잡이 -->
+  <rect x="206" y="394" width="180" height="22" rx="11" fill="#ffffff"
+        transform="rotate(-30 296 405)"/>
+  <!-- 작은 ₩ 강조 -->
+  <text x="256" y="464" text-anchor="middle"
+        font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif"
+        font-size="56" font-weight="700" fill="#ffffff">₩</text>
+</svg>

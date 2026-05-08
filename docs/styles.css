@@ -159,6 +159,30 @@ code {
 }
 .link-btn:hover { text-decoration: underline; }
 
+.install-btn { display: inline-flex; align-items: center; gap: 4px; }
+
+/* PWA 토스트 (하단 띠) */
+.pwa-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #2c3e50;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  box-shadow: 0 8px 24px rgba(15, 30, 50, 0.25);
+  z-index: 200;
+  max-width: calc(100vw - 24px);
+}
+.pwa-toast .link-btn { color: #ffd66e; background: transparent; border: 0; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.pwa-toast .link-btn:hover { text-decoration: underline; }
+.pwa-toast[hidden] { display: none; }
+
 .quick-chips {
   display: flex;
   gap: 8px;
