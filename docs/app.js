@@ -580,6 +580,7 @@ function applyFilters() {
   renderItems();
   renderItemsHead();
   renderCharts();
+  renderPersonalRecs();
   pushUrlState();
 }
 
@@ -1422,6 +1423,159 @@ function renderCharts() {
   if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
 }
 
+/* ─── 사용자 피드백 기반 맞춤 추천 ──────────────────────────── */
+const PERSONAL_MIN_SIGNALS = 3;
+
+function _signalItems() {
+  // ★ + 📝 + 👁 합집합. 가중치 (★=3, 📝=3, 👁=1)
+  const weights = new Map();
+  STATE.favorites.forEach((id) => weights.set(String(id), (weights.get(String(id)) || 0) + 3));
+  Object.keys(STATE.notes).forEach((id) => weights.set(String(id), (weights.get(String(id)) || 0) + 3));
+  STATE.viewed.forEach((v) => weights.set(String(v.id), (weights.get(String(v.id)) || 0) + 1));
+  // STATE.items 와 매칭되는 것만
+  const out = [];
+  for (const [id, w] of weights) {
+    const it = STATE.items.find((x) => String(x.id) === id);
+    if (it) out.push({ item: it, weight: w });
+  }
+  return out;
+}
+
+function buildUserProfile() {
+  const signals = _signalItems();
+  if (signals.length < PERSONAL_MIN_SIGNALS) return null;
+  const counts = (key) => {
+    const m = new Map();
+    for (const { item, weight } of signals) {
+      const k = item[key];
+      if (!k) continue;
+      m.set(k, (m.get(k) || 0) + weight);
+    }
+    return m;
+  };
+  const top = (m) => {
+    let bestK = null, bestV = -1;
+    for (const [k, v] of m) if (v > bestV) { bestK = k; bestV = v; }
+    return bestK;
+  };
+
+  const regions = counts("region");
+  const types = counts("item_type");
+  const sources = counts("source");
+  const grades = counts("recommendation_grade");
+  const risks = counts("risk_level");
+
+  let totalW = 0, totalPrice = 0;
+  for (const { item, weight } of signals) {
+    if (item.min_bid_price) {
+      totalPrice += item.min_bid_price * weight;
+      totalW += weight;
+    }
+  }
+  const avgPrice = totalW > 0 ? totalPrice / totalW : null;
+
+  return {
+    signalCount: signals.length,
+    signalIds: new Set(signals.map((s) => String(s.item.id))),
+    topRegion: top(regions),
+    topType: top(types),
+    topSource: top(sources),
+    topGrade: top(grades),
+    topRisk: top(risks),
+    avgPrice,
+    distRegion: regions,
+    distType: types,
+  };
+}
+
+function scoreAgainstProfile(it, profile) {
+  let score = 0;
+  const reasons = [];
+  if (profile.topRegion && it.region === profile.topRegion) {
+    score += 30; reasons.push(`선호 지역 ${profile.topRegion}`);
+  }
+  if (profile.topType && it.item_type === profile.topType) {
+    score += 25; reasons.push(`선호 종류 ${profile.topType}`);
+  }
+  if (profile.topSource && it.source === profile.topSource) {
+    score += 8;
+  }
+  if (profile.avgPrice && it.min_bid_price) {
+    const ratio = it.min_bid_price / profile.avgPrice;
+    if (ratio >= 0.8 && ratio <= 1.2) {
+      score += 15; reasons.push("비슷한 가격대");
+    } else if (ratio >= 0.6 && ratio <= 1.4) {
+      score += 7;
+    }
+  }
+  if (it.recommendation_grade === "A") { score += 10; reasons.push("A등급"); }
+  else if (it.recommendation_grade === "B") { score += 6; }
+  if (profile.topRisk && it.risk_level === profile.topRisk) {
+    score += 6;
+  }
+  return { score, reasons };
+}
+
+function renderPersonalRecs() {
+  const sec = $("section-personal-recs");
+  const grid = $("personal-rec-grid");
+  const cap = $("personal-recs-caption");
+  if (!sec || !grid) return;
+
+  const profile = buildUserProfile();
+  if (!profile) {
+    sec.hidden = true;
+    return;
+  }
+
+  // 시그널에 들어 있지 않은 매물 중 점수 desc 상위 5
+  const candidates = STATE.items.filter((it) => !profile.signalIds.has(String(it.id)));
+  const scored = candidates.map((it) => ({ it, ...scoreAgainstProfile(it, profile) }));
+  scored.sort((a, b) => b.score - a.score);
+  const top5 = scored.filter((x) => x.score >= 25).slice(0, 5);
+
+  if (!top5.length) {
+    sec.hidden = true;
+    return;
+  }
+
+  sec.hidden = false;
+  cap.textContent = `★/📝/👁 ${profile.signalCount}건 시그널 기반 — 선호 ${profile.topRegion || ""} ${profile.topType || ""}`.trim();
+
+  grid.innerHTML = "";
+  top5.forEach(({ it, score, reasons }, idx) => {
+    const grade = it.recommendation_grade || "C";
+    const risk = it.risk_level || "medium";
+    const profit = it.expected_profit;
+    const roi = it.expected_profit_rate;
+    const reasonText = reasons.slice(0, 3).join(" · ") || "유사도 점수 기반";
+    const card = el(
+      `<article class="rec-card" data-item-id="${it.id}">
+         <div class="rec-head">
+           <span class="rec-rank">맞춤 #${idx + 1}</span>
+           <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
+           <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
+           <span class="source-pill">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</span>
+           <span class="personal-score" title="당신 시그널 대비 유사도">유사도 ${score}</span>
+         </div>
+         <div class="rec-title">${escapeHtml(it.title || it.address || "주소 미상")}</div>
+         <div class="rec-meta">${escapeHtml(it.address || "")} · ${escapeHtml(it.item_type || "")}</div>
+         <div class="rec-stats">
+           <span class="rec-stat"><strong>${fmtMan(profit)}</strong> 차익</span>
+           <span class="rec-stat">ROI <strong>${fmtPct(roi)}</strong></span>
+           <span class="rec-stat">최저가 ${fmtMan(it.min_bid_price)}</span>
+           <span class="rec-stat">점수 <strong>${escapeHtml(String(it.recommendation_score || "-"))}</strong></span>
+         </div>
+         <div class="rec-reason">${escapeHtml(reasonText)}</div>
+       </article>`
+    );
+    bindTap(card, () => openDetailById(it.id), {
+      onLongPress: () => toggleCompare(it.id),
+    });
+    grid.appendChild(card);
+  });
+}
+
 /* 입찰가 시뮬레이터 — modules/profit_calculator.py 의 JS 미러 */
 const ACQUISITION_TAX_RATE = 0.035;
 const DEFAULT_REPAIR_COST = 500;
@@ -2066,6 +2220,8 @@ function refreshNoteBadgeForItem(itemId) {
   });
   // 만약 현재 칩이 '메모'이고 메모가 사라졌으면 결과 즉시 갱신
   if (STATE.filters.chip === "notes") applyFilters();
+  // 시그널 변화 → 맞춤 추천 갱신
+  renderPersonalRecs();
 }
 
 let CURRENT_DETAIL_ID = null;
