@@ -341,7 +341,7 @@ python -m http.server 8000 -d docs
 
 ## 변경 이력 (정적 대시보드)
 
-GitHub Pages 정적 대시보드의 누적 개선을 16개 Phase (A ~ P) 로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
+GitHub Pages 정적 대시보드의 누적 개선을 17개 Phase (A ~ Q) 로 정리합니다. 모든 기능은 외부 라이브러리 0, 외부 API 호출 0, 사용자 데이터는 자기 폰 localStorage 에만 저장됩니다.
 
 ### Phase A — 출시 + 기본 UX (`af5d50c` ~ `3af4b16`)
 - 정적 대시보드 초기 출시 (`docs/index.html` + `app.js` + `styles.css` + `mock_dashboard.json`)
@@ -414,9 +414,10 @@ GitHub Pages 정적 대시보드의 누적 개선을 16개 Phase (A ~ P) 로 정
 - **K73 카드 다중 선택** — ☑ 토글 모드. 카드 탭 = 선택 토글, 하단 액션 바: ★ 일괄 등록·해제 (toggle 시맨틱) / ⇆ 비교 트레이에 추가 (5건 한도 안내) / 📥 CSV (선택만) / 모두 해제 / 종료. 선택 모드 중 비교 트레이는 자동 숨김
 - **K72 클러스터 도넛 차트** — I47 클러스터 카드 우상단에 50×50 SVG 도넛, 등급(A/B/C/D/X) 분포 segment + 가운데 총 건수, 단일 등급은 stroke 폴백, 호버/탭 시 'A 등급 N건' 툴팁
 
-### Phase L — 인쇄·SEO·문서 (`e5184f7` ~ 최신)
+### Phase L — 인쇄·SEO·문서·QA (`e5184f7` ~ `21876e3`)
 - **L77 인쇄 PDF 메타 footer** — 매물·비교 모달 인쇄 결과물 마지막에 자동 footer (URL + 인쇄 시각 + 빨강 면책). `.print-only` + `body.printing-*` 활성 시에만 노출
-- **L75 README changelog Phase J/K 갱신** + **L80 마지막 패스** (이 커밋)
+- **K70 정적 대시보드 검증 스크립트** — `scripts/validate_static_dashboard.py` 가 JSON top-level 6키 + 매물 16 필수 필드 + 타입·범위·enum + recommendations 일관성 + RSS `<channel>`/`<item>` 구조까지 종합 검사. CI/daily 의 inline Python 30줄을 한 줄 호출로 대체
+- **L75/L80/L82/L83/L84 README changelog 단계별 갱신**
 
 ### Phase M — 분석 차트 확장 (`5237ec6`)
 - **M81 가격 분포 히스토그램** — 분석 차트 카드에 3번째 SVG (10 bin 최저가 히스토그램). x축 시작/중간/끝 만원 단위, y축 max 카운트, 막대 호버/탭 툴팁. 데스크탑 차트 그리드를 2열 → 3열로 확장
@@ -431,8 +432,11 @@ GitHub Pages 정적 대시보드의 누적 개선을 16개 Phase (A ~ P) 로 정
 - **O98 검색 자동완성 (매물 직접 매칭)** — 검색바 드롭다운에 "매물 매칭" 섹션 추가 (입력 2+ 자). 등급 pill + 매칭 텍스트 `<mark>` 강조 + 종류 메타. 행 탭 시 검색 결과를 거치지 않고 그 매물 상세 모달 직접 오픈. title/address/region/item_type/case_no 필드 검색
 - **O99 매물 모달 핫키** — 모달 열린 상태 단일 키: f=★ 토글, b=⇆ 비교 토글, n=메모 textarea 포커스, p=인쇄, s=공유. 입력 포커스/Cmd·Ctrl·Alt 조합 시 무시. ←/→ 이전·다음 매물, Esc 닫기와 결합돼 키보드만으로 매물 탐색·정리·공유 가능
 
-### Phase P — 비교 세부 (`d5a2340` ~ 최신)
+### Phase P — 비교 세부 (`d5a2340`)
 - **P102 비교 모달 컬럼 정렬** — 비교 모달 헤더 dropdown 으로 컬럼을 담은 순서 / 등급 / 점수 / 차익 / 수익률 / 최저가↑ / 위험↑ 으로 즉시 재정렬. ▲/▼ best·worst 마킹은 상대값이라 자동 갱신. 모달 다시 열면 '담은 순서' 로 초기화
+
+### Phase Q — 입력·접근성 (`13bb43c` ~ 최신)
+- **Q103 음성 검색 (🎤)** — Web Speech API 기반 검색바 마이크 버튼. 한국어(ko-KR), 중간 결과 즉시 입력창 반영, 최종 시 필터+히스토리 저장. 듣는 중 빨강 펄스 (prefers-reduced-motion 대응), 권한 거부/오류 명확한 토스트, 미지원 브라우저(Firefox 등)는 자동 숨김
 
 ### 누적 사용자 데이터 키
 | 키 | 내용 | 백업 포함 |
