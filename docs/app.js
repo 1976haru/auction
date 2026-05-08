@@ -34,6 +34,45 @@ const AGENT_EXAMPLES = [
   "오늘 뭐부터 봐야 돼?",
 ];
 
+// 한 번에 여러 필터를 세팅하는 프리셋 — chipMatch 가 처리하지 못하는 조건은
+// 추가 후처리(filter)에서 score/risk 등 제약을 더 둘 수 있도록 둔다.
+const PRESETS = [
+  {
+    id: "p_recommended",
+    label: "⭐ 추천 후보",
+    apply: () => ({ chip: "all", grade: "", risk: "", source: "",
+                    sort: "score_desc", _scoreMin: 60 }),
+    note: "점수 60 이상 + 추천점수 정렬",
+  },
+  {
+    id: "p_high_low",
+    label: "🚀 고수익 저위험",
+    apply: () => ({ chip: "all", grade: "", risk: "low", source: "",
+                    sort: "profit_desc" }),
+    note: "위험 낮음 + 차익 큰순",
+  },
+  {
+    id: "p_imminent",
+    label: "⏰ 임박 후보",
+    apply: () => ({ chip: "all", grade: "", risk: "", source: "",
+                    due_max: 7, sort: "due_asc" }),
+    note: "7일 이내 + 기일 임박순",
+  },
+  {
+    id: "p_seoul_apt",
+    label: "🏠 서울 아파트",
+    apply: () => ({ chip: "all", region: "서울특별시", item_type: "아파트",
+                    sort: "score_desc" }),
+    note: "서울 + 아파트 + 추천 정렬",
+  },
+  {
+    id: "p_grade_a",
+    label: "🥇 A등급만",
+    apply: () => ({ chip: "all", grade: "A", sort: "score_desc" }),
+    note: "A등급 추천 정렬",
+  },
+];
+
 const SORT_LABEL = {
   score_desc: "추천점수 높은순",
   profit_desc: "차익 큰순",
@@ -260,6 +299,38 @@ function renderGeneratedAt(iso) {
   $("generated-at").textContent = `데이터 기준 ${txt}`;
 }
 
+// ── Preset chips ─────────────────────────────────────
+function applyPreset(preset) {
+  const overrides = preset.apply() || {};
+  // 기본값으로 리셋 후 프리셋 덮어쓰기 (사용자가 매번 깨끗한 상태에서 시작)
+  STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
+  // _scoreMin 같은 임시 키도 같이 받도록 머지
+  Object.entries(overrides).forEach(([k, v]) => { STATE.filters[k] = v; });
+  syncControlsFromState();
+  renderQuickChips();
+  applyFilters();
+  showToast(`프리셋 적용: ${preset.label} — ${preset.note || ""}`, "초기화", () => resetFilters());
+  setTimeout(hideToast, 3500);
+  // 결과 영역으로 자동 스크롤
+  const items = document.getElementById("section-items");
+  if (items) items.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderPresets() {
+  const root = $("preset-chips");
+  if (!root) return;
+  clearChildren(root);
+  PRESETS.forEach((p) => {
+    const btn = document.createElement("button");
+    btn.className = "preset-chip";
+    btn.type = "button";
+    btn.textContent = p.label;
+    btn.title = p.note || "";
+    btn.addEventListener("click", () => applyPreset(p));
+    root.appendChild(btn);
+  });
+}
+
 // ── Quick chips ─────────────────────────────────────
 function renderQuickChips() {
   const root = $("quick-chips");
@@ -381,6 +452,8 @@ function applyFilters() {
   if (f.grade)     out = out.filter((it) => it.recommendation_grade === f.grade);
   if (f.flag)      out = out.filter((it) =>
     (it.risk_flags || []).some((fl) => (fl.keyword || "").includes(f.flag)));
+  if (f._scoreMin !== undefined && f._scoreMin !== null)
+    out = out.filter((it) => (it.recommendation_score || 0) >= f._scoreMin);
 
   out = sortItems(out, f.sort);
   STATE.filtered = out;
@@ -1888,6 +1961,7 @@ function render(data) {
   syncControlsFromState();
   URL_SYNC_ENABLED = true;
   renderQuickChips();
+  renderPresets();
   applyFilters();
 
   // 비교 트레이: 데이터에 더 이상 없는 id 는 제거

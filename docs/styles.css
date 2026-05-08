@@ -467,6 +467,42 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   border-color: var(--color-primary);
 }
 
+/* 프리셋 칩: 빠른 메뉴와 시각적으로 구분되는 별도 줄 */
+.preset-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 2px 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.preset-chips::-webkit-scrollbar { height: 4px; }
+.preset-chips::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+.preset-chip {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: var(--color-surface-3);
+  color: var(--color-primary-dark);
+  border: 1px dashed var(--color-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  touch-action: manipulation;
+  transition: background 0.12s, color 0.12s;
+}
+.preset-chip:active { background: var(--color-tap-bg); }
+@media (hover: hover) {
+  .preset-chip:hover { background: var(--color-tap-bg); }
+}
+:root[data-theme="dark"] .preset-chip { color: #7fb6e0; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .preset-chip { color: #7fb6e0; }
+}
+
 /* ── Card ────────────────────────────────── */
 .card {
   background: var(--color-surface);
