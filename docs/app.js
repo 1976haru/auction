@@ -379,6 +379,7 @@ function renderGeneratedAt(iso) {
 
 // ── Preset chips ─────────────────────────────────────
 function applyPreset(preset) {
+  const before = snapshotFilters();
   const overrides = preset.apply() || {};
   // 기본값으로 리셋 후 프리셋 덮어쓰기 (사용자가 매번 깨끗한 상태에서 시작)
   STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
@@ -387,8 +388,8 @@ function applyPreset(preset) {
   syncControlsFromState();
   renderQuickChips();
   applyFilters();
-  showToast(`프리셋 적용: ${preset.label} — ${preset.note || ""}`, "초기화", () => resetFilters());
-  setTimeout(hideToast, 3500);
+  showToast(`프리셋 적용: ${preset.label} — ${preset.note || ""}`, "되돌리기", () => restoreFilters(before));
+  setTimeout(hideToast, 4500);
   // 결과 영역으로 자동 스크롤
   const items = document.getElementById("section-items");
   if (items) items.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -476,12 +477,30 @@ function bindFilterEvents() {
   });
 }
 
+function snapshotFilters() {
+  return JSON.parse(JSON.stringify(STATE.filters));
+}
+function restoreFilters(snap) {
+  if (!snap) return;
+  STATE.filters = JSON.parse(JSON.stringify(snap));
+  syncControlsFromState();
+  renderQuickChips();
+  applyFilters();
+  hideAgentResult();
+}
+
 function resetFilters() {
+  const before = snapshotFilters();
   STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
   syncControlsFromState();
   renderQuickChips();
   applyFilters();
   hideAgentResult();
+  // 의미 있는 변경이 있었던 경우에만 되돌리기 제안
+  if (JSON.stringify(before) !== JSON.stringify(STATE.filters)) {
+    showToast("필터를 초기화했어요.", "되돌리기", () => restoreFilters(before));
+    setTimeout(hideToast, 5000);
+  }
 }
 
 // ── Filter application ─────────────────────────────
