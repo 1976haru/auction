@@ -112,11 +112,13 @@ function saveCompare(list) {
 }
 
 // ── 글로벌 상태 ──────────────────────────────────────
+const PAGE_SIZE = 30;
 const STATE = {
   data: null,
   items: [],
   filtered: [],
   view: "card",          // card | table
+  pageShown: PAGE_SIZE,
   favorites: loadFavorites(),
   compare: loadCompare(),  // ordered list of item ids (string)
   filters: {
@@ -457,6 +459,7 @@ function applyFilters() {
 
   out = sortItems(out, f.sort);
   STATE.filtered = out;
+  STATE.pageShown = PAGE_SIZE;  // 필터/검색 바뀌면 항상 처음부터
   renderItems();
   renderItemsHead();
   renderCharts();
@@ -475,7 +478,11 @@ function renderItemsHead() {
     const cf = QUICK_CHIPS.find((c) => c.id === f.chip);
     if (cf) chips += ` <span class="meta-chip">${escapeHtml(cf.label)}</span>`;
   }
-  root.innerHTML = `결과 ${STATE.filtered.length}건 / 전체 ${STATE.items.length}건 ${chips}`;
+  const shown = Math.min(STATE.pageShown, STATE.filtered.length);
+  const showCount = (shown < STATE.filtered.length)
+    ? `표시 ${shown} / 결과 ${STATE.filtered.length} / 전체 ${STATE.items.length}건`
+    : `결과 ${STATE.filtered.length}건 / 전체 ${STATE.items.length}건`;
+  root.innerHTML = `${showCount} ${chips}`;
   const csvBtn = $("dl-csv"); const jsonBtn = $("dl-json");
   if (csvBtn && jsonBtn) {
     const empty = STATE.filtered.length === 0;
@@ -750,14 +757,17 @@ function renderItems() {
   clearChildren(cardRoot);
   clearChildren(tableBody);
 
-  const list = STATE.filtered;
-  if (!list.length) {
+  const fullList = STATE.filtered;
+  if (!fullList.length) {
     cardRoot.appendChild(el(`<p class="caption">조건에 맞는 물건이 없습니다.</p>`));
     const tr = document.createElement("tr");
     tr.innerHTML = `<td colspan="13" class="caption">조건에 맞는 물건이 없습니다.</td>`;
     tableBody.appendChild(tr);
+    updateMoreRow();
     return;
   }
+  // 페이지네이션 — 처음 pageShown 만 그린다
+  const list = fullList.slice(0, STATE.pageShown);
   list.forEach((it, idx) => {
     const card = el(itemCardHtml(it));
     bindTap(card, () => openDetailById(it.id), {
@@ -794,6 +804,34 @@ function renderItems() {
       onLongPress: () => toggleCompare(it.id),
     });
     tableBody.appendChild(tr);
+  });
+  updateMoreRow();
+}
+
+function updateMoreRow() {
+  const row = $("more-row");
+  const btn = $("more-btn");
+  if (!row || !btn) return;
+  const total = STATE.filtered.length;
+  const shown = Math.min(STATE.pageShown, total);
+  const remaining = Math.max(0, total - shown);
+  if (remaining > 0) {
+    row.hidden = false;
+    btn.textContent = `더 보기 (+${Math.min(PAGE_SIZE, remaining)} / ${remaining}건 남음)`;
+    btn.disabled = false;
+  } else {
+    row.hidden = true;
+    btn.disabled = true;
+  }
+}
+
+function bindMoreButton() {
+  const btn = $("more-btn");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    STATE.pageShown += PAGE_SIZE;
+    renderItems();
+    renderItemsHead();
   });
 }
 
@@ -2286,6 +2324,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindModalClose();
   bindCompareTray();
   bindKbdShortcuts();
+  bindMoreButton();
   bindPwa();
   load();
 });

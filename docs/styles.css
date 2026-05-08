@@ -1189,6 +1189,19 @@ kbd {
 }
 .dl-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
 
+.more-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.more-row[hidden] { display: none; }
+.more-btn {
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 21px;
+  font-size: 0.95rem;
+}
+
 .items-card-grid {
   display: grid;
   gap: 14px;
