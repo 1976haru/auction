@@ -823,6 +823,8 @@ function renderCompareTray() {
 function bindCompareTray() {
   const closeBtn = $("compare-close");
   if (closeBtn) closeBtn.addEventListener("click", closeCompareModal);
+  const printBtn = $("compare-print");
+  if (printBtn) printBtn.addEventListener("click", printCompare);
   const modal = $("compare-modal");
   if (modal) {
     modal.addEventListener("click", (e) => {
@@ -1680,7 +1682,18 @@ function printDetail() {
     window.removeEventListener("afterprint", cleanup);
   };
   window.addEventListener("afterprint", cleanup);
-  // 일부 브라우저는 afterprint 를 늦게 부르므로 안전망
+  setTimeout(cleanup, 5000);
+  try { window.print(); } catch (_) { cleanup(); }
+}
+
+function printCompare() {
+  if ($("compare-modal").hidden) return;
+  document.body.classList.add("printing-compare");
+  const cleanup = () => {
+    document.body.classList.remove("printing-compare");
+    window.removeEventListener("afterprint", cleanup);
+  };
+  window.addEventListener("afterprint", cleanup);
   setTimeout(cleanup, 5000);
   try { window.print(); } catch (_) { cleanup(); }
 }

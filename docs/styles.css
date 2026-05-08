@@ -1340,13 +1340,20 @@ footer {
 .detail-section ul { margin: 4px 0 0; padding-left: 20px; }
 .detail-section li { font-size: 0.88rem; margin-bottom: 4px; }
 
-/* ── Print: 매물 상세 모달만 풀페이지로 인쇄 ───────────────── */
+/* ── Print: 매물 상세 / 비교 모달만 풀페이지로 인쇄 ───────────────── */
 @media print {
-  body.printing-detail > * { display: none !important; }
-  body.printing-detail .modal#detail-modal { display: block !important; position: static !important; }
-  body.printing-detail #detail-modal[hidden] { display: none !important; }
-  body.printing-detail #detail-modal .modal-backdrop { display: none !important; }
-  body.printing-detail #detail-modal .modal-panel {
+  body.printing-detail > *,
+  body.printing-compare > * { display: none !important; }
+  body.printing-detail .modal#detail-modal,
+  body.printing-compare .modal#compare-modal {
+    display: block !important; position: static !important;
+  }
+  body.printing-detail #detail-modal[hidden],
+  body.printing-compare #compare-modal[hidden] { display: none !important; }
+  body.printing-detail #detail-modal .modal-backdrop,
+  body.printing-compare #compare-modal .modal-backdrop { display: none !important; }
+  body.printing-detail #detail-modal .modal-panel,
+  body.printing-compare #compare-modal .modal-panel {
     position: static !important;
     transform: none !important;
     width: 100% !important;
@@ -1354,12 +1361,17 @@ footer {
     box-shadow: none !important;
     border: 0 !important;
   }
-  body.printing-detail .modal-head-actions { display: none !important; }
-  body.printing-detail .fav-btn { display: none !important; }
-  body.printing-detail .compare-tray { display: none !important; }
-  body.printing-detail .pwa-toast { display: none !important; }
+  body.printing-detail .modal-head-actions,
+  body.printing-compare .modal-head-actions { display: none !important; }
+  body.printing-detail .fav-btn,
+  body.printing-compare .fav-btn { display: none !important; }
+  body.printing-detail .compare-tray,
+  body.printing-compare .compare-tray { display: none !important; }
+  body.printing-detail .pwa-toast,
+  body.printing-compare .pwa-toast { display: none !important; }
   /* 인쇄용 톤 */
-  body.printing-detail {
+  body.printing-detail,
+  body.printing-compare {
     background: #fff !important;
     color: #000 !important;
     padding: 0 !important;
@@ -1367,11 +1379,25 @@ footer {
   body.printing-detail .detail-grid .v,
   body.printing-detail .detail-section,
   body.printing-detail .detail-section h3,
-  body.printing-detail .modal-head h2 { color: #000 !important; }
+  body.printing-detail .modal-head h2,
+  body.printing-compare .modal-head h2,
+  body.printing-compare .compare-table,
+  body.printing-compare .compare-col-head .ttl,
+  body.printing-compare .compare-col-head .meta { color: #000 !important; }
   body.printing-detail .trend-host { background: #fff !important; border-color: #ccc !important; }
   body.printing-detail kbd { background: #fff !important; }
-  /* 페이지 마진 */
+  /* 비교 표는 인쇄 시 모든 컬럼 보이도록 가로 스크롤 비활성 */
+  body.printing-compare .compare-table-wrap { overflow: visible !important; }
+  body.printing-compare .compare-table { min-width: 0 !important; font-size: 0.78rem !important; }
+  body.printing-compare .compare-table thead th { background: #fff !important; }
+  body.printing-compare .compare-table tbody th { background: #f4f4f4 !important; color: #444 !important; position: static !important; }
+  body.printing-compare .compare-section-row th,
+  body.printing-compare .compare-section-row td { background: #ececec !important; color: #000 !important; }
+  body.printing-compare .compare-table td.best { background: #e6f7e6 !important; }
+  body.printing-compare .compare-table td.worst { background: #fde6e6 !important; }
+  /* 페이지 설정 */
   @page { margin: 14mm; }
+  body.printing-compare { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
 /* ── Tablet ──────────────────────────────── */
