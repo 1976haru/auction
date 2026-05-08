@@ -96,6 +96,22 @@ function saveFavorites(set) {
   catch {}
 }
 
+const SEARCHES_KEY = "auction:searches:v1";
+const SEARCHES_MAX = 8;
+function loadSearches() {
+  try {
+    const raw = localStorage.getItem(SEARCHES_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr)
+      ? arr.filter((x) => typeof x === "string" && x.trim()).slice(0, SEARCHES_MAX)
+      : [];
+  } catch { return []; }
+}
+function saveSearches(arr) {
+  try { localStorage.setItem(SEARCHES_KEY, JSON.stringify(arr)); } catch {}
+}
+
 const COMPARE_KEY = "auction:compare:v1";
 const COMPARE_MAX = 5;
 const COMPARE_MIN = 2;
@@ -121,6 +137,7 @@ const STATE = {
   pageShown: PAGE_SIZE,
   favorites: loadFavorites(),
   compare: loadCompare(),  // ordered list of item ids (string)
+  recentSearches: loadSearches(),
   filters: {
     q: "",
     chip: "all",
@@ -1810,22 +1827,119 @@ function printCompare() {
 }
 
 // ── Search bar ───────────────────────────────────
+function pushSearchHistory(q) {
+  q = String(q || "").trim();
+  if (q.length < 2) return;
+  let arr = STATE.recentSearches.slice();
+  arr = arr.filter((x) => x !== q);
+  arr.unshift(q);
+  if (arr.length > SEARCHES_MAX) arr.length = SEARCHES_MAX;
+  STATE.recentSearches = arr;
+  saveSearches(arr);
+}
+
+function removeSearchHistory(q) {
+  STATE.recentSearches = STATE.recentSearches.filter((x) => x !== q);
+  saveSearches(STATE.recentSearches);
+  renderSearchSuggest();
+}
+
+function clearSearchHistory() {
+  STATE.recentSearches = [];
+  saveSearches(STATE.recentSearches);
+  renderSearchSuggest();
+}
+
+function showSearchSuggest() {
+  renderSearchSuggest();
+  $("search-suggest").hidden = false;
+}
+function hideSearchSuggest() {
+  $("search-suggest").hidden = true;
+}
+
+function renderSearchSuggest() {
+  const root = $("search-suggest");
+  if (!root) return;
+  const arr = STATE.recentSearches;
+  if (!arr.length) {
+    root.innerHTML = `<p class="search-suggest-empty">최근 검색어가 없어요. 검색 후 Enter 또는 검색 버튼을 누르면 여기 모입니다.</p>`;
+    return;
+  }
+  let body = `<div class="search-suggest-head">최근 검색어</div>`;
+  body += arr.map((q) =>
+    `<div class="search-suggest-row" role="option" data-q="${escapeHtml(q)}">
+       <span class="ico">⏱</span>
+       <span class="q">${escapeHtml(q)}</span>
+       <button class="x" type="button" data-remove="${escapeHtml(q)}" aria-label="이 검색어 지우기">×</button>
+     </div>`
+  ).join("");
+  body += `<div class="search-suggest-foot">
+    <button id="search-clear-all" type="button">전체 지우기</button>
+  </div>`;
+  root.innerHTML = body;
+
+  // 클릭 위임 — 행 클릭/× 버튼/전체 지우기
+  root.querySelectorAll(".search-suggest-row").forEach((row) => {
+    row.addEventListener("mousedown", (e) => e.preventDefault()); // blur 방지
+    row.addEventListener("click", (e) => {
+      const xBtn = e.target.closest(".x");
+      if (xBtn) {
+        e.stopPropagation();
+        removeSearchHistory(xBtn.dataset.remove);
+        return;
+      }
+      const q = row.dataset.q || "";
+      const input = $("q-input");
+      input.value = q;
+      STATE.filters.q = q;
+      pushSearchHistory(q);
+      applyFilters();
+      hideSearchSuggest();
+      input.blur();
+    });
+  });
+  const clearAll = root.querySelector("#search-clear-all");
+  if (clearAll) {
+    clearAll.addEventListener("mousedown", (e) => e.preventDefault());
+    clearAll.addEventListener("click", clearSearchHistory);
+  }
+}
+
 function bindSearch() {
   const input = $("q-input");
-  const submit = () => {
+  const submit = (explicit) => {
     STATE.filters.q = input.value.trim();
     applyFilters();
+    if (explicit) {
+      pushSearchHistory(STATE.filters.q);
+      hideSearchSuggest();
+    }
   };
-  $("q-submit").addEventListener("click", submit);
+  $("q-submit").addEventListener("click", () => submit(true));
   $("q-reset").addEventListener("click", resetFilters);
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") submit();
+    if (e.key === "Enter") {
+      submit(true);
+      input.blur();
+    } else if (e.key === "Escape") {
+      hideSearchSuggest();
+    }
   });
-  // 가벼운 디바운스 - 입력 중에도 즉시 결과 갱신
+  // 디바운스 입력 갱신은 explicit=false (히스토리에 안 저장)
   let t;
   input.addEventListener("input", () => {
     clearTimeout(t);
-    t = setTimeout(submit, 200);
+    t = setTimeout(() => submit(false), 200);
+  });
+  // 포커스 시 추천 패널, blur 시 살짝 늦춰 닫음 (행 클릭 허용)
+  input.addEventListener("focus", showSearchSuggest);
+  input.addEventListener("blur", () => setTimeout(hideSearchSuggest, 180));
+
+  // 검색바 외부 클릭 시 닫기
+  document.addEventListener("click", (e) => {
+    const sb = document.querySelector(".search-bar");
+    if (sb && !sb.contains(e.target)) hideSearchSuggest();
   });
 }
 

@@ -203,7 +203,82 @@ code {
   display: flex;
   gap: 8px;
   align-items: center;
+  position: relative; /* search-suggest 앵커 */
 }
+
+/* 최근 검색어 드롭다운 */
+.search-suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-hover);
+  z-index: 60;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.search-suggest[hidden] { display: none; }
+.search-suggest-head {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  padding: 8px 12px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+.search-suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--color-border);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(31, 119, 180, 0.12);
+}
+.search-suggest-row:last-of-type { border-bottom: 0; }
+.search-suggest-row:active { background: var(--color-tap-bg); }
+@media (hover: hover) {
+  .search-suggest-row:hover { background: var(--color-tap-bg); }
+}
+.search-suggest-row .ico { color: var(--color-text-muted); }
+.search-suggest-row .q { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-suggest-row .x {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  line-height: 1;
+}
+.search-suggest-row .x:active { background: var(--color-pill-bg); color: var(--color-text); }
+.search-suggest-empty {
+  padding: 14px 12px;
+  font-size: 0.84rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+.search-suggest-foot {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+.search-suggest-foot button {
+  background: transparent;
+  border: 0;
+  color: var(--color-primary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.search-suggest-foot button:active { background: var(--color-tap-bg); }
 .search-bar input[type="search"] {
   flex: 1;
   height: 44px;

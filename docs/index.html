@@ -45,12 +45,13 @@
   <section class="search-section">
     <div class="container search-inner">
       <div class="search-bar">
-        <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" autocomplete="off" />
+        <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" autocomplete="off" aria-haspopup="listbox" aria-controls="search-suggest" />
         <button class="btn btn-primary" id="q-submit">검색</button>
         <button class="btn btn-ghost" id="q-reset">초기화</button>
         <button class="btn btn-ghost theme-btn" id="theme-btn" type="button" aria-label="테마 전환" title="라이트/다크 모드 전환">🌙</button>
         <button class="btn btn-ghost kbd-help-btn" id="kbd-help-btn" type="button" aria-label="키보드 단축키" title="키보드 단축키 (?)">⌨</button>
         <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" title="홈 화면에 설치">📲 설치</button>
+        <div class="search-suggest" id="search-suggest" role="listbox" hidden></div>
       </div>
       <div class="quick-chips" id="quick-chips" role="tablist" aria-label="빠른 메뉴"></div>
       <div class="preset-chips" id="preset-chips" aria-label="필터 프리셋"></div>
