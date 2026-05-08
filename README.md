@@ -1,5 +1,9 @@
 # 경매·공매 능동형 AI 에이전트
 
+[![CI](https://github.com/1976haru/auction/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/1976haru/auction/actions/workflows/ci.yml)
+[![Daily](https://github.com/1976haru/auction/actions/workflows/daily.yml/badge.svg)](https://github.com/1976haru/auction/actions/workflows/daily.yml)
+[![Pages](https://img.shields.io/badge/GitHub%20Pages-live-1f77b4)](https://1976haru.github.io/auction/)
+
 > 매일 경매·공매 후보를 알아서 수집·분석·등급화하고, 시세차익 큰 매물과 오늘 확인할 일을 4개 채널(Telegram/Slack/Discord/Email)로 먼저 알려주는 지능형 보조 프로그램. 24개 에이전트 / 19개 대시보드 탭 / 138 pytest 통과 / mock-first 로 실제 API 키 없이 즉시 동작.
 
 ## 현재 상태
