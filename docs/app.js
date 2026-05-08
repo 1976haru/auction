@@ -12,6 +12,7 @@ const RISK_LABEL = { low: "낮음", medium: "보통", high: "높음" };
 const QUICK_CHIPS = [
   { id: "all",      label: "전체" },
   { id: "favorites",label: "★ 내 관심" },
+  { id: "notes",    label: "📝 메모" },
   { id: "changes",  label: "🆕 변화" },
   { id: "auction",  label: "경매" },
   { id: "public",   label: "공매" },
@@ -112,6 +113,34 @@ function saveSearches(arr) {
   try { localStorage.setItem(SEARCHES_KEY, JSON.stringify(arr)); } catch {}
 }
 
+const NOTES_KEY = "auction:notes:v1";
+function loadNotes() {
+  try {
+    const raw = localStorage.getItem(NOTES_KEY);
+    if (!raw) return {};
+    const obj = JSON.parse(raw);
+    return (obj && typeof obj === "object" && !Array.isArray(obj)) ? obj : {};
+  } catch { return {}; }
+}
+function saveNotes(obj) {
+  try { localStorage.setItem(NOTES_KEY, JSON.stringify(obj)); } catch {}
+}
+function getNote(id) {
+  const k = String(id);
+  const n = STATE.notes[k];
+  return (n && typeof n.text === "string") ? n : null;
+}
+function setNote(id, text) {
+  const k = String(id);
+  const trimmed = String(text || "").trim();
+  if (!trimmed) {
+    delete STATE.notes[k];
+  } else {
+    STATE.notes[k] = { text: trimmed, updatedAt: new Date().toISOString() };
+  }
+  saveNotes(STATE.notes);
+}
+
 const COMPARE_KEY = "auction:compare:v1";
 const COMPARE_MAX = 5;
 const COMPARE_MIN = 2;
@@ -138,6 +167,7 @@ const STATE = {
   favorites: loadFavorites(),
   compare: loadCompare(),  // ordered list of item ids (string)
   recentSearches: loadSearches(),
+  notes: loadNotes(),
   filters: {
     q: "",
     chip: "all",
@@ -430,6 +460,7 @@ function chipMatch(chip, it) {
   switch (chip) {
     case "all":       return true;
     case "favorites": return STATE.favorites.has(String(it.id));
+    case "notes":     return !!getNote(it.id);
     case "changes":   return Array.isArray(it.change_tags) && it.change_tags.length > 0;
     case "auction":   return it.source === "auction";
     case "public":    return it.source === "public_sale";
@@ -730,6 +761,12 @@ function compareBtnHtml(it) {
   const on = STATE.compare.includes(String(it.id));
   return `<button class="cmp-btn${on ? " on" : ""}" data-cmp="${it.id}" aria-pressed="${on ? "true" : "false"}" aria-label="비교에 ${on ? "제거" : "담기"}" title="비교 트레이에 ${on ? "제거" : "담기"} (카드 길게 눌러도 동일)">${on ? "⇆ 담김" : "⇆ 비교"}</button>`;
 }
+function noteBadgeHtml(it) {
+  const n = getNote(it.id);
+  if (!n) return "";
+  const preview = (n.text || "").replace(/\s+/g, " ").slice(0, 40);
+  return `<span class="note-badge" title="메모: ${escapeHtml(preview)}">📝</span>`;
+}
 function itemCardHtml(it) {
   const grade = it.recommendation_grade || "C";
   const risk = it.risk_level || "medium";
@@ -745,6 +782,7 @@ function itemCardHtml(it) {
         ${urgencyBadge(it)}
         <span class="caption">${escapeHtml(it.item_type || "")}</span>
         ${changeBadgesHtml(it)}
+        ${noteBadgeHtml(it)}
         <span class="head-spacer"></span>
         ${compareBtnHtml(it)}
         ${favoriteBtnHtml(it)}
@@ -1815,6 +1853,14 @@ function openDetailById(id) {
       <p class="caption"><b>AI 한줄 판단:</b> ${escapeHtml(aiVerdict)}</p>
     </div>
 
+    <div class="detail-section note-section" data-note-item-id="${escapeHtml(String(it.id))}">
+      <h3>내 메모 <span class="note-status caption" id="note-status"></span></h3>
+      <textarea class="note-input" id="note-input" rows="3" placeholder="이 매물에 대한 메모를 남겨두세요. 예: 1차 현장조사 완료, 임차인 만남 예정, 보증금 협의 필요 등. (자기 폰에만 저장됨)" maxlength="2000">${escapeHtml((getNote(it.id) || {}).text || "")}</textarea>
+      <div class="note-actions">
+        <button class="btn btn-ghost note-clear" id="note-clear" type="button">메모 지우기</button>
+      </div>
+    </div>
+
     <p class="caption" style="margin-top:14px">
       ※ 본 분석은 mock 데이터를 기반으로 한 참고용 정보입니다. 법률·투자 판단을 단정하지 않으며,
       실제 입찰 전 등기부등본·전입세대열람·현장조사·전문가 자문이 필요합니다.
@@ -1823,6 +1869,80 @@ function openDetailById(id) {
   $("detail-modal").hidden = false;
   document.body.style.overflow = "hidden";
   wireBidSimulator();
+  wireNoteSection();
+}
+
+function wireNoteSection() {
+  const sec = document.querySelector(".note-section");
+  if (!sec) return;
+  const itemId = sec.dataset.noteItemId;
+  const ta = sec.querySelector("#note-input");
+  const status = sec.querySelector("#note-status");
+  const clearBtn = sec.querySelector("#note-clear");
+
+  // 초기 상태 표시
+  const initial = getNote(itemId);
+  status.textContent = initial && initial.updatedAt
+    ? `· 마지막 저장 ${formatRelative(initial.updatedAt)}`
+    : "· 아직 메모 없음";
+
+  let t = null;
+  const persist = () => {
+    setNote(itemId, ta.value);
+    const n = getNote(itemId);
+    status.textContent = n
+      ? `· 저장됨 ${formatRelative(n.updatedAt)}`
+      : "· 메모 없음";
+    // 카드 배지 즉시 반영
+    refreshNoteBadgeForItem(itemId);
+  };
+  ta.addEventListener("input", () => {
+    if (t) clearTimeout(t);
+    status.textContent = "· 입력 중…";
+    t = setTimeout(persist, 600);
+  });
+  ta.addEventListener("blur", persist);
+
+  clearBtn.addEventListener("click", () => {
+    ta.value = "";
+    persist();
+  });
+}
+
+function formatRelative(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const now = new Date();
+  const sec = Math.floor((now - d) / 1000);
+  if (sec < 30) return "방금 전";
+  if (sec < 60) return `${sec}초 전`;
+  if (sec < 3600) return `${Math.floor(sec / 60)}분 전`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}시간 전`;
+  const pad = (x) => String(x).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function refreshNoteBadgeForItem(itemId) {
+  document.querySelectorAll(`.item-card[data-item-id="${itemId}"], .rec-card[data-item-id="${itemId}"]`).forEach((card) => {
+    const head = card.querySelector(".item-head, .rec-head");
+    if (!head) return;
+    const existing = head.querySelector(".note-badge");
+    if (existing) existing.remove();
+    const it = STATE.items.find((x) => String(x.id) === String(itemId));
+    if (!it) return;
+    const html = noteBadgeHtml(it);
+    if (!html) return;
+    // change_tags 뒤, head-spacer 앞에 삽입 (최대한 자연스럽게)
+    const spacer = head.querySelector(".head-spacer");
+    if (spacer) {
+      spacer.insertAdjacentHTML("beforebegin", html);
+    } else {
+      head.insertAdjacentHTML("beforeend", html);
+    }
+  });
+  // 만약 현재 칩이 '메모'이고 메모가 사라졌으면 결과 즉시 갱신
+  if (STATE.filters.chip === "notes") applyFilters();
 }
 
 let CURRENT_DETAIL_ID = null;
