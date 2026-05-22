@@ -338,6 +338,21 @@ def _search_fields(
     }
 
 
+def _conf_breakdown(overall: float | None, seed: int) -> dict:
+    """전체 신뢰도 주변으로 항목별(가격/권리/문서/주소) 신뢰도를 결정적 생성."""
+    o = float(overall if overall is not None else 0.7)
+
+    def jit(base: float, span: int) -> float:
+        return round(max(0.3, min(0.98, base + ((seed % (2 * span + 1)) - span) / 100.0)), 3)
+
+    return {
+        "price_confidence": jit(o, 6),
+        "legal_confidence": jit(o - 0.02, 8),
+        "document_confidence": jit(o + 0.01, 5),
+        "address_confidence": jit(o + 0.03, 4),
+    }
+
+
 def _connect() -> sqlite3.Connection | None:
     if not DB_PATH.exists():
         return None
@@ -793,6 +808,7 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "region": region,
             "item_type": item_type,
             "minimum_to_market_ratio": mtm_ratio,
+            **_conf_breakdown(confidence, item_id),
             **sf,
             "appraisal_price": appr,
             "min_bid_price": minb,
@@ -1176,6 +1192,7 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "region": region,
             "item_type": item_type,
             "minimum_to_market_ratio": round(minb / market * 100, 1) if market else None,
+            **_conf_breakdown(confidence, i),
             **sf,
             "appraisal_price": appr,
             "min_bid_price": minb,

@@ -328,9 +328,93 @@
             </select>
           </label>
           <div class="f-field f-actions-row">
+            <button class="btn btn-ghost" id="adv-toggle" type="button" aria-expanded="false" aria-controls="adv-filter-body">＋ 고급 필터</button>
             <button class="btn btn-ghost" id="f-reset">필터 초기화</button>
           </div>
         </div>
+
+        <!-- 고급 필터 (접기/펼치기) -->
+        <div class="adv-filter-body" id="adv-filter-body" hidden>
+          <div class="filter-grid adv-grid">
+            <label class="f-field"><span>법원/기관</span>
+              <select id="f-court"><option value="">전체</option></select>
+            </label>
+            <label class="f-field"><span>시·도</span>
+              <select id="f-sido"><option value="">전체</option></select>
+            </label>
+            <label class="f-field"><span>시·군·구</span>
+              <select id="f-sigungu"><option value="">전체</option></select>
+            </label>
+            <label class="f-field"><span>읍·면·동</span>
+              <select id="f-dong"><option value="">전체</option></select>
+            </label>
+            <label class="f-field"><span>물건그룹</span>
+              <select id="f-group"><option value="">전체</option></select>
+            </label>
+            <label class="f-field"><span>신뢰도</span>
+              <select id="f-confidence">
+                <option value="">전체</option>
+                <option value="high">높음 (0.8+)</option>
+                <option value="medium">보통 (0.6~0.8)</option>
+                <option value="low">낮음 (0.4~0.6)</option>
+                <option value="very_low">매우 낮음 (&lt;0.4)</option>
+              </select>
+            </label>
+            <label class="f-field"><span>문서상태</span>
+              <select id="f-doc">
+                <option value="">전체</option>
+                <option value="present">문서 있음</option>
+                <option value="missing">문서 미공개</option>
+              </select>
+            </label>
+            <label class="f-field"><span>감정가 (만원)</span>
+              <span class="range-inputs">
+                <input type="number" id="f-appraisal-min" placeholder="최소" min="0" />
+                <span>~</span>
+                <input type="number" id="f-appraisal-max" placeholder="최대" min="0" />
+              </span>
+            </label>
+            <label class="f-field"><span>예상시세 (만원)</span>
+              <span class="range-inputs">
+                <input type="number" id="f-market-min" placeholder="최소" min="0" />
+                <span>~</span>
+                <input type="number" id="f-market-max" placeholder="최대" min="0" />
+              </span>
+            </label>
+            <label class="f-field"><span>예상차익 (만원)</span>
+              <span class="range-inputs">
+                <input type="number" id="f-profit-min" placeholder="최소" />
+                <span>~</span>
+                <input type="number" id="f-profit-max" placeholder="최대" />
+              </span>
+            </label>
+            <label class="f-field"><span>수익률 (%)</span>
+              <span class="range-inputs">
+                <input type="number" id="f-roi-min" placeholder="최소" />
+                <span>~</span>
+                <input type="number" id="f-roi-max" placeholder="최대" />
+              </span>
+            </label>
+            <label class="f-field"><span>입찰기일 범위</span>
+              <span class="range-inputs">
+                <input type="date" id="f-date-from" aria-label="입찰기일 시작" />
+                <span>~</span>
+                <input type="date" id="f-date-to" aria-label="입찰기일 종료" />
+              </span>
+            </label>
+          </div>
+          <fieldset class="adv-flags">
+            <legend>위험 키워드</legend>
+            <label class="chk"><input type="checkbox" id="f-ex-lien" data-exclude="유치권" /> 유치권 제외</label>
+            <label class="chk"><input type="checkbox" id="f-ex-superficies" data-exclude="법정지상권" /> 법정지상권 제외</label>
+            <label class="chk"><input type="checkbox" id="f-ex-share" data-exclude="지분" /> 지분매각 제외</label>
+            <label class="chk"><input type="checkbox" id="f-ex-farm" data-exclude="농지" /> 농지 제외</label>
+            <label class="chk"><input type="checkbox" id="f-in-tenant" data-include="임차" /> 임차인 포함만</label>
+          </fieldset>
+        </div>
+
+        <!-- 현재 적용 필터 칩 -->
+        <div class="applied-filters" id="applied-filters" hidden aria-label="현재 적용 필터"></div>
       </div>
     </section>
 

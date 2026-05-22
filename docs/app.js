@@ -230,6 +230,26 @@ const STATE = {
     grade: "",
     sort: "score_desc",
     flag: "",     // 위험 키워드 단일 (예: "임차인")
+    // ── 고급 필터 ──
+    court: "",        // 법원/기관 (court_name 또는 agency_name)
+    sido: "",
+    sigungu: "",
+    dong: "",
+    item_group: "",
+    confidence: "",   // high | medium | low | very_low
+    document_status: "", // present | missing
+    appraisal_min: null,
+    appraisal_max: null,
+    market_min: null,
+    market_max: null,
+    profit_min: null,
+    profit_max: null,
+    roi_min: null,
+    roi_max: null,
+    bid_date_from: "",
+    bid_date_to: "",
+    exclude_flags: [],  // 제외할 위험 키워드
+    include_flags: [],  // 반드시 포함할 위험 키워드
   },
 };
 
@@ -298,6 +318,30 @@ function syncControlsFromState() {
   $("f-risk").value = f.risk || "";
   $("f-grade").value = f.grade || "";
   $("f-sort").value = f.sort || "score_desc";
+  // ── 고급 필터 동기화 ──
+  const setVal = (id, v) => { const n = $(id); if (n) n.value = (v ?? ""); };
+  setVal("f-court", f.court);
+  setVal("f-group", f.item_group);
+  setVal("f-confidence", f.confidence);
+  setVal("f-doc", f.document_status);
+  setVal("f-appraisal-min", f.appraisal_min);
+  setVal("f-appraisal-max", f.appraisal_max);
+  setVal("f-market-min", f.market_min);
+  setVal("f-market-max", f.market_max);
+  setVal("f-profit-min", f.profit_min);
+  setVal("f-profit-max", f.profit_max);
+  setVal("f-roi-min", f.roi_min);
+  setVal("f-roi-max", f.roi_max);
+  setVal("f-date-from", f.bid_date_from);
+  setVal("f-date-to", f.bid_date_to);
+  if (typeof refreshSigunguOptions === "function") { refreshSigunguOptions(); refreshDongOptions(); }
+  setVal("f-sido", f.sido);
+  setVal("f-sigungu", f.sigungu);
+  setVal("f-dong", f.dong);
+  const exSet = new Set(f.exclude_flags || []);
+  document.querySelectorAll("[data-exclude]").forEach((chk) => { chk.checked = exSet.has(chk.dataset.exclude); });
+  const inSet = new Set(f.include_flags || []);
+  document.querySelectorAll("[data-include]").forEach((chk) => { chk.checked = inSet.has(chk.dataset.include); });
   // 보기 토글
   document.querySelectorAll(".view-btn").forEach((b) => {
     const active = b.dataset.view === STATE.view;
@@ -454,13 +498,49 @@ function renderQuickChips() {
 }
 
 // ── Filter dropdowns ───────────────────────────────
+function _fillSelect(id, values, keep) {
+  const sel = $(id);
+  if (!sel) return;
+  const cur = keep ? sel.value : "";
+  // 첫 옵션(전체)만 남기고 비움
+  while (sel.options.length > 1) sel.remove(1);
+  values.forEach((v) => sel.appendChild(el(`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)));
+  if (keep && values.includes(cur)) sel.value = cur;
+}
+
 function populateFilterOptions() {
-  const regions = Array.from(new Set(STATE.items.map((it) => it.region).filter(Boolean))).sort();
-  const types   = Array.from(new Set(STATE.items.map((it) => it.item_type).filter(Boolean))).sort();
-  const regSel = $("f-region");
-  const typSel = $("f-type");
-  regions.forEach((r) => regSel.appendChild(el(`<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`)));
-  types.forEach((t) => typSel.appendChild(el(`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`)));
+  const uniqSorted = (fn) =>
+    Array.from(new Set(STATE.items.map(fn).filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), "ko"));
+  _fillSelect("f-region", uniqSorted((it) => it.region));
+  _fillSelect("f-type", uniqSorted((it) => it.item_type));
+  // 법원/기관: court_name ∪ agency_name
+  const courts = Array.from(new Set([
+    ...STATE.items.map((it) => it.court_name).filter(Boolean),
+    ...STATE.items.map((it) => it.agency_name).filter(Boolean),
+  ])).sort((a, b) => String(a).localeCompare(String(b), "ko"));
+  _fillSelect("f-court", courts);
+  _fillSelect("f-group", uniqSorted((it) => it.item_group));
+  _fillSelect("f-sido", uniqSorted((it) => it.sido || it.region));
+  refreshSigunguOptions();
+  refreshDongOptions();
+}
+
+// 시도 선택 시 해당 시군구만, 시군구 선택 시 해당 동만 (cascade)
+function refreshSigunguOptions() {
+  const f = STATE.filters;
+  const vals = Array.from(new Set(STATE.items
+    .filter((it) => !f.sido || (it.sido || it.region) === f.sido)
+    .map((it) => it.sigungu).filter(Boolean)))
+    .sort((a, b) => String(a).localeCompare(String(b), "ko"));
+  _fillSelect("f-sigungu", vals, true);
+}
+function refreshDongOptions() {
+  const f = STATE.filters;
+  const vals = Array.from(new Set(STATE.items
+    .filter((it) => (!f.sido || (it.sido || it.region) === f.sido) && (!f.sigungu || it.sigungu === f.sigungu))
+    .map((it) => it.dong).filter(Boolean)))
+    .sort((a, b) => String(a).localeCompare(String(b), "ko"));
+  _fillSelect("f-dong", vals, true);
 }
 
 function bindFilterEvents() {
@@ -475,6 +555,21 @@ function bindFilterEvents() {
     "f-risk":      (v) => STATE.filters.risk = v,
     "f-grade":     (v) => STATE.filters.grade = v,
     "f-sort":      (v) => STATE.filters.sort = v || "score_desc",
+    // ── 고급 필터 ──
+    "f-court":     (v) => STATE.filters.court = v,
+    "f-group":     (v) => STATE.filters.item_group = v,
+    "f-confidence":(v) => STATE.filters.confidence = v,
+    "f-doc":       (v) => STATE.filters.document_status = v,
+    "f-appraisal-min": (v) => STATE.filters.appraisal_min = v ? Number(v) : null,
+    "f-appraisal-max": (v) => STATE.filters.appraisal_max = v ? Number(v) : null,
+    "f-market-min": (v) => STATE.filters.market_min = v ? Number(v) : null,
+    "f-market-max": (v) => STATE.filters.market_max = v ? Number(v) : null,
+    "f-profit-min": (v) => STATE.filters.profit_min = (v !== "" ? Number(v) : null),
+    "f-profit-max": (v) => STATE.filters.profit_max = (v !== "" ? Number(v) : null),
+    "f-roi-min":    (v) => STATE.filters.roi_min = (v !== "" ? Number(v) : null),
+    "f-roi-max":    (v) => STATE.filters.roi_max = (v !== "" ? Number(v) : null),
+    "f-date-from":  (v) => STATE.filters.bid_date_from = v || "",
+    "f-date-to":    (v) => STATE.filters.bid_date_to = v || "",
   };
   Object.entries(map).forEach(([id, setter]) => {
     const node = $(id);
@@ -484,6 +579,53 @@ function bindFilterEvents() {
       setter(node.value);
       applyFilters();
     });
+  });
+  // 지역(시도/시군구/동) cascade
+  const sidoSel = $("f-sido");
+  if (sidoSel) sidoSel.addEventListener("change", () => {
+    STATE.filters.sido = sidoSel.value;
+    STATE.filters.sigungu = ""; STATE.filters.dong = "";
+    refreshSigunguOptions(); refreshDongOptions();
+    applyFilters();
+  });
+  const sgSel = $("f-sigungu");
+  if (sgSel) sgSel.addEventListener("change", () => {
+    STATE.filters.sigungu = sgSel.value;
+    STATE.filters.dong = "";
+    refreshDongOptions();
+    applyFilters();
+  });
+  const dongSel = $("f-dong");
+  if (dongSel) dongSel.addEventListener("change", () => {
+    STATE.filters.dong = dongSel.value;
+    applyFilters();
+  });
+  // 위험 키워드 포함/제외 체크박스
+  document.querySelectorAll("[data-exclude]").forEach((chk) => {
+    chk.addEventListener("change", () => {
+      const kw = chk.dataset.exclude;
+      const set = new Set(STATE.filters.exclude_flags);
+      chk.checked ? set.add(kw) : set.delete(kw);
+      STATE.filters.exclude_flags = [...set];
+      applyFilters();
+    });
+  });
+  document.querySelectorAll("[data-include]").forEach((chk) => {
+    chk.addEventListener("change", () => {
+      const kw = chk.dataset.include;
+      const set = new Set(STATE.filters.include_flags);
+      chk.checked ? set.add(kw) : set.delete(kw);
+      STATE.filters.include_flags = [...set];
+      applyFilters();
+    });
+  });
+  // 고급 필터 펼치기/접기
+  const advToggle = $("adv-toggle");
+  if (advToggle) advToggle.addEventListener("click", () => {
+    const body = $("adv-filter-body");
+    const hidden = body.hasAttribute("hidden");
+    if (hidden) { body.removeAttribute("hidden"); advToggle.textContent = "－ 고급 필터 접기"; advToggle.setAttribute("aria-expanded", "true"); }
+    else { body.setAttribute("hidden", ""); advToggle.textContent = "＋ 고급 필터"; advToggle.setAttribute("aria-expanded", "false"); }
   });
   $("f-reset").addEventListener("click", resetFilters);
   $("filter-toggle").addEventListener("click", () => {
@@ -594,6 +736,33 @@ function _hasRiskKeyword(it, sub) {
 function _hasText(arr, sub) {
   return (arr || []).some((s) => String(s || "").includes(sub));
 }
+// 수익률 안전 변환: 0.12(분수) / 12(퍼센트) 혼용 → 퍼센트로 통일
+function _roiPct(v) {
+  if (v === null || v === undefined || isNaN(v)) return 0;
+  const n = Number(v);
+  return (Math.abs(n) > 0 && Math.abs(n) < 1) ? n * 100 : n;
+}
+// 신뢰도 점수(0~1) → 구간
+function _confBand(score) {
+  const s = Number(score);
+  if (isNaN(s)) return "";
+  if (s >= 0.8) return "high";
+  if (s >= 0.6) return "medium";
+  if (s >= 0.4) return "low";
+  return "very_low";
+}
+// 문서 미공개 여부 (documents_missing / document_status / documents 배열 함께 확인)
+function _docsMissing(it) {
+  if (it.documents_missing === true) return true;
+  if (/미공개/.test(it.document_status || "")) return true;
+  if (Array.isArray(it.documents) && it.documents.length === 0) return true;
+  return false;
+}
+// 입찰기일 시작일 (bid_date "YYYY-MM-DD~YYYY-MM-DD" 또는 단일) → "YYYY-MM-DD"
+function _bidStart(it) {
+  const s = String(it.bid_date || "").split("~")[0].trim();
+  return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : "";
+}
 
 // 통합검색 대상 텍스트 — 주소/사건번호/관리번호/법원·기관명/지역/물건종류/위험키워드/추천이유까지
 function searchableText(it) {
@@ -655,6 +824,32 @@ function applyFilters() {
   if (f._scoreMin !== undefined && f._scoreMin !== null)
     out = out.filter((it) => (it.recommendation_score || 0) >= f._scoreMin);
 
+  // ── 고급 필터 ──
+  if (f.court) out = out.filter((it) =>
+    it.court_name === f.court || it.agency_name === f.court ||
+    it.court_region === f.court || it.source_site === f.court);
+  if (f.sido)    out = out.filter((it) => (it.sido || it.region || "") === f.sido);
+  if (f.sigungu) out = out.filter((it) => (it.sigungu || "") === f.sigungu);
+  if (f.dong)    out = out.filter((it) => (it.dong || "") === f.dong);
+  if (f.item_group) out = out.filter((it) => (it.item_group || "") === f.item_group);
+  if (f.confidence) out = out.filter((it) => _confBand(it.confidence_score) === f.confidence);
+  if (f.document_status === "missing") out = out.filter((it) => _docsMissing(it));
+  if (f.document_status === "present") out = out.filter((it) => !_docsMissing(it));
+  if (f.appraisal_min !== null) out = out.filter((it) => (it.appraisal_price || 0) >= f.appraisal_min);
+  if (f.appraisal_max !== null) out = out.filter((it) => (it.appraisal_price || 0) <= f.appraisal_max);
+  if (f.market_min !== null) out = out.filter((it) => (it.market_price || 0) >= f.market_min);
+  if (f.market_max !== null) out = out.filter((it) => (it.market_price || 0) <= f.market_max);
+  if (f.profit_min !== null) out = out.filter((it) => (it.expected_profit || 0) >= f.profit_min);
+  if (f.profit_max !== null) out = out.filter((it) => (it.expected_profit || 0) <= f.profit_max);
+  if (f.roi_min !== null) out = out.filter((it) => _roiPct(it.expected_profit_rate) >= f.roi_min);
+  if (f.roi_max !== null) out = out.filter((it) => _roiPct(it.expected_profit_rate) <= f.roi_max);
+  if (f.bid_date_from) out = out.filter((it) => _bidStart(it) && _bidStart(it) >= f.bid_date_from);
+  if (f.bid_date_to)   out = out.filter((it) => _bidStart(it) && _bidStart(it) <= f.bid_date_to);
+  if (f.exclude_flags && f.exclude_flags.length)
+    out = out.filter((it) => !f.exclude_flags.some((kw) => _hasRiskKeyword(it, kw)));
+  if (f.include_flags && f.include_flags.length)
+    out = out.filter((it) => f.include_flags.every((kw) => _hasRiskKeyword(it, kw)));
+
   // 초보자 모드: 고위험, 복잡한 물건 제외
   if (BEGINNER_MODE_ENABLED) {
     out = out.filter((it) => {
@@ -698,6 +893,7 @@ function applyFilters() {
   resetCardFocus();             // 키보드 카드 포커스도 초기화
   renderItems();
   renderItemsHead();
+  renderAppliedFilters();
   renderCharts();
   renderPersonalRecs();
   pushUrlState();
@@ -720,8 +916,8 @@ function renderItemsHead() {
   }
   const shown = Math.min(STATE.pageShown, STATE.filtered.length);
   const showCount = (shown < STATE.filtered.length)
-    ? `표시 ${shown} / 결과 ${STATE.filtered.length} / 전체 ${STATE.items.length}건`
-    : `결과 ${STATE.filtered.length}건 / 전체 ${STATE.items.length}건`;
+    ? `전체 ${STATE.items.length}건 중 ${STATE.filtered.length}건 (현재 ${shown}건 표시)`
+    : `전체 ${STATE.items.length}건 중 ${STATE.filtered.length}건 표시`;
   const hint = f.q
     ? `<span class="search-target-hint caption">주소·사건번호·관리번호·법원/기관명·지역·물건종류·위험키워드·추천이유에서 검색</span>`
     : "";
@@ -1123,7 +1319,46 @@ function _activeFilterChips() {
   if (f.price_max !== null && f.price_max !== undefined) chips.push({ key: "price_max", label: `최저가 ${f.price_max.toLocaleString("ko-KR")}만↓`, clear: () => { STATE.filters.price_max = null; $("f-price-max").value = ""; } });
   if (f.flag) chips.push({ key: "flag", label: `키워드 ${f.flag}`, clear: () => { STATE.filters.flag = ""; } });
   if (f._scoreMin !== undefined && f._scoreMin !== null) chips.push({ key: "_scoreMin", label: `점수 ${f._scoreMin}+`, clear: () => { delete STATE.filters._scoreMin; } });
+  // ── 고급 필터 칩 ──
+  if (f.court) chips.push({ key: "court", label: `법원/기관 ${f.court}`, clear: () => { STATE.filters.court = ""; const n = $("f-court"); if (n) n.value = ""; } });
+  if (f.sido) chips.push({ key: "sido", label: `시도 ${f.sido}`, clear: () => { STATE.filters.sido = ""; STATE.filters.sigungu = ""; STATE.filters.dong = ""; refreshSigunguOptions(); refreshDongOptions(); const n = $("f-sido"); if (n) n.value = ""; } });
+  if (f.sigungu) chips.push({ key: "sigungu", label: `시군구 ${f.sigungu}`, clear: () => { STATE.filters.sigungu = ""; STATE.filters.dong = ""; refreshDongOptions(); const n = $("f-sigungu"); if (n) n.value = ""; } });
+  if (f.dong) chips.push({ key: "dong", label: `동 ${f.dong}`, clear: () => { STATE.filters.dong = ""; const n = $("f-dong"); if (n) n.value = ""; } });
+  if (f.item_group) chips.push({ key: "item_group", label: `그룹 ${f.item_group}`, clear: () => { STATE.filters.item_group = ""; const n = $("f-group"); if (n) n.value = ""; } });
+  if (f.confidence) chips.push({ key: "confidence", label: `신뢰도 ${f.confidence}`, clear: () => { STATE.filters.confidence = ""; const n = $("f-confidence"); if (n) n.value = ""; } });
+  if (f.document_status) chips.push({ key: "document_status", label: f.document_status === "missing" ? "문서 미공개" : "문서 있음", clear: () => { STATE.filters.document_status = ""; const n = $("f-doc"); if (n) n.value = ""; } });
+  if (f.appraisal_min !== null) chips.push({ key: "appraisal_min", label: `감정가 ${f.appraisal_min.toLocaleString("ko-KR")}만↑`, clear: () => { STATE.filters.appraisal_min = null; const n = $("f-appraisal-min"); if (n) n.value = ""; } });
+  if (f.appraisal_max !== null) chips.push({ key: "appraisal_max", label: `감정가 ${f.appraisal_max.toLocaleString("ko-KR")}만↓`, clear: () => { STATE.filters.appraisal_max = null; const n = $("f-appraisal-max"); if (n) n.value = ""; } });
+  if (f.market_min !== null) chips.push({ key: "market_min", label: `시세 ${f.market_min.toLocaleString("ko-KR")}만↑`, clear: () => { STATE.filters.market_min = null; const n = $("f-market-min"); if (n) n.value = ""; } });
+  if (f.market_max !== null) chips.push({ key: "market_max", label: `시세 ${f.market_max.toLocaleString("ko-KR")}만↓`, clear: () => { STATE.filters.market_max = null; const n = $("f-market-max"); if (n) n.value = ""; } });
+  if (f.profit_min !== null) chips.push({ key: "profit_min", label: `차익 ${f.profit_min.toLocaleString("ko-KR")}만↑`, clear: () => { STATE.filters.profit_min = null; const n = $("f-profit-min"); if (n) n.value = ""; } });
+  if (f.profit_max !== null) chips.push({ key: "profit_max", label: `차익 ${f.profit_max.toLocaleString("ko-KR")}만↓`, clear: () => { STATE.filters.profit_max = null; const n = $("f-profit-max"); if (n) n.value = ""; } });
+  if (f.roi_min !== null) chips.push({ key: "roi_min", label: `수익률 ${f.roi_min}%↑`, clear: () => { STATE.filters.roi_min = null; const n = $("f-roi-min"); if (n) n.value = ""; } });
+  if (f.roi_max !== null) chips.push({ key: "roi_max", label: `수익률 ${f.roi_max}%↓`, clear: () => { STATE.filters.roi_max = null; const n = $("f-roi-max"); if (n) n.value = ""; } });
+  if (f.bid_date_from) chips.push({ key: "bid_date_from", label: `기일 ${f.bid_date_from}~`, clear: () => { STATE.filters.bid_date_from = ""; const n = $("f-date-from"); if (n) n.value = ""; } });
+  if (f.bid_date_to) chips.push({ key: "bid_date_to", label: `기일 ~${f.bid_date_to}`, clear: () => { STATE.filters.bid_date_to = ""; const n = $("f-date-to"); if (n) n.value = ""; } });
+  (f.exclude_flags || []).forEach((kw) => chips.push({ key: `ex_${kw}`, label: `${kw} 제외`, clear: () => { STATE.filters.exclude_flags = STATE.filters.exclude_flags.filter((x) => x !== kw); const c = document.querySelector(`[data-exclude="${kw}"]`); if (c) c.checked = false; } }));
+  (f.include_flags || []).forEach((kw) => chips.push({ key: `in_${kw}`, label: `${kw} 포함`, clear: () => { STATE.filters.include_flags = STATE.filters.include_flags.filter((x) => x !== kw); const c = document.querySelector(`[data-include="${kw}"]`); if (c) c.checked = false; } }));
   return chips;
+}
+
+// 현재 적용 필터 칩을 필터 영역 하단에 항상 표시 (개별 × 제거 가능)
+function renderAppliedFilters() {
+  const root = $("applied-filters");
+  if (!root) return;
+  const chips = _activeFilterChips();
+  clearChildren(root);
+  if (!chips.length) { root.hidden = true; return; }
+  root.hidden = false;
+  root.appendChild(el(`<span class="applied-label">적용 필터</span>`));
+  chips.forEach((c) => {
+    const b = el(`<button class="applied-chip" type="button">${escapeHtml(c.label)} <span class="x">×</span></button>`);
+    b.addEventListener("click", () => { c.clear(); applyFilters(); });
+    root.appendChild(b);
+  });
+  const clearAll = el(`<button class="applied-clear" type="button">전체 해제</button>`);
+  clearAll.addEventListener("click", resetFilters);
+  root.appendChild(clearAll);
 }
 
 function buildZeroState() {
@@ -3534,6 +3769,40 @@ function parseIntent(text) {
     intent.note.push(`상위 ${intent.limit}개`);
   }
 
+  // 법원/기관
+  const COURTS = ["서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원",
+    "서울서부지방법원", "의정부지방법원", "인천지방법원", "수원지방법원", "대전지방법원",
+    "대구지방법원", "부산지방법원", "광주지방법원", "울산지방법원", "창원지방법원",
+    "제주지방법원", "춘천지방법원", "청주지방법원", "전주지방법원"];
+  for (const c of COURTS) {
+    if (q.includes(c)) { intent.filters.court = c; intent.note.push(`법원: ${c}`); break; }
+  }
+  if (!intent.filters.court && (q.includes("캠코") || q.includes("자산관리공사"))) {
+    intent.filters.court = "한국자산관리공사"; intent.note.push("기관: 한국자산관리공사");
+  }
+
+  // 물건그룹
+  if (q.includes("주거")) { intent.filters.item_group = "주거용 건물"; intent.note.push("주거용"); }
+  else if (q.includes("상업")) { intent.filters.item_group = "상업용 건물"; intent.note.push("상업용"); }
+
+  // 유찰 N회 이상
+  const failMatch = q.match(/유찰\s*(\d+)\s*회/);
+  if (failMatch) { intent.filters.fail_min = Number(failMatch[1]); intent.note.push(`유찰 ${failMatch[1]}회+`); }
+
+  // 문서 상태
+  if (q.includes("미공개")) {
+    if (/(빼|제외|말고)/.test(q)) { intent.filters.document_status = "present"; intent.note.push("문서 있음"); }
+    else { intent.filters.document_status = "missing"; intent.note.push("문서 미공개"); }
+  }
+
+  // 위험 키워드 제외 / 포함
+  intent.filters.exclude_flags = [];
+  ["유치권", "법정지상권", "지분", "농지"].forEach((kw) => {
+    if (q.includes(kw) && /(제외|빼|말고)/.test(q)) { intent.filters.exclude_flags.push(kw); intent.note.push(`${kw} 제외`); }
+  });
+  intent.filters.include_flags = [];
+  if (q.includes("임차") && /(포함|만)/.test(q)) { intent.filters.include_flags.push("임차"); intent.note.push("임차인 포함"); }
+
   // 오늘 뭐부터 등 모호한 입력 → 추천점수 정렬 + top5
   if (!intent.sort && (q.includes("뭐부터") || q.includes("오늘") || q.includes("괜찮") || !q)) {
     intent.sort = "score_desc";
@@ -3555,6 +3824,17 @@ function runAgentSearch(text) {
   if (f.due_max !== undefined) arr = arr.filter((it) =>
     it.days_left !== null && it.days_left !== undefined &&
     it.days_left >= 0 && it.days_left <= f.due_max);
+  // ── 고급 필터 연동 ──
+  if (f.court) arr = arr.filter((it) =>
+    (it.court_name || "").includes(f.court) || (it.agency_name || "").includes(f.court));
+  if (f.item_group) arr = arr.filter((it) => (it.item_group || "") === f.item_group);
+  if (f.fail_min !== undefined) arr = arr.filter((it) => (it.fail_count || 0) >= f.fail_min);
+  if (f.document_status === "missing") arr = arr.filter((it) => _docsMissing(it));
+  if (f.document_status === "present") arr = arr.filter((it) => !_docsMissing(it));
+  if (f.exclude_flags && f.exclude_flags.length)
+    arr = arr.filter((it) => !f.exclude_flags.some((kw) => _hasRiskKeyword(it, kw)));
+  if (f.include_flags && f.include_flags.length)
+    arr = arr.filter((it) => f.include_flags.every((kw) => _hasRiskKeyword(it, kw)));
 
   arr = sortItems(arr, intent.sort || "score_desc");
   const limit = intent.limit || 10;

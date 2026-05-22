@@ -1213,8 +1213,93 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   gap: 6px;
 }
 .range-inputs input { flex: 1; min-width: 0; }
-.f-actions-row { justify-content: flex-end; align-self: end; }
+.f-actions-row { justify-content: flex-end; align-self: end; gap: 8px; display: flex; }
 .f-actions-row .btn { height: 38px; padding: 0 14px; border-radius: 6px; }
+.f-field input[type="date"] {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: var(--color-input);
+  color: var(--color-text);
+}
+
+/* ── 고급 필터 ────────────────────────── */
+.adv-filter-body {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border);
+}
+.adv-flags {
+  margin-top: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.adv-flags legend {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0 4px;
+}
+.adv-flags .chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  cursor: pointer;
+  min-height: 32px;
+}
+.adv-flags .chk input { width: 18px; height: 18px; }
+
+/* ── 현재 적용 필터 칩 ────────────────────────── */
+.applied-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+.applied-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+.applied-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  background: var(--color-primary);
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+}
+.applied-chip .x { font-weight: 700; opacity: 0.85; }
+.applied-clear {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  cursor: pointer;
+}
+@media (max-width: 640px) {
+  .applied-filters { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .applied-chip, .applied-clear, .applied-label { flex-shrink: 0; }
+}
 
 /* ── Metric grid ────────────────────────── */
 .metric-grid {
