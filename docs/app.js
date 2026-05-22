@@ -537,6 +537,21 @@ function passQuery(q, it) {
     .some((s) => s && String(s).toLowerCase().includes(needle));
 }
 
+function _is_beginner_friendly(it) {
+  if (!it) return false;
+  if (it.risk_level === "high") return false;
+  if ((it.confidence_score || 0) < 0.6) return false;
+  const grade = it.recommendation_grade || "C";
+  if (!["A", "B"].includes(grade)) return false;
+  const itype = it.item_type || "";
+  if (!["아파트", "오피스텔", "주택", "빌라"].includes(itype)) return false;
+  const forbidden = ["유치권", "법정지상권", "지분매각", "농지취득자격증명", "분묘기지권"];
+  for (const flag of (it.risk_flags || [])) {
+    if (forbidden.includes(flag.keyword)) return false;
+  }
+  return true;
+}
+
 function applyFilters() {
   const f = STATE.filters;
   let out = STATE.items.filter((it) => chipMatch(f.chip, it) && passQuery(f.q, it));
@@ -555,6 +570,23 @@ function applyFilters() {
     (it.risk_flags || []).some((fl) => (fl.keyword || "").includes(f.flag)));
   if (f._scoreMin !== undefined && f._scoreMin !== null)
     out = out.filter((it) => (it.recommendation_score || 0) >= f._scoreMin);
+
+  // 초보자 모드: 고위험, 복잡한 물건 제외
+  if (BEGINNER_MODE_ENABLED) {
+    out = out.filter((it) => {
+      if (it.risk_level === "high") return false;  // 고위험 제외
+      if ((it.confidence_score || 0) < 0.6) return false;  // 신뢰도 낮음 제외
+      const grade = it.recommendation_grade || "C";
+      if (!["A", "B"].includes(grade)) return false;  // A/B 등급만
+      const itype = it.item_type || "";
+      if (!["아파트", "오피스텔", "주택", "빌라"].includes(itype)) return false;  // 주거용만
+      const forbidden = ["유치권", "법정지상권", "지분매각", "농지취득자격증명", "분묘기지권"];
+      for (const flag of (it.risk_flags || [])) {
+        if (forbidden.includes(flag.keyword)) return false;
+      }
+      return true;
+    });
+  }
 
   // '최근 본' 칩일 땐 본 순서대로 정렬을 강제 (사용자가 명시 정렬을 바꾸면 그대로 따름)
   if (f.chip === "viewed" && f.sort === "score_desc") {
@@ -675,6 +707,14 @@ function renderRecs(recs) {
     // 매물 상세 데이터(변화 태그 등)는 items 배열에서 join
     const itFull = r.item_id ? STATE.items.find((x) => String(x.id) === String(r.item_id)) : null;
     const recCh = itFull ? changeBadgesHtml(itFull) : "";
+    const begLabel = BEGINNER_GRADE_LABEL[grade] || "";
+    const begPill = (itFull && itFull.beginner_friendly)
+      ? `<span class="beginner-pill ok">🎓 ${escapeHtml(begLabel)}</span>`
+      : (begLabel ? `<span class="beginner-pill">🎓 ${escapeHtml(begLabel)}</span>` : "");
+    const easyProfit = (itFull && itFull.simple_profit_summary)
+      ? `<div class="rec-easy">💰 ${escapeHtml(itFull.simple_profit_summary)}</div>` : "";
+    const easyRisk = (itFull && itFull.simple_risk_summary)
+      ? `<div class="rec-easy">⚠ 조심할 점: ${escapeHtml(itFull.simple_risk_summary)}</div>` : "";
     const card = el(
       `<article class="rec-card" data-item-id="${r.item_id || ""}">
          <div class="rec-head">
@@ -682,6 +722,7 @@ function renderRecs(recs) {
            <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
            <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
            <span class="source-pill">${escapeHtml(SOURCE_LABEL[r.source] || r.source || "")}</span>
+           ${begPill}
            ${recCh}
          </div>
          <div class="rec-title">${escapeHtml(r.title || r.address || "")}</div>
@@ -693,6 +734,8 @@ function renderRecs(recs) {
            <span class="rec-stat">시세 ${fmtMan(r.market_price)}</span>
            <span class="rec-stat">점수 <strong>${escapeHtml(String(r.recommendation_score || "-"))}</strong></span>
          </div>
+         ${easyProfit}
+         ${easyRisk}
          ${reason}
          ${next}
        </article>`
@@ -3537,6 +3580,7 @@ async function load() {
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     render(data);
+    renderAppHome();  // 홈 화면 렌더링
   } catch (e) {
     showError(`mock_dashboard.json 을 불러오지 못했습니다: ${e && e.message ? e.message : e}`);
   }
@@ -4245,6 +4289,281 @@ function setupStickyOffset() {
   }
 }
 
+// ── 홈 화면 (초보자 친화형) ───────────────────────
+let BEGINNER_MODE_ENABLED = false;
+
+function getBeginnerfMode() {
+  try {
+    const saved = localStorage.getItem("auction:beginner:v1");
+    return saved === "true";
+  } catch {
+    return false;
+  }
+}
+
+function setBeginnerfMode(enabled) {
+  BEGINNER_MODE_ENABLED = !!enabled;
+  try {
+    localStorage.setItem("auction:beginner:v1", enabled ? "true" : "false");
+  } catch {}
+  applyFilters();  // 필터 재적용
+}
+
+// 추천등급 → 초보자용 라벨
+const BEGINNER_GRADE_LABEL = {
+  A: "초보자 검토 가능",
+  B: "조심해서 검토",
+  C: "보류 후보",
+  D: "낮은 우선순위",
+  X: "초보자 비추천",
+};
+
+function renderAppHome() {
+  // AI 브리핑 텍스트 업데이트
+  const briefing = STATE.data && STATE.data.briefing;
+  const briefingBox = $("app-briefing-text");
+  if (briefingBox && briefing && briefing.summary) {
+    const lines = briefing.summary.split("\n");
+    briefingBox.textContent = lines[0] || "오늘의 경매·공매 분석 결과입니다";
+  }
+
+  renderStatusCards();
+  renderTodayItems();
+}
+
+function renderStatusCards() {
+  const grid = $("status-grid");
+  if (!grid) return;
+  clearChildren(grid);
+  const s = (STATE.data && STATE.data.summary) || {};
+  // 초보자 후보 수: summary 값 우선, 없으면 items 에서 계산
+  const beginnerCount = (s.beginner_candidate_items != null)
+    ? s.beginner_candidate_items
+    : STATE.items.filter((it) => it.beginner_friendly).length;
+  const cards = [
+    { label: "전체 물건", value: s.total_items ?? STATE.items.length, cls: "stat-total" },
+    { label: "경매", value: s.auction_count ?? "-", cls: "stat-auction" },
+    { label: "공매", value: s.public_sale_count ?? "-", cls: "stat-public" },
+    { label: "추천 후보", value: s.recommended_items ?? "-", cls: "stat-rec" },
+    { label: "초보자 후보", value: beginnerCount, cls: "stat-beginner" },
+    { label: "고위험", value: s.high_risk_items ?? "-", cls: "stat-risk" },
+    { label: "입찰임박", value: s.urgent_items ?? "-", cls: "stat-urgent" },
+  ];
+  cards.forEach((c) => {
+    const card = el(
+      `<div class="status-card ${c.cls}">
+         <span class="status-value">${escapeHtml(String(c.value))}</span>
+         <span class="status-label">${escapeHtml(c.label)}</span>
+       </div>`
+    );
+    grid.appendChild(card);
+  });
+}
+
+function renderTodayItems() {
+  const list = $("today-items-list");
+  if (!list) return;
+  clearChildren(list);
+
+  // 오늘 우선 볼 물건: 초보자 친화 물건 중 예상차익 큰 순 → 입찰기일 임박 순, 3개
+  const candidates = STATE.items
+    .filter((it) => it.beginner_friendly || _is_beginner_friendly(it))
+    .sort((a, b) => {
+      const p = (b.expected_profit || 0) - (a.expected_profit || 0);
+      if (p !== 0) return p;
+      return (a.days_left ?? 999) - (b.days_left ?? 999);
+    })
+    .slice(0, 3);
+
+  if (!candidates.length) {
+    list.appendChild(el(`<p class="caption">초보자에게 바로 권할 물건이 오늘은 없어요. 전체 물건을 탐색해 보세요.</p>`));
+    return;
+  }
+
+  list.appendChild(el(`<p class="today-lead">AI가 오늘 먼저 볼 물건을 골랐어요.</p>`));
+
+  candidates.forEach((item) => {
+    const grade = item.recommendation_grade || "B";
+    const label = BEGINNER_GRADE_LABEL[grade] || "검토 후보";
+    const caution = item.simple_risk_summary || item.simple_next_action || "기본 확인 필요";
+    const card = el(
+      `<div class="today-item">
+         <div class="today-item-tags">
+           <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
+           <span class="beginner-pill">🎓 ${escapeHtml(label)}</span>
+         </div>
+         <div class="today-item-title">${escapeHtml(item.title || item.address || "주소 미상")}</div>
+         <div class="today-item-addr">${escapeHtml(item.address || "")} · ${escapeHtml(item.item_type || "")}</div>
+         <div class="today-item-desc">💰 예상 시세차익 ${fmtMan(item.expected_profit)}</div>
+         <div class="today-item-caution">⚠ 조심할 점: ${escapeHtml(caution)}</div>
+         <button class="today-item-detail" type="button">상세보기 →</button>
+       </div>`
+    );
+    bindTap(card.querySelector(".today-item-detail"), () => openDetailById(item.id));
+    bindTap(card, () => openDetailById(item.id));
+    list.appendChild(card);
+  });
+}
+
+function scrollToSection(id) {
+  const sec = $(id);
+  if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+  return sec;
+}
+
+// 카테고리 → 데모 데이터에 존재하는 물건종류 매핑
+const CATEGORY_TYPE_MAP = { 주택: "빌라" };
+
+function selectCategory(category) {
+  const type = CATEGORY_TYPE_MAP[category] || category;
+  STATE.filters.chip = "all";
+  STATE.filters.item_type = type;
+  const sel = $("f-type");
+  if (sel) {
+    const has = Array.from(sel.options).some((o) => o.value === type);
+    sel.value = has ? type : "";
+    if (!has) STATE.filters.item_type = "";  // 데모에 없는 종류면 전체로
+  }
+  applyFilters();
+  scrollToSection("section-items");
+  if (!STATE.filters.item_type) {
+    showToast(`데모 데이터에는 '${category}' 물건이 아직 없어요. 전체 물건을 보여드릴게요.`, null);
+    setTimeout(hideToast, 2800);
+  }
+}
+
+// 유틸리티 메뉴 → 기존 섹션 연결
+const UTIL_ACTIONS = {
+  news:       () => scrollToSection("section-briefing"),
+  rights:     () => openGlossary(),
+  quiz:       () => openGlossary(),
+  simulation: () => scrollToSection("section-recommendations"),
+  results:    () => scrollToSection("section-items"),
+  map:        () => scrollToSection("section-charts"),
+  calendar:   () => {
+    STATE.filters.sort = "due_asc";
+    const sortSel = $("f-sort"); if (sortSel) sortSel.value = "due_asc";
+    applyFilters();
+    scrollToSection("section-items");
+  },
+  loan:       () => scrollToSection("section-recommendations"),
+};
+
+function bindAppHome() {
+  // 초보자 모드 토글
+  const toggle = document.getElementById("beginner-mode-toggle");
+  if (toggle) {
+    toggle.checked = getBeginnerfMode();
+    toggle.addEventListener("change", () => {
+      setBeginnerfMode(toggle.checked);
+      showToast(toggle.checked
+        ? "초보자 모드 ON — 위험·복잡 물건을 숨기고 A/B 주거용만 보여줘요."
+        : "초보자 모드 OFF — 모든 물건을 보여줘요.", null);
+      setTimeout(hideToast, 2500);
+    });
+  }
+
+  // 카테고리 버튼 클릭
+  document.querySelectorAll(".cat-btn").forEach((btn) => {
+    btn.addEventListener("click", () => selectCategory(btn.dataset.category));
+  });
+
+  // 유틸리티 버튼 클릭 → 기존 섹션/기능 연결
+  document.querySelectorAll(".util-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const fn = UTIL_ACTIONS[btn.dataset.utility];
+      if (fn) fn();
+    });
+  });
+
+  // AI 물건 검색 → AI 에이전트 검색 섹션으로 스크롤
+  const aiSearchBtn = document.getElementById("btn-ai-search");
+  if (aiSearchBtn) {
+    aiSearchBtn.addEventListener("click", () => {
+      scrollToSection("section-agent-search");
+      const aq = $("agent-q");
+      if (aq) setTimeout(() => aq.focus(), 350);
+    });
+  }
+
+  // AI 물건 분석 → 추천 TOP 5 섹션으로 스크롤
+  const aiAnalyzeBtn = document.getElementById("btn-ai-analyze");
+  if (aiAnalyzeBtn) {
+    aiAnalyzeBtn.addEventListener("click", () => scrollToSection("section-recommendations"));
+  }
+
+  // 전체 탐색 버튼
+  const exploreBtn = document.getElementById("btn-explore");
+  if (exploreBtn) {
+    exploreBtn.addEventListener("click", () => scrollToSection("section-items"));
+  }
+
+  bindGlossary();
+}
+
+// ── 용어 쉽게 설명 (초보자 권리분석 용어집) ──────────
+const GLOSSARY = {
+  "유치권": "건설업자나 자재 공급자가 못 받은 대금을 담보로 물건을 점유할 수 있는 권리. 낙찰 후 새 주인이 이 돈을 떠안아야 할 수 있어요.",
+  "법정지상권": "토지와 건물 주인이 다를 때, 건물 주인이 그 땅을 계속 쓸 수 있는 권리. 건물을 낙찰받아도 토지 사용료를 계속 내야 할 수 있어요.",
+  "대항력": "임차인이 등기에 없어도 새 주인에게 권리를 주장할 수 있는 힘. 임차인이 살고 있으면 보증금을 떠안아야 할 수 있어요.",
+  "선순위임차인": "지금 주인보다 먼저 계약한 임차인. 낙찰 후에도 그 보증금을 먼저 돌려줘야 할 수 있어요.",
+  "지분매각": "물건 전체가 아니라 일부 지분만 파는 경우. 권리관계가 복잡하고 분쟁 가능성이 높아 초보자에게 어려워요.",
+  "농지취득자격증명": "농지를 사려면 필요한 자격 증명서. 없으면 낙찰받아도 농지로 못 쓸 수 있어요.",
+  "분묘기지권": "남의 땅에 무덤을 쓸 수 있는 권리. 땅 주인이 바뀌어도 그 권리는 계속 유지돼요.",
+  "명도": "사는 사람이나 점유자를 내보내는 절차. 시간과 비용이 들고 법원 집행이 필요할 수 있어요.",
+  "말소기준권리": "이 권리를 기준으로 뒤에 붙은 권리들이 낙찰 후 사라지는, 권리분석의 기준점이에요.",
+  "매각물건명세서": "법원이 물건 상태·권리를 정리해 공개하는 공식 문서. 가장 믿을 수 있는 정보예요.",
+  "현황조사서": "법원이 직접 현장을 조사해 점유 상태·하자 등을 기록한 보고서예요.",
+  "감정평가서": "감정사가 매긴 시장 가치 문서. 경매 최저가의 근거가 되는 가격이에요.",
+};
+
+function renderGlossary(filter) {
+  const list = $("glossary-list");
+  if (!list) return;
+  clearChildren(list);
+  const q = (filter || "").trim().toLowerCase();
+  const entries = Object.entries(GLOSSARY).filter(
+    ([term, exp]) => !q || term.toLowerCase().includes(q) || exp.toLowerCase().includes(q)
+  );
+  if (!entries.length) {
+    list.appendChild(el(`<p class="caption">검색 결과가 없어요.</p>`));
+    return;
+  }
+  entries.forEach(([term, exp]) => {
+    list.appendChild(el(
+      `<div class="glossary-item">
+         <div class="glossary-term">${escapeHtml(term)}</div>
+         <div class="glossary-exp">${escapeHtml(exp)}</div>
+       </div>`
+    ));
+  });
+}
+
+function openGlossary(term) {
+  const modal = $("glossary-modal");
+  if (!modal) return;
+  const search = $("glossary-search");
+  if (search) search.value = term || "";
+  renderGlossary(term || "");
+  modal.hidden = false;
+}
+
+function bindGlossary() {
+  const modal = $("glossary-modal");
+  if (!modal) return;
+  const hide = () => { modal.hidden = true; };
+  const close = $("glossary-close");
+  if (close) close.addEventListener("click", hide);
+  modal.addEventListener("click", (e) => {
+    if (e.target instanceof HTMLElement && e.target.dataset.close === "1") hide();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!modal.hidden && e.key === "Escape") hide();
+  });
+  const search = $("glossary-search");
+  if (search) search.addEventListener("input", () => renderGlossary(search.value));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   bindTheme();
   bindFilterEvents();
@@ -4265,6 +4584,8 @@ document.addEventListener("DOMContentLoaded", () => {
   bindVoiceSearch();
   bindMoreButton();
   bindPwa();
+  bindAppHome();  // 홈 화면 바인딩 추가
   setupStickyOffset();
+  BEGINNER_MODE_ENABLED = getBeginnerfMode();  // 초보자 모드 상태 복원
   load();
 });

@@ -52,6 +52,155 @@ def _extract_region(address: str | None) -> str:
     return s[0] if s else "기타"
 
 
+# ── 초보자 모드 용어 설명 ───────────────────────────────────────
+GLOSSARY_DICT = {
+    "유치권": "건설업자나 자재 공급자가 미결제 대금을 담보하기 위해 물건에 설정한 권리. 경매 후 새 소유자가 미결제 금액을 인수해야 할 수 있음.",
+    "법정지상권": "토지와 건물이 따로 소유자를 가질 때 건물 소유자가 토지를 계속 사용할 수 있는 권리. 건물 경매 시에도 토지 임차료를 계속 내야 함.",
+    "대항력": "임차인이 등기부에 기록되지 않아도 새 소유자에게 주장할 수 있는 권리. 임차인이 계속 거주하고 있으면 임차보증금을 인수해야 함.",
+    "선순위임차인": "현재 소유자보다 먼저 임차 계약한 임차인. 경매 후 새 소유자도 그들의 보증금을 우선 변제해야 함.",
+    "지분매각": "물건 전체가 아닌 일부만 매각되는 경우. 복잡한 권리관계와 추후 분쟁 가능성이 높음.",
+    "농지취득자격증명": "농지를 구매하려면 농지소유자 자격이 필요하며 이를 증명하는 서류. 없으면 경매 후에도 농지로 사용할 수 없음.",
+    "분묘기지권": "묘지 소유자가 다른 사람의 토지에 무덤을 쓸 수 있는 권리. 토지 소유자가 바뀌어도 그 권리는 계속 유지됨.",
+    "명도": "임차인이나 불법 점유자가 물건을 비우도록 강제하는 절차. 비용과 시간이 소요되며 법원 집행이 필요할 수 있음.",
+    "말소기준권리": "이미 해결되었거나 소멸했어야 할 권리가 등기부에 남아있는 경우. 새 소유자가 소송으로 말소해야 함.",
+    "매각물건명세서": "경매 물건의 상태, 권리, 기타 정보를 정리한 법원 공식 문서. 가장 신뢰할 수 있는 정보 출처.",
+    "현황조사서": "법원이 직접 현장 조사해서 작성한 보고서. 실제 점유 상태, 위반건축물, 하자 등을 기록.",
+    "감정평가서": "부동산 감정사가 시장 가치를 평가한 문서. 경매 최저가 결정의 근거가 되는 가격.",
+}
+
+
+def _get_easy_explanation(keyword: str) -> str:
+    """위험 키워드에 대한 초보자용 쉬운 설명."""
+    return GLOSSARY_DICT.get(keyword, f"{keyword}에 대해 전문가 상담이 필요합니다.")
+
+
+def _is_beginner_friendly(it: dict) -> bool:
+    """초보자 모드에서 표시할 물건인지 판단.
+    - 고위험 물건 제외
+    - 특정 위험 키워드 보유 물건 제외  
+    - 신뢰도 낮은 물건 제외
+    - A/B등급 주거용 위주
+    """
+    # 고위험 물건 제외
+    if it.get("risk_level") == "high":
+        return False
+    
+    # 신뢰도 낮은 물건 제외 (0.6 이상만)
+    if (it.get("confidence_score") or 0) < 0.6:
+        return False
+    
+    # 주거용이 아니면 제외
+    item_type = it.get("item_type", "")
+    if item_type not in ("아파트", "오피스텔", "주택", "빌라"):
+        return False
+    
+    # A/B 등급 우선
+    grade = it.get("recommendation_grade", "C")
+    if grade not in ("A", "B"):
+        return False
+    
+    # 복잡한 권리문제 키워드 제외
+    forbidden_keywords = {
+        "유치권", "법정지상권", "지분매각", 
+        "농지취득자격증명", "분묘기지권",
+        "선순위임차인"
+    }
+    for flag in it.get("risk_flags", []):
+        if flag.get("keyword") in forbidden_keywords:
+            return False
+    
+    return True
+
+
+def _beginner_reason(it: dict) -> str:
+    """초보자용 추천 이유."""
+    grade = it.get("recommendation_grade", "C")
+    profit = it.get("expected_profit", 0)
+    risk = it.get("risk_level", "medium")
+    
+    reasons = []
+    if grade == "A":
+        reasons.append("데이터 기준 검토 가치 높음")
+    elif grade == "B":
+        reasons.append("조건 충족 양호")
+    
+    if profit > 50000:
+        reasons.append(f"차익 {profit:,}만원 이상")
+    elif profit > 0:
+        reasons.append(f"차익 {profit:,}만원 기대")
+    
+    if risk == "low":
+        reasons.append("위험 낮음")
+    
+    return " · ".join(reasons) if reasons else "추가 검토 필요"
+
+
+def _simple_risk_summary(it: dict) -> str:
+    """초보자용 간단한 위험 요약."""
+    risk = it.get("risk_level", "medium")
+    flags = it.get("risk_flags", [])
+    
+    if risk == "low":
+        if flags:
+            kw = flags[0].get("keyword", "")
+            return f"낮음 · 단, {kw} 확인 필요"
+        return "낮음 · 상대적으로 안전"
+    elif risk == "medium":
+        if flags:
+            kw = flags[0].get("keyword", "")
+            return f"보통 · 주의할 점: {kw}"
+        return "보통 · 기본 확인 필수"
+    else:
+        if flags:
+            kw = flags[0].get("keyword", "")
+            return f"높음 · {kw} 때문에 신중히 검토"
+        return "높음 · 전문가 상담 권장"
+
+
+def _simple_profit_summary(it: dict) -> str:
+    """초보자용 간단한 수익 요약."""
+    profit = it.get("expected_profit", 0)
+    roi = it.get("expected_profit_rate", 0)
+    bid = it.get("min_bid_price", 0)
+    
+    if not bid:
+        return "수익 추정 불가"
+    
+    if profit >= 50000:
+        return f"{profit:,}만원 차익 기대 (ROI {roi:.0f}%)"
+    elif profit > 0:
+        return f"{profit:,}만원 소폭 수익 (ROI {roi:.0f}%)"
+    else:
+        return f"수익 예상 어려움 (손실 위험)"
+
+
+def _simple_next_action(it: dict, days_left: int | None) -> str:
+    """초보자용 '오늘 할 일'."""
+    risk = it.get("risk_level", "medium")
+    
+    actions = []
+    
+    # 입찰 임박
+    if days_left is not None and 0 <= days_left <= 3:
+        actions.append(f"입찰 D-{days_left} · 빠른 결정 필요")
+    elif days_left is not None and 0 <= days_left <= 7:
+        actions.append(f"D-{days_left} 이내 결정")
+    else:
+        actions.append("시간 있으니 천천히 검토")
+    
+    # 현장조사
+    if it.get("item_type") in ("아파트", "주택"):
+        actions.append("현장 방문 필수")
+    
+    # 위험도별 조치
+    if risk == "high":
+        actions.append("전문가 상담 받기")
+    elif risk == "medium":
+        actions.append("등기부등본 확인")
+    
+    return " → ".join(actions)
+
+
 def _connect() -> sqlite3.Connection | None:
     if not DB_PATH.exists():
         return None
@@ -533,6 +682,50 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
                 expected_profit, expected_profit_rate, risk_level,
                 float(confidence), days_left,
             ),
+            # ─── 초보자 모드 필드 ───
+            "beginner_friendly": _is_beginner_friendly({
+                "risk_level": risk_level,
+                "confidence_score": confidence,
+                "item_type": r["item_type"],
+                "recommendation_grade": grade,
+                "risk_flags": [{
+                    "keyword": fl.get("keyword"),
+                    "flag_type": fl.get("flag_type"),
+                    "risk_level": fl.get("risk_level"),
+                    "severity": fl.get("severity"),
+                    "description": fl.get("description"),
+                } for fl in flags],
+            }),
+            "beginner_reason": _beginner_reason({
+                "recommendation_grade": grade,
+                "expected_profit": expected_profit,
+                "risk_level": risk_level,
+            }),
+            "simple_risk_summary": _simple_risk_summary({
+                "risk_level": risk_level,
+                "risk_flags": [{
+                    "keyword": fl.get("keyword"),
+                    "flag_type": fl.get("flag_type"),
+                } for fl in flags],
+            }),
+            "simple_profit_summary": _simple_profit_summary({
+                "expected_profit": expected_profit,
+                "expected_profit_rate": expected_profit_rate,
+                "min_bid_price": minb,
+            }),
+            "simple_next_action": _simple_next_action({
+                "risk_level": risk_level,
+                "item_type": r["item_type"],
+            }, days_left),
+            "why_recommended": rec_reason,
+            "what_to_check": checklist[0] if checklist else "등기부등본 확인",
+            "easy_explanation": _get_easy_explanation(
+                warnings_list[0] if warnings_list else ""
+            ),
+            "glossary_terms": [
+                {"term": kw, "explanation": _get_easy_explanation(kw)}
+                for kw in warnings_list
+            ],
         })
     return out
 
@@ -863,6 +1056,41 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
                 for k in range(11, -1, -1)
             ])(market),
             "score_breakdown": _score_breakdown(profit, roi, risk, confidence, days_offset),
+            # ─── 초보자 모드 필드 ───
+            "beginner_friendly": _is_beginner_friendly({
+                "risk_level": risk,
+                "confidence_score": confidence,
+                "item_type": item_type,
+                "recommendation_grade": grade,
+                "risk_flags": flags,
+            }),
+            "beginner_reason": _beginner_reason({
+                "recommendation_grade": grade,
+                "expected_profit": profit,
+                "risk_level": risk,
+            }),
+            "simple_risk_summary": _simple_risk_summary({
+                "risk_level": risk,
+                "risk_flags": flags,
+            }),
+            "simple_profit_summary": _simple_profit_summary({
+                "expected_profit": profit,
+                "expected_profit_rate": roi,
+                "min_bid_price": minb,
+            }),
+            "simple_next_action": _simple_next_action({
+                "risk_level": risk,
+                "item_type": item_type,
+            }, days_offset),
+            "why_recommended": rec_reason,
+            "what_to_check": checklist[0] if checklist else "등기부등본 확인",
+            "easy_explanation": _get_easy_explanation(
+                warnings_list[0] if warnings_list else ""
+            ),
+            "glossary_terms": [
+                {"term": kw, "explanation": _get_easy_explanation(kw)}
+                for kw in warnings_list
+            ],
         })
     return items
 
@@ -920,6 +1148,8 @@ def _fallback_payload() -> dict[str, Any]:
         "public_sale_count": sum(1 for it in items if it["source"] == "public_sale"),
         "urgent_items": sum(1 for it in items
                             if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0),
+        "beginner_candidate_items": sum(1 for it in items if it.get("beginner_friendly")),
+        "beginner_mode_default": False,
     }
     briefing = {
         "summary": (
@@ -970,6 +1200,8 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
         1 for it in items
         if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0
     )
+    summary["beginner_candidate_items"] = sum(1 for it in items if it.get("beginner_friendly"))
+    summary["beginner_mode_default"] = False
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "source": "db",
