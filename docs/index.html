@@ -217,7 +217,7 @@
   <section class="search-section" id="search-section">
     <div class="container search-inner">
       <div class="search-bar">
-        <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" aria-label="통합 검색 (주소·사건번호·물건명·키워드)" autocomplete="off" aria-haspopup="listbox" aria-controls="search-suggest" />
+        <input type="search" id="q-input" placeholder="주소·사건번호·법원명·기관명·물건종류·위험키워드 검색" aria-label="통합 검색 (주소·사건번호·관리번호·법원명·기관명·지역·물건종류·위험키워드·추천이유)" autocomplete="off" aria-haspopup="listbox" aria-controls="search-suggest" />
         <button class="btn btn-primary" id="q-submit">검색</button>
         <button class="btn btn-ghost" id="q-reset">초기화</button>
         <button class="btn btn-ghost theme-btn" id="theme-btn" type="button" aria-label="테마 전환" title="라이트/다크 모드 전환">🌙</button>
@@ -227,6 +227,15 @@
         <button class="btn btn-ghost settings-btn" id="settings-btn" type="button" aria-label="설정 / 데이터 백업" title="설정 (데이터 백업·복원)">⚙</button>
         <button class="btn btn-ghost install-btn" id="install-btn" hidden type="button" aria-label="홈 화면에 설치" title="홈 화면에 설치">📲 설치</button>
         <div class="search-suggest" id="search-suggest" role="listbox" hidden></div>
+      </div>
+      <div class="search-examples" aria-label="검색 예시">
+        <span class="search-ex-label">예시</span>
+        <button class="search-ex-chip" type="button" data-ex="강남">강남</button>
+        <button class="search-ex-chip" type="button" data-ex="2025타경">2025타경</button>
+        <button class="search-ex-chip" type="button" data-ex="수원지방법원">수원지방법원</button>
+        <button class="search-ex-chip" type="button" data-ex="한국자산관리공사">한국자산관리공사</button>
+        <button class="search-ex-chip" type="button" data-ex="유치권">유치권</button>
+        <button class="search-ex-chip" type="button" data-ex="아파트">아파트</button>
       </div>
       <div class="quick-chips" id="quick-chips" role="tablist" aria-label="빠른 메뉴"></div>
       <div class="preset-chips" id="preset-chips" aria-label="필터 프리셋"></div>

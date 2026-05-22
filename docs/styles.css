@@ -1068,6 +1068,38 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   :root:not([data-theme]) .preset-chip { color: #7fb6e0; }
 }
 
+/* 검색 예시 칩 */
+.search-examples {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.search-ex-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.search-ex-chip {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  background: var(--color-surface-2, #f1f3f5);
+  color: var(--color-text, #333);
+  border: 1px solid var(--color-border, #e0e0e0);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.12s, border-color 0.12s;
+}
+.search-ex-chip:active { background: var(--color-tap-bg); }
+@media (hover: hover) {
+  .search-ex-chip:hover { background: var(--color-tap-bg); border-color: var(--color-primary); }
+}
+.meta-chip-q { background: var(--color-surface-3, #eef3f8); }
+.search-target-hint { display: inline-block; margin-left: 2px; }
+
 /* ★ 매물 임박 배너 */
 .urgent-banner {
   background: var(--color-warn-bg);

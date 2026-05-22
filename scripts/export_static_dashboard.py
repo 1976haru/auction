@@ -201,6 +201,114 @@ def _simple_next_action(it: dict, days_left: int | None) -> str:
     return " → ".join(actions)
 
 
+# ── 통합검색 대상 필드 보강 ──────────────────────────────────────
+# 시·도 → 관할 법원(데모용 매핑). 실제 관할과 다를 수 있는 mock 값.
+COURT_BY_SIDO = {
+    "서울특별시": "서울중앙지방법원",
+    "경기도": "수원지방법원",
+    "인천광역시": "인천지방법원",
+    "부산광역시": "부산지방법원",
+    "대구광역시": "대구지방법원",
+    "대전광역시": "대전지방법원",
+    "광주광역시": "광주지방법원",
+    "울산광역시": "울산지방법원",
+    "세종특별자치시": "대전지방법원",
+    "강원특별자치도": "춘천지방법원",
+    "충청북도": "청주지방법원",
+    "충청남도": "대전지방법원",
+    "전북특별자치도": "전주지방법원",
+    "전라남도": "광주지방법원",
+    "경상북도": "대구지방법원",
+    "경상남도": "창원지방법원",
+    "제주특별자치도": "제주지방법원",
+}
+
+ITEM_GROUP_BY_TYPE = {
+    "아파트": "주거용 건물",
+    "오피스텔": "주거용 건물",
+    "빌라": "주거용 건물",
+    "주택": "주거용 건물",
+    "다세대": "주거용 건물",
+    "상가": "상업용 건물",
+    "사무실": "상업용 건물",
+    "공장": "산업용 건물",
+    "토지": "토지",
+    "임야": "토지",
+    "전답": "토지",
+    "차량": "차량",
+    "기계": "기계·중기",
+}
+
+
+def _addr_parts(address: str | None, sido: str | None, sigungu: str | None) -> tuple[str, str, str]:
+    """주소를 시/도·시군구·동(읍·면)으로 분해. DB 값이 없으면 주소 문자열에서 추출."""
+    s = (address or "").strip()
+    toks = s.split()
+    _sido = sido or (toks[0] if toks else "")
+    _sigungu = sigungu or (toks[1] if len(toks) > 1 else "")
+    _dong = ""
+    for t in toks[2:]:
+        if t.endswith(("동", "읍", "면", "가", "리")):
+            _dong = t
+            break
+    if not _dong and len(toks) > 2:
+        _dong = toks[2]
+    return _sido, _sigungu, _dong
+
+
+def _search_fields(
+    item_id: int,
+    source: str,
+    region: str,
+    item_type: str,
+    address: str | None,
+    sido: str | None,
+    sigungu: str | None,
+    case_no: str | None,
+    flags: list[dict],
+    rec_reason: str | None,
+    risk_level: str,
+) -> dict:
+    """통합검색에서 매칭될 메타 필드 묶음. DB 값이 없으면 결정적(mock) 기본값 생성."""
+    seed = int(item_id or 0)
+    _sido, _sigungu, _dong = _addr_parts(address, sido, sigungu)
+    is_auction = source == "auction"
+    court_name = COURT_BY_SIDO.get(_sido, "지방법원") if is_auction else ""
+    agency_name = "" if is_auction else "한국자산관리공사(캠코)"
+    if is_auction:
+        cno = case_no or f"2025타경{10000 + (seed * 7) % 89999}"
+        mgmt_no = ""
+        source_site = "법원경매(대법원 법원경매정보)"
+        sale_type = "기일입찰"
+    else:
+        cno = case_no or ""
+        mgmt_no = f"2025-{(seed * 13) % 10000:04d}-{(seed % 9) + 1:03d}"
+        source_site = "온비드(한국자산관리공사)"
+        sale_type = "공매(매각)"
+    item_no = str((seed % 5) + 1)
+    risk_keywords = [f.get("keyword") for f in flags if f.get("keyword")]
+    descs = [f.get("description") for f in flags if f.get("description")]
+    caution_reason = ("; ".join(descs))[:240] if descs else f"{risk_level} 위험 — 기본 권리분석 확인 권장"
+    return {
+        "case_no": cno,
+        "item_no": item_no,
+        "mgmt_no": mgmt_no,
+        "court_name": court_name,
+        "court_region": _sido if is_auction else "",
+        "agency_name": agency_name,
+        "source_site": source_site,
+        "sale_type": sale_type,
+        "sido": _sido,
+        "sigungu": _sigungu,
+        "dong": _dong,
+        "item_group": ITEM_GROUP_BY_TYPE.get(item_type, "기타"),
+        "risk_keywords": risk_keywords,
+        "caution_reason": caution_reason,
+        "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
+        "agent_opinion": rec_reason or f"{risk_level} 위험 기준 검토 필요",
+    }
+
+
 def _connect() -> sqlite3.Connection | None:
     if not DB_PATH.exists():
         return None
@@ -641,14 +749,19 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             + f" / 위험 {risk_level} / 신뢰도 {confidence:.2f}"
         )
 
+        sf = _search_fields(
+            item_id, r["source"], region, r["item_type"], r["address_full"],
+            r["address_si"], r["address_gu"], r["case_no"], flags, rec_reason, risk_level,
+        )
         out.append({
             "id": item_id,
             "source": r["source"],
-            "case_no": r["case_no"],
+            "case_no": sf["case_no"],
             "title": title,
             "address": r["address_full"],
             "region": region,
             "item_type": r["item_type"],
+            **sf,
             "appraisal_price": appr,
             "min_bid_price": minb,
             "minimum_price": minb,
@@ -1018,14 +1131,19 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
                     "created_at": today.isoformat(),
                 })
 
+        sf = _search_fields(
+            i, source, region, item_type, addr,
+            None, None, case_no, flags, rec_reason, risk,
+        )
         items.append({
             "id": i,
             "source": source,
-            "case_no": case_no,
+            "case_no": sf["case_no"],
             "title": addr,
             "address": addr,
             "region": region,
             "item_type": item_type,
+            **sf,
             "appraisal_price": appr,
             "min_bid_price": minb,
             "minimum_price": minb,

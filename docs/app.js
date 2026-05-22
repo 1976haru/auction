@@ -529,12 +529,30 @@ function chipMatch(chip, it) {
   }
 }
 
+// 통합검색 대상 텍스트 — 주소/사건번호/관리번호/법원·기관명/지역/물건종류/위험키워드/추천이유까지
+function searchableText(it) {
+  if (!it) return "";
+  const riskKw = (it.risk_keywords && it.risk_keywords.length)
+    ? it.risk_keywords
+    : (it.risk_flags || []).map((f) => f && (f.keyword || f.description));
+  return [
+    it.title, it.address, it.region, it.sido, it.sigungu, it.dong,
+    it.case_no, it.item_no, it.mgmt_no,
+    it.court_name, it.court_region, it.agency_name, it.source_site, it.sale_type,
+    it.item_type, it.item_group, it.risk_level,
+    ...(riskKw || []),
+    it.recommendation_reason, it.caution_reason, it.agent_opinion, it.document_status,
+    ...(it.warnings || []),
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
 function passQuery(q, it) {
   if (!q) return true;
-  const needle = q.toLowerCase();
-  return [it.title, it.address, it.region, it.item_type, it.case_no,
-          it.recommendation_reason, (it.warnings || []).join(" ")]
-    .some((s) => s && String(s).toLowerCase().includes(needle));
+  // 공백 구분 다중 토큰 — 모든 토큰이 포함돼야 매칭 (AND)
+  const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return true;
+  const hay = searchableText(it);
+  return tokens.every((t) => hay.includes(t));
 }
 
 function _is_beginner_friendly(it) {
@@ -624,6 +642,9 @@ function renderItemsHead() {
   const root = $("items-count");
   const sortLabel = SORT_LABEL[f.sort] || SORT_LABEL.score_desc;
   let chips = `<span class="meta-chip">정렬 · ${escapeHtml(sortLabel)}</span>`;
+  if (f.q) {
+    chips += ` <span class="meta-chip meta-chip-q" data-clear-q="1">검색어 · "${escapeHtml(f.q)}" <b>×</b></span>`;
+  }
   if (f.flag) {
     chips += ` <span class="meta-chip meta-chip-warn" data-clear-flag="1">키워드 · ${escapeHtml(f.flag)} <b>×</b></span>`;
   }
@@ -635,7 +656,10 @@ function renderItemsHead() {
   const showCount = (shown < STATE.filtered.length)
     ? `표시 ${shown} / 결과 ${STATE.filtered.length} / 전체 ${STATE.items.length}건`
     : `결과 ${STATE.filtered.length}건 / 전체 ${STATE.items.length}건`;
-  root.innerHTML = `${showCount} ${chips}`;
+  const hint = f.q
+    ? `<span class="search-target-hint caption">주소·사건번호·관리번호·법원/기관명·지역·물건종류·위험키워드·추천이유에서 검색</span>`
+    : "";
+  root.innerHTML = `${showCount} ${chips} ${hint}`;
   const csvBtn = $("dl-csv"); const jsonBtn = $("dl-json");
   if (csvBtn && jsonBtn) {
     const empty = STATE.filtered.length === 0;
@@ -646,6 +670,15 @@ function renderItemsHead() {
     clearFlag.style.cursor = "pointer";
     clearFlag.addEventListener("click", () => {
       STATE.filters.flag = "";
+      applyFilters();
+    });
+  }
+  const clearQ = root.querySelector('[data-clear-q="1"]');
+  if (clearQ) {
+    clearQ.style.cursor = "pointer";
+    clearQ.addEventListener("click", () => {
+      STATE.filters.q = "";
+      const qi = $("q-input"); if (qi) qi.value = "";
       applyFilters();
     });
   }
@@ -1032,8 +1065,12 @@ function buildZeroState() {
   wrap.className = "zero-state";
   const chips = _activeFilterChips();
   let chipsHtml = "";
+  const qNote = STATE.filters.q
+    ? `<p class="zero-msg">검색어 <b>"${escapeHtml(STATE.filters.q)}"</b> 와 일치하는 물건이 없어요. 검색어를 줄이거나 필터를 초기화해 보세요.</p>`
+    : "";
   if (chips.length) {
     chipsHtml = `
+      ${qNote}
       <p class="zero-msg">아래 조건이 적용돼 있어요. 칩의 ×로 하나씩 풀거나 한 번에 초기화해 보세요.</p>
       <div class="zero-chips">
         ${chips.map((c, i) =>
@@ -3161,9 +3198,7 @@ function _matchItemsForSuggest(q, limit) {
   if (needle.length < 2) return [];
   const matches = [];
   for (const it of STATE.items) {
-    const fields = [it.title, it.address, it.region, it.item_type, it.case_no]
-      .filter(Boolean).map((s) => String(s).toLowerCase());
-    if (fields.some((f) => f.includes(needle))) {
+    if (searchableText(it).includes(needle)) {
       matches.push(it);
       if (matches.length >= limit) break;
     }
@@ -3360,6 +3395,20 @@ function bindSearch() {
   document.addEventListener("click", (e) => {
     const sb = document.querySelector(".search-bar");
     if (sb && !sb.contains(e.target)) hideSearchSuggest();
+  });
+
+  // 검색 예시 칩 — 클릭 시 해당 검색어로 즉시 검색
+  document.querySelectorAll(".search-ex-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const ex = chip.dataset.ex || chip.textContent.trim();
+      input.value = ex;
+      STATE.filters.q = ex;
+      applyFilters();
+      pushSearchHistory(ex);
+      hideSearchSuggest();
+      const sec = $("section-items");
+      if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   });
 }
 
