@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T13:10:19",
+  "generated_at": "2026-05-22T22:06:03",
   "source": "db",
   "summary": {
     "total_items": 100,
@@ -24,7 +24,7 @@
       "medium": 18,
       "high": 77
     },
-    "data_timestamp": "2026-05-22T13:10:19"
+    "data_timestamp": "2026-05-22T22:06:03"
   },
   "briefing": {
     "run_date": "2026-05-08",

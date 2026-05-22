@@ -242,7 +242,8 @@ if tab_sel == "통합검색":
             f_sort = f8.selectbox(
                 "정렬",
                 ["추천점수 높은순", "차익 큰순", "수익률 높은순",
-                 "기일 임박순", "최저가 낮은순", "위험 낮은순"],
+                 "기일 임박순", "최저가 낮은순", "감정가 높은순",
+                 "유찰횟수 많은순", "위험 낮은순", "시세신뢰도 높은순"],
             )
             pmin = st.number_input("최저가 하한 (만원)", value=0, step=1000)
             pmax = st.number_input("최저가 상한 (만원, 0=제한없음)", value=0, step=1000)
@@ -306,7 +307,10 @@ if tab_sel == "통합검색":
             "수익률 높은순":  lambda x: -(x.get("roi_estimate") or 0),
             "기일 임박순":    lambda x: _days_until(x.get("bid_date")) or 9999,
             "최저가 낮은순":  lambda x: x.get("min_bid_price") or 0,
+            "감정가 높은순":  lambda x: -(x.get("appraisal_price") or 0),
+            "유찰횟수 많은순": lambda x: -(x.get("fail_count") or 0),
             "위험 낮은순":    lambda x: {"low":0,"medium":1,"high":2}.get(x.get("risk_level"),1),
+            "시세신뢰도 높은순": lambda x: -((x.get("confidence_score") or x.get("price_confidence")) or 0),
         }
         result.sort(key=sort_keys.get(f_sort, sort_keys["추천점수 높은순"]))
 

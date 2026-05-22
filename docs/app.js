@@ -99,11 +99,28 @@ const PRESETS = [
 
 const SORT_LABEL = {
   score_desc: "추천점수 높은순",
-  profit_desc: "차익 큰순",
+  score_asc: "추천점수 낮은순",
+  profit_desc: "예상차익 높은순",
+  profit_asc: "예상차익 낮은순",
   roi_desc: "수익률 높은순",
-  due_asc: "기일 임박순",
+  roi_asc: "수익률 낮은순",
+  // price_asc 는 하위호환(최저가 낮은순) — min_price_asc 와 동일 동작
   price_asc: "최저가 낮은순",
-  risk_asc: "위험 낮은순",
+  min_price_asc: "최저가 낮은순",
+  min_price_desc: "최저가 높은순",
+  appraisal_asc: "감정가 낮은순",
+  appraisal_desc: "감정가 높은순",
+  due_asc: "입찰기일 가까운순",
+  due_desc: "입찰기일 먼순",
+  fail_desc: "유찰횟수 많은순",
+  fail_asc: "유찰횟수 적은순",
+  risk_asc: "위험도 낮은순",
+  risk_desc: "위험도 높은순",
+  confidence_desc: "시세신뢰도 높은순",
+  confidence_asc: "시세신뢰도 낮은순",
+  grade_asc: "A등급 우선",
+  high_risk_first: "고위험 우선",
+  urgent_profit_desc: "입찰임박 + 고수익 우선",
 };
 
 const FAV_KEY = "auction:favorites:v1";
@@ -327,6 +344,7 @@ function syncControlsFromState() {
   $("f-risk").value = f.risk || "";
   $("f-grade").value = f.grade || "";
   $("f-sort").value = f.sort || "score_desc";
+  updateSortCurrent();
   // ── 고급 필터 동기화 ──
   const setVal = (id, v) => { const n = $(id); if (n) n.value = (v ?? ""); };
   setVal("f-court", f.court);
@@ -564,7 +582,7 @@ function bindFilterEvents() {
     "f-due":       (v) => STATE.filters.due_max  = v ? Number(v) : null,
     "f-risk":      (v) => STATE.filters.risk = v,
     "f-grade":     (v) => STATE.filters.grade = v,
-    "f-sort":      (v) => STATE.filters.sort = v || "score_desc",
+    "f-sort":      (v) => { STATE.filters.sort = v || "score_desc"; updateSortCurrent(); },
     // ── 고급 필터 ──
     "f-court":     (v) => STATE.filters.court = v,
     "f-group":     (v) => STATE.filters.item_group = v,
@@ -645,6 +663,22 @@ function bindFilterEvents() {
       }
       applyFilters();
     });
+  });
+  // 테이블 헤더 클릭 정렬 (현재 정렬과 같으면 asc↔desc 토글)
+  document.querySelectorAll("#items-table th.th-sort").forEach((th) => {
+    th.style.cursor = "pointer";
+    th.setAttribute("role", "button");
+    th.setAttribute("tabindex", "0");
+    const apply = () => {
+      const asc = th.dataset.sortAsc, desc = th.dataset.sortDesc;
+      const cur = STATE.filters.sort;
+      STATE.filters.sort = (cur === desc && asc !== desc) ? asc : desc;
+      const sel = $("f-sort"); if (sel) sel.value = STATE.filters.sort;
+      updateSortCurrent();
+      applyFilters();
+    };
+    th.addEventListener("click", apply);
+    th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); apply(); } });
   });
   // 고급 필터 펼치기/접기
   const advToggle = $("adv-toggle");
@@ -1031,19 +1065,96 @@ function renderItemsHead() {
   }
 }
 
+// ── 정렬 helper (null/undefined/혼용 안전) ──────────────
+function getNumber(value, fallback) {
+  const fb = (fallback === undefined) ? 0 : fallback;
+  if (value === null || value === undefined || value === "") return fb;
+  const n = Number(value);
+  return isNaN(n) ? fb : n;
+}
+function getMinBidPrice(it) {
+  // min_bid_price 우선, 없으면 minimum_price
+  const v = (it.min_bid_price ?? it.minimum_price);
+  return getNumber(v, 0);
+}
+function getAppraisalPrice(it) { return getNumber(it.appraisal_price, 0); }
+function getMarketPrice(it) { return getNumber(it.market_price, 0); }
+function getExpectedProfit(it) { return getNumber(it.expected_profit, 0); }
+function getRoi(it) {
+  // 0.12(분수) / 12(퍼센트) 혼용 → 퍼센트로 통일
+  const v = getNumber(it.expected_profit_rate, 0);
+  return (Math.abs(v) > 0 && Math.abs(v) < 1) ? v * 100 : v;
+}
+function getFailCount(it) { return getNumber(it.fail_count, 0); }
+function getDaysLeft(it) {
+  if (it.days_left !== null && it.days_left !== undefined && it.days_left !== "")
+    return getNumber(it.days_left, 9999);
+  // bid_date 로 보조 계산
+  const s = String(it.bid_date || "").split("~")[0].trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const d = new Date(s.slice(0, 10));
+    if (!isNaN(d.getTime())) return Math.round((d - new Date()) / 86400000);
+  }
+  return 9999;
+}
+function getRiskRank(it) {
+  return { none: 0, low: 1, medium: 2, high: 3 }[it.risk_level] ?? 2;
+}
+function getGradeRank(it) {
+  return { A: 0, B: 1, C: 2, D: 3, X: 4 }[it.recommendation_grade] ?? 2;
+}
+function getConfidenceScore(it) {
+  // confidence_score 우선, 없으면 price_confidence
+  const v = (it.confidence_score ?? it.price_confidence);
+  return getNumber(v, 0);
+}
+function getRecScore(it) { return getNumber(it.recommendation_score, 0); }
+
+function updateSortCurrent() {
+  const node = $("sort-current");
+  if (!node) return;
+  const label = SORT_LABEL[STATE.filters.sort] || SORT_LABEL.score_desc;
+  node.textContent = `현재 정렬: ${label}`;
+}
+
 function sortItems(arr, mode) {
   const copy = arr.slice();
-  const num = (v) => (v === null || v === undefined || isNaN(v)) ? -Infinity : Number(v);
+  // 동점 보조 정렬: 추천점수 → 예상차익 → 입찰기일 가까운순
+  const tie = (a, b) =>
+    (getRecScore(b) - getRecScore(a)) ||
+    (getExpectedProfit(b) - getExpectedProfit(a)) ||
+    (getDaysLeft(a) - getDaysLeft(b));
+  const withTie = (primary) => (a, b) => primary(a, b) || tie(a, b);
   const map = {
-    score_desc:  (a, b) => num(b.recommendation_score) - num(a.recommendation_score),
-    profit_desc: (a, b) => num(b.expected_profit) - num(a.expected_profit),
-    roi_desc:    (a, b) => num(b.expected_profit_rate) - num(a.expected_profit_rate),
-    due_asc:     (a, b) => (a.days_left ?? 9999) - (b.days_left ?? 9999),
-    price_asc:   (a, b) => (a.min_bid_price || 0) - (b.min_bid_price || 0),
-    risk_asc:    (a, b) => ({low:0,medium:1,high:2}[a.risk_level||"medium"]) -
-                            ({low:0,medium:1,high:2}[b.risk_level||"medium"]),
+    score_desc:  (a, b) => getRecScore(b) - getRecScore(a),
+    score_asc:   (a, b) => getRecScore(a) - getRecScore(b),
+    profit_desc: (a, b) => getExpectedProfit(b) - getExpectedProfit(a),
+    profit_asc:  (a, b) => getExpectedProfit(a) - getExpectedProfit(b),
+    roi_desc:    (a, b) => getRoi(b) - getRoi(a),
+    roi_asc:     (a, b) => getRoi(a) - getRoi(b),
+    price_asc:     (a, b) => getMinBidPrice(a) - getMinBidPrice(b),
+    min_price_asc: (a, b) => getMinBidPrice(a) - getMinBidPrice(b),
+    min_price_desc:(a, b) => getMinBidPrice(b) - getMinBidPrice(a),
+    appraisal_asc: (a, b) => getAppraisalPrice(a) - getAppraisalPrice(b),
+    appraisal_desc:(a, b) => getAppraisalPrice(b) - getAppraisalPrice(a),
+    due_asc:     (a, b) => getDaysLeft(a) - getDaysLeft(b),
+    due_desc:    (a, b) => getDaysLeft(b) - getDaysLeft(a),
+    fail_desc:   (a, b) => getFailCount(b) - getFailCount(a),
+    fail_asc:    (a, b) => getFailCount(a) - getFailCount(b),
+    risk_asc:    (a, b) => getRiskRank(a) - getRiskRank(b),
+    risk_desc:   (a, b) => getRiskRank(b) - getRiskRank(a),
+    confidence_desc: (a, b) => getConfidenceScore(b) - getConfidenceScore(a),
+    confidence_asc:  (a, b) => getConfidenceScore(a) - getConfidenceScore(b),
+    grade_asc:   (a, b) => getGradeRank(a) - getGradeRank(b),
+    high_risk_first: (a, b) => getRiskRank(b) - getRiskRank(a),
+    urgent_profit_desc: (a, b) => {
+      const ua = getDaysLeft(a) >= 0 && getDaysLeft(a) <= 7 ? 0 : 1;
+      const ub = getDaysLeft(b) >= 0 && getDaysLeft(b) <= 7 ? 0 : 1;
+      return (ua - ub) || (getExpectedProfit(b) - getExpectedProfit(a));
+    },
   };
-  copy.sort(map[mode] || map.score_desc);
+  const primary = map[mode] || map.score_desc;
+  copy.sort(withTie(primary));
   return copy;
 }
 

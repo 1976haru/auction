@@ -319,13 +319,41 @@
           </label>
           <label class="f-field"><span>정렬</span>
             <select id="f-sort">
-              <option value="score_desc">추천점수 높은순</option>
-              <option value="profit_desc">시세차익 큰순</option>
-              <option value="roi_desc">수익률 높은순</option>
-              <option value="due_asc">입찰기일 임박순</option>
-              <option value="price_asc">최저가 낮은순</option>
-              <option value="risk_asc">위험 낮은순</option>
+              <optgroup label="추천점수">
+                <option value="score_desc">추천점수 높은순</option>
+                <option value="score_asc">추천점수 낮은순</option>
+              </optgroup>
+              <optgroup label="예상차익 / 수익률">
+                <option value="profit_desc">예상차익 높은순</option>
+                <option value="profit_asc">예상차익 낮은순</option>
+                <option value="roi_desc">수익률 높은순</option>
+                <option value="roi_asc">수익률 낮은순</option>
+              </optgroup>
+              <optgroup label="가격">
+                <option value="min_price_asc">최저가 낮은순</option>
+                <option value="min_price_desc">최저가 높은순</option>
+                <option value="appraisal_asc">감정가 낮은순</option>
+                <option value="appraisal_desc">감정가 높은순</option>
+              </optgroup>
+              <optgroup label="기일 / 유찰">
+                <option value="due_asc">입찰기일 가까운순</option>
+                <option value="due_desc">입찰기일 먼순</option>
+                <option value="fail_desc">유찰횟수 많은순</option>
+                <option value="fail_asc">유찰횟수 적은순</option>
+              </optgroup>
+              <optgroup label="위험 / 신뢰도 / 등급">
+                <option value="risk_asc">위험도 낮은순</option>
+                <option value="risk_desc">위험도 높은순</option>
+                <option value="confidence_desc">시세신뢰도 높은순</option>
+                <option value="confidence_asc">시세신뢰도 낮은순</option>
+                <option value="grade_asc">A등급 우선</option>
+              </optgroup>
+              <optgroup label="복합">
+                <option value="high_risk_first">고위험 우선</option>
+                <option value="urgent_profit_desc">입찰임박 + 고수익 우선</option>
+              </optgroup>
             </select>
+            <span class="sort-current caption" id="sort-current"></span>
           </label>
           <div class="f-field f-actions-row">
             <button class="btn btn-ghost" id="adv-toggle" type="button" aria-expanded="false" aria-controls="adv-filter-body">＋ 고급 필터</button>
@@ -548,10 +576,17 @@
         <table id="items-table">
           <thead>
             <tr>
-              <th>#</th><th>구분</th><th>등급</th><th>주소</th><th>유형</th>
-              <th class="num">감정가</th><th class="num">최저가</th><th class="num">시세</th>
-              <th class="num">차익</th><th class="num">ROI</th>
-              <th class="num">유찰</th><th>입찰기일</th><th>위험</th>
+              <th>#</th><th>구분</th>
+              <th class="th-sort" data-sort-asc="grade_asc" data-sort-desc="grade_asc" title="등급순 정렬">등급</th>
+              <th>주소</th><th>유형</th>
+              <th class="num th-sort" data-sort-asc="appraisal_asc" data-sort-desc="appraisal_desc" title="감정가 정렬">감정가</th>
+              <th class="num th-sort" data-sort-asc="min_price_asc" data-sort-desc="min_price_desc" title="최저가 정렬">최저가</th>
+              <th class="num">시세</th>
+              <th class="num th-sort" data-sort-asc="profit_asc" data-sort-desc="profit_desc" title="차익 정렬">차익</th>
+              <th class="num th-sort" data-sort-asc="roi_asc" data-sort-desc="roi_desc" title="수익률 정렬">ROI</th>
+              <th class="num th-sort" data-sort-asc="fail_asc" data-sort-desc="fail_desc" title="유찰 정렬">유찰</th>
+              <th class="th-sort" data-sort-asc="due_asc" data-sort-desc="due_desc" title="입찰기일 정렬">입찰기일</th>
+              <th class="th-sort" data-sort-asc="risk_asc" data-sort-desc="risk_desc" title="위험도 정렬">위험</th>
             </tr>
           </thead>
           <tbody></tbody>

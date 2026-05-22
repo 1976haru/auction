@@ -2561,6 +2561,13 @@ th {
   top: 0;
   z-index: 1;
 }
+th.th-sort { user-select: none; white-space: nowrap; }
+th.th-sort::after { content: " ⇅"; opacity: 0.5; font-size: 0.85em; }
+@media (hover: hover) {
+  th.th-sort:hover { color: var(--color-primary); background: var(--color-surface-3); }
+}
+th.th-sort:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+.sort-current { margin-top: 4px; font-size: 0.75rem; color: var(--color-primary-dark, #155a8a); }
 tbody tr {
   cursor: pointer;
   touch-action: manipulation;
