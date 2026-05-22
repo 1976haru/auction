@@ -2545,13 +2545,36 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.86rem;
-  min-width: 880px;
+  min-width: 1360px;
 }
 th, td {
   padding: 9px 12px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
   white-space: nowrap;
+}
+/* 주소는 길면 말줄임 */
+#items-table td.col-addr {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#items-table td.col-court, #items-table td.col-case {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-detail-btn { padding: 3px 10px; font-size: 0.8rem; }
+/* 카드: 법원/사건 보조줄 + 상세보기 버튼 */
+.item-sub2 { font-size: 0.76rem; margin-top: 1px; }
+.item-actions { margin-top: 8px; }
+.item-detail-btn {
+  width: 100%;
+  min-height: 38px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 th {
   background: var(--color-surface-2);

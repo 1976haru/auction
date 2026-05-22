@@ -153,6 +153,22 @@ function saveSearches(arr) {
   try { localStorage.setItem(SEARCHES_KEY, JSON.stringify(arr)); } catch {}
 }
 
+// 보기 모드(card/table) 영속화 + 화면폭 기반 기본값
+const VIEW_KEY = "auction:view:v1";
+function loadSavedView() {
+  try {
+    const v = localStorage.getItem(VIEW_KEY);
+    return (v === "card" || v === "table") ? v : null;
+  } catch { return null; }
+}
+function saveView(v) {
+  try { localStorage.setItem(VIEW_KEY, v); } catch {}
+}
+function defaultViewByWidth() {
+  // PC/태블릿 넓은 화면 → table, 모바일 → card
+  return (typeof window !== "undefined" && window.innerWidth >= 1024) ? "table" : "card";
+}
+
 const VIEWED_KEY = "auction:viewed:v1";
 const VIEWED_MAX = 20;
 function loadViewed() {
@@ -1022,7 +1038,9 @@ function renderItemsHead() {
   const f = STATE.filters;
   const root = $("items-count");
   const sortLabel = SORT_LABEL[f.sort] || SORT_LABEL.score_desc;
-  let chips = `<span class="meta-chip">정렬 · ${escapeHtml(sortLabel)}</span>`;
+  const viewLabel = STATE.view === "table" ? "테이블형" : "카드형";
+  let chips = `<span class="meta-chip">보기 · ${escapeHtml(viewLabel)}</span>`;
+  chips += ` <span class="meta-chip">정렬 · ${escapeHtml(sortLabel)}</span>`;
   if (f.q) {
     chips += ` <span class="meta-chip meta-chip-q" data-clear-q="1">검색어 · "${escapeHtml(f.q)}" <b>×</b></span>`;
   }
@@ -1438,7 +1456,8 @@ function itemCardHtml(it) {
         ${favoriteBtnHtml(it)}
       </div>
       <div class="item-title">${escapeHtml(it.title || "주소 미상")}</div>
-      <div class="item-sub">${escapeHtml(it.address || "")} · ${escapeHtml(it.case_no || "사건번호 없음")}</div>
+      <div class="item-sub">${escapeHtml(it.address || "")}</div>
+      <div class="item-sub2 caption">${escapeHtml(it.court_name || it.agency_name || "")}${(it.court_name || it.agency_name) ? " · " : ""}${escapeHtml(it.case_no || it.mgmt_no || "사건번호 없음")}</div>
       <div class="item-stats">
         <span class="k">감정가</span><span class="v">${fmtMan(it.appraisal_price)}</span>
         <span class="k">최저가</span><span class="v">${fmtMan(it.min_bid_price)}</span>
@@ -1455,6 +1474,7 @@ function itemCardHtml(it) {
         <span>· 신뢰도 ${escapeHtml(String((it.confidence_score || 0).toFixed(2)))}</span>
         ${priceTrendBadge(it)}
       </div>
+      <div class="item-actions"><button class="btn btn-ghost item-detail-btn" type="button">상세보기 →</button></div>
     </article>`;
 }
 
@@ -1468,7 +1488,7 @@ function renderItems() {
   if (!fullList.length) {
     cardRoot.appendChild(buildZeroState());
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="13" class="caption">조건에 맞는 물건이 없습니다.</td>`;
+    tr.innerHTML = `<td colspan="18" class="caption">조건에 맞는 물건이 없습니다.</td>`;
     tableBody.appendChild(tr);
     updateMoreRow();
     return;
@@ -1486,6 +1506,8 @@ function renderItems() {
     });
     wireFavoriteButtons(card);
     wireCompareButtons(card);
+    const dBtn = card.querySelector(".item-detail-btn");
+    if (dBtn) dBtn.addEventListener("click", (e) => { e.stopPropagation(); openDetailById(it.id); });
     cardRoot.appendChild(card);
 
     const tr = document.createElement("tr");
@@ -1494,23 +1516,33 @@ function renderItems() {
     const risk = it.risk_level || "medium";
     const u = urgencyBadge(it);
     const ch = changeBadgesHtml(it);
+    const courtAgency = it.court_name || it.agency_name || "-";
+    const caseNo = it.case_no || it.mgmt_no || "-";
+    const conf = (it.confidence_score ?? it.price_confidence);
     tr.innerHTML = `
       <td>${idx + 1}</td>
       <td>${escapeHtml(SOURCE_LABEL[it.source] || it.source || "")}</td>
+      <td class="col-court">${escapeHtml(courtAgency)}</td>
+      <td class="col-case">${escapeHtml(caseNo)}</td>
       <td><span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span></td>
-      <td>${escapeHtml(it.address || "")} ${u} ${ch}</td>
       <td>${escapeHtml(it.item_type || "")}</td>
-      <td class="num">${(it.appraisal_price || 0).toLocaleString("ko-KR")}</td>
-      <td class="num">${(it.min_bid_price || 0).toLocaleString("ko-KR")}</td>
-      <td class="num">${(it.market_price || 0).toLocaleString("ko-KR")}</td>
-      <td class="num">${(it.expected_profit || 0).toLocaleString("ko-KR")}</td>
+      <td class="col-addr">${escapeHtml(it.address || "")} ${u} ${ch}</td>
+      <td class="num">${fmtMan(it.appraisal_price)}</td>
+      <td class="num">${fmtMan(it.min_bid_price)}</td>
+      <td class="num">${fmtMan(it.market_price)}</td>
+      <td class="num">${fmtMan(it.expected_profit)}</td>
       <td class="num">${fmtPct(it.expected_profit_rate)}</td>
       <td class="num">${it.fail_count !== undefined ? it.fail_count : "-"}</td>
       <td>${escapeHtml(it.bid_date || "-")}</td>
       <td><span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span></td>
+      <td class="num">${escapeHtml(String(it.recommendation_score ?? "-"))}</td>
+      <td class="num">${conf !== undefined && conf !== null ? Number(conf).toFixed(2) : "-"}</td>
+      <td><button class="dl-btn row-detail-btn" type="button" aria-label="상세 보기">상세</button></td>
     `;
     tr.setAttribute("tabindex", "0");
     tr.setAttribute("role", "button");
+    const detailBtn = tr.querySelector(".row-detail-btn");
+    if (detailBtn) detailBtn.addEventListener("click", (e) => { e.stopPropagation(); openDetailById(it.id); });
     bindTap(tr, () => openDetailById(it.id), {
       onLongPress: () => toggleCompare(it.id),
     });
@@ -3221,19 +3253,25 @@ function bindDensity() {
   });
 }
 
+function setView(v, opts) {
+  v = (v === "table") ? "table" : "card";
+  STATE.view = v;
+  document.querySelectorAll(".view-btn").forEach((b) => {
+    const active = b.dataset.view === v;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  const cv = $("items-card-view"); if (cv) cv.hidden = (v !== "card");
+  const tv = $("items-table-view"); if (tv) tv.hidden = (v !== "table");
+  if (!opts || opts.persist !== false) saveView(v);
+  if (!opts || opts.silent !== true) { renderItemsHead(); pushUrlState(); }
+}
+
 function bindViewToggle() {
   document.querySelectorAll(".view-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const v = btn.dataset.view;
-      STATE.view = v;
-      document.querySelectorAll(".view-btn").forEach((b) => {
-        const active = b.dataset.view === v;
-        b.classList.toggle("active", active);
-        b.setAttribute("aria-pressed", active ? "true" : "false");
-      });
-      $("items-card-view").hidden = (v !== "card");
-      $("items-table-view").hidden = (v !== "table");
-      pushUrlState();
+    btn.addEventListener("click", () => setView(btn.dataset.view));
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setView(btn.dataset.view); }
     });
   });
 }
@@ -4155,7 +4193,9 @@ function render(data) {
   renderConfidence(data.confidence_summary, summary);
 
   populateFilterOptions();
-  applyUrlToState();
+  // 보기 모드 우선순위: URL > localStorage > 화면폭 기본값 > card
+  STATE.view = loadSavedView() || defaultViewByWidth();
+  applyUrlToState();  // URL 에 view 가 있으면 위 값을 덮어씀
   syncControlsFromState();
   URL_SYNC_ENABLED = true;
   renderQuickChips();
@@ -4632,16 +4672,12 @@ function bindKbdShortcuts() {
       }
       case "1": {
         e.preventDefault();
-        STATE.view = "card";
-        syncControlsFromState();
-        pushUrlState();
+        setView("card");
         break;
       }
       case "2": {
         e.preventDefault();
-        STATE.view = "table";
-        syncControlsFromState();
-        pushUrlState();
+        setView("table");
         break;
       }
       case "c":

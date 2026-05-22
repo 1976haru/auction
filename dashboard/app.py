@@ -355,8 +355,10 @@ if tab_sel == "통합검색":
         else:
             df = pd.DataFrame([{
                 "id": it["id"], "구분": SOURCE_LABELS.get(it.get("source"), it.get("source")),
+                "법원/기관": it.get("court_name") or it.get("agency_name") or "-",
                 "등급": it.get("grade") or "-",
                 "점수": round(it.get("score") or 0, 1),
+                "신뢰도": round((it.get("overall_confidence") or it.get("confidence_score") or 0), 2),
                 "주소": it.get("address_full"), "유형": it.get("item_type"),
                 "감정가": it.get("appraisal_price", 0),
                 "최저가": it.get("min_bid_price", 0),
