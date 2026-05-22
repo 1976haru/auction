@@ -26,6 +26,23 @@ const QUICK_CHIPS = [
   { id: "low_risk", label: "저위험 후보" },
   { id: "imminent", label: "입찰임박" },
   { id: "high_risk",label: "고위험 주의" },
+  // ── 확장 빠른 메뉴 ──
+  { id: "fail2",        label: "유찰 2회+" },
+  { id: "grade_a",      label: "A등급" },
+  { id: "undervalued",  label: "시세 저평가" },
+  { id: "multi_house",  label: "연립/다세대" },
+  { id: "single_house", label: "단독/다가구" },
+  { id: "factory",      label: "공장/창고" },
+  { id: "vehicle",      label: "차량" },
+  { id: "public_shop",  label: "공매 상가" },
+  { id: "auction_apt",  label: "경매 아파트" },
+  { id: "land_under",   label: "토지 저평가" },
+  { id: "docs_missing", label: "문서 미공개" },
+  { id: "field_survey", label: "현장조사 필요" },
+  { id: "tenant_warn",  label: "임차인 주의" },
+  { id: "lien_warn",    label: "유치권 주의" },
+  { id: "share_warn",   label: "지분매각 주의" },
+  { id: "farm_warn",    label: "농지 주의" },
 ];
 
 const AGENT_EXAMPLES = [
@@ -417,11 +434,16 @@ function renderQuickChips() {
   const root = $("quick-chips");
   clearChildren(root);
   QUICK_CHIPS.forEach((c) => {
+    const active = STATE.filters.chip === c.id;
     const btn = document.createElement("button");
-    btn.className = "chip" + (STATE.filters.chip === c.id ? " active" : "");
+    btn.className = "chip" + (active ? " active" : "");
     btn.type = "button";
     btn.dataset.chip = c.id;
     btn.textContent = c.label;
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+    btn.setAttribute("aria-label", `빠른 메뉴: ${c.label}`);
+    btn.title = c.label;
     btn.addEventListener("click", () => {
       STATE.filters.chip = c.id;
       renderQuickChips();
@@ -525,8 +547,52 @@ function chipMatch(chip, it) {
     case "imminent":  return it.days_left !== null && it.days_left !== undefined
                               && it.days_left <= 7 && it.days_left >= 0;
     case "high_risk": return it.risk_level === "high";
+    // ── 확장 빠른 메뉴 ──
+    case "fail2":        return (it.fail_count || 0) >= 2;
+    case "grade_a":      return it.recommendation_grade === "A";
+    case "undervalued":  return _mtmRatio(it) !== null && _mtmRatio(it) <= 85;
+    case "multi_house":  return ["연립", "다세대", "빌라"].some((t) => (it.item_type || "").includes(t));
+    case "single_house": return ["단독", "다가구"].some((t) => (it.item_type || "").includes(t));
+    case "factory":      return ["공장", "창고"].some((t) => (it.item_type || "").includes(t));
+    case "vehicle":      return (it.item_type || "").includes("차량");
+    case "public_shop":  return it.source === "public_sale" && (it.item_type || "").includes("상가");
+    case "auction_apt":  return it.source === "auction" && (it.item_type || "").includes("아파트");
+    case "land_under":   return _isLand(it) && _mtmRatio(it) !== null && _mtmRatio(it) <= 85;
+    case "docs_missing": return it.documents_missing === true
+                                || /미공개/.test(it.document_status || "");
+    case "field_survey": return (it.field_survey_needed !== undefined)
+                                ? it.field_survey_needed === true
+                                : _hasText([...(it.next_actions || []), ...(it.checklist || [])], "현장");
+    case "tenant_warn":  return _hasRiskKeyword(it, "임차");
+    case "lien_warn":    return _hasRiskKeyword(it, "유치권");
+    case "share_warn":   return _hasRiskKeyword(it, "지분");
+    case "farm_warn":    return _hasRiskKeyword(it, "농지");
     default: return true;
   }
+}
+
+// 빠른 메뉴 보조 함수
+function _mtmRatio(it) {
+  if (it.minimum_to_market_ratio !== null && it.minimum_to_market_ratio !== undefined)
+    return it.minimum_to_market_ratio;
+  if (it.market_price) return (it.min_bid_price / it.market_price) * 100;
+  return null;
+}
+function _isLand(it) {
+  if ((it.item_group || "").includes("토지")) return true;
+  return ["토지", "전", "답", "임야"].some((t) => (it.item_type || "").includes(t));
+}
+function _riskKeywords(it) {
+  const a = (it.risk_keywords && it.risk_keywords.length)
+    ? it.risk_keywords
+    : (it.risk_flags || []).map((f) => f && f.keyword);
+  return a.filter(Boolean);
+}
+function _hasRiskKeyword(it, sub) {
+  return _riskKeywords(it).some((k) => String(k).includes(sub));
+}
+function _hasText(arr, sub) {
+  return (arr || []).some((s) => String(s || "").includes(sub));
 }
 
 // 통합검색 대상 텍스트 — 주소/사건번호/관리번호/법원·기관명/지역/물건종류/위험키워드/추천이유까지

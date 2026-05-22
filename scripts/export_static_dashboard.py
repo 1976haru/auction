@@ -229,14 +229,26 @@ ITEM_GROUP_BY_TYPE = {
     "빌라": "주거용 건물",
     "주택": "주거용 건물",
     "다세대": "주거용 건물",
+    "연립": "주거용 건물",
+    "단독주택": "주거용 건물",
+    "다가구주택": "주거용 건물",
     "상가": "상업용 건물",
     "사무실": "상업용 건물",
     "공장": "산업용 건물",
+    "창고": "산업용 건물",
     "토지": "토지",
     "임야": "토지",
     "전답": "토지",
     "차량": "차량",
     "기계": "기계·중기",
+}
+
+# 데모 데이터 다양성 확보: enumerate 인덱스 기준으로 일부 물건의 종류를
+# 빠른 메뉴(연립/다세대·단독/다가구·공장/창고·차량)가 동작하도록 주입.
+DEMO_TYPE_INJECT = {
+    0: "다세대", 1: "다세대", 2: "단독주택", 3: "다가구주택",
+    4: "공장", 5: "창고", 6: "차량", 7: "차량",
+    8: "단독주택", 9: "연립",
 }
 
 
@@ -289,6 +301,21 @@ def _search_fields(
     risk_keywords = [f.get("keyword") for f in flags if f.get("keyword")]
     descs = [f.get("description") for f in flags if f.get("description")]
     caution_reason = ("; ".join(descs))[:240] if descs else f"{risk_level} 위험 — 기본 권리분석 확인 권장"
+    # 일부 물건은 문서 미공개 / 현장조사 필요로 표시 (결정적 mock)
+    documents_missing = (seed % 7 == 0)
+    document_status = (
+        "문서 미공개 — 매각물건명세서·현황조사서 미열람 (mock)"
+        if documents_missing
+        else "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)"
+    )
+    # 현장조사가 특히 필요한 물건: 문서 미공개거나 점유·위반건축물·전입세대 이슈가 있는 경우
+    # (임차인 일반은 별도 '임차인 주의' 칩에서 다루므로 여기서는 제외)
+    field_survey_needed = (
+        documents_missing
+        or any(kw_part in (f.get("keyword") or "")
+               for f in flags
+               for kw_part in ("점유", "위반건축물", "전입세대"))
+    )
     return {
         "case_no": cno,
         "item_no": item_no,
@@ -304,7 +331,9 @@ def _search_fields(
         "item_group": ITEM_GROUP_BY_TYPE.get(item_type, "기타"),
         "risk_keywords": risk_keywords,
         "caution_reason": caution_reason,
-        "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
+        "document_status": document_status,
+        "documents_missing": documents_missing,
+        "field_survey_needed": field_survey_needed,
         "agent_opinion": rec_reason or f"{risk_level} 위험 기준 검토 필요",
     }
 
@@ -674,8 +703,9 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
         fresh_count = 0
     treat_new = (len(rows) > 0) and (fresh_count < len(rows) * 0.5)
     out = []
-    for r in rows:
+    for idx, r in enumerate(rows):
         item_id = r["id"]
+        item_type = DEMO_TYPE_INJECT.get(idx, r["item_type"])
         flags = _flags_for(conn, item_id)
         risk_level = "low"
         for fl in flags:
@@ -750,9 +780,10 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
         )
 
         sf = _search_fields(
-            item_id, r["source"], region, r["item_type"], r["address_full"],
+            item_id, r["source"], region, item_type, r["address_full"],
             r["address_si"], r["address_gu"], r["case_no"], flags, rec_reason, risk_level,
         )
+        mtm_ratio = round(minb / market * 100, 1) if market else None
         out.append({
             "id": item_id,
             "source": r["source"],
@@ -760,7 +791,8 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "title": title,
             "address": r["address_full"],
             "region": region,
-            "item_type": r["item_type"],
+            "item_type": item_type,
+            "minimum_to_market_ratio": mtm_ratio,
             **sf,
             "appraisal_price": appr,
             "min_bid_price": minb,
@@ -799,7 +831,7 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "beginner_friendly": _is_beginner_friendly({
                 "risk_level": risk_level,
                 "confidence_score": confidence,
-                "item_type": r["item_type"],
+                "item_type": item_type,
                 "recommendation_grade": grade,
                 "risk_flags": [{
                     "keyword": fl.get("keyword"),
@@ -828,7 +860,7 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             }),
             "simple_next_action": _simple_next_action({
                 "risk_level": risk_level,
-                "item_type": r["item_type"],
+                "item_type": item_type,
             }, days_left),
             "why_recommended": rec_reason,
             "what_to_check": checklist[0] if checklist else "등기부등본 확인",
@@ -1080,7 +1112,7 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
         grade = _grade_from_score(score)
         confidence = round(rnd.uniform(0.55, 0.92), 3)
         warnings_list = [f["keyword"] for f in flags if f["risk_level"] == "high"][:4]
-        item_type = rnd.choice(FALLBACK_TYPES)
+        item_type = DEMO_TYPE_INJECT.get(i - 1, rnd.choice(FALLBACK_TYPES))
         source = rnd.choice(["auction", "public_sale"])
         case_no = (f"2025타경{rnd.randrange(1000, 9999)}" if source == "auction"
                    else f"2025-{rnd.randrange(1000, 9999):04d}")
@@ -1143,6 +1175,7 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "address": addr,
             "region": region,
             "item_type": item_type,
+            "minimum_to_market_ratio": round(minb / market * 100, 1) if market else None,
             **sf,
             "appraisal_price": appr,
             "min_bid_price": minb,

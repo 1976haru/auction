@@ -1030,6 +1030,16 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   background: var(--color-primary);
   color: white;
   border-color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.25);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+/* PC: 빠른 메뉴를 줄바꿈으로 보기 좋게 (모바일은 가로 스크롤 유지) */
+@media (min-width: 900px) {
+  .quick-chips { flex-wrap: wrap; overflow-x: visible; }
 }
 
 /* 프리셋 칩: 빠른 메뉴와 시각적으로 구분되는 별도 줄 */
