@@ -654,6 +654,29 @@ def _checklist_from_flags(flags: list[dict]) -> list[str]:
     return out[:6]
 
 
+def _additional_checklist(flags: list[dict]) -> list[str]:
+    """위험 키워드에 따른 추가 확인사항(심화)."""
+    kws = " ".join((f.get("keyword") or "") for f in flags)
+    out: list[str] = []
+    if any(k in kws for k in ("임차", "전입", "대항")):
+        out.append("전입세대 열람내역서·확정일자 부여현황 발급 확인")
+    if "유치권" in kws:
+        out.append("유치권 신고서·점유 개시 시점·피담보채권 확인")
+    if "지분" in kws or "공유" in kws:
+        out.append("공유자 우선매수 신고 가능성·공유물분할 청구 검토")
+    if "농지" in kws:
+        out.append("농지취득자격증명 발급 가능 여부 사전 확인")
+    if "위반건축물" in kws:
+        out.append("위반건축물 이행강제금·양성화 가능성 확인")
+    if "분묘" in kws:
+        out.append("분묘기지권 성립 여부·개장 협의 비용 확인")
+    if "재매각" in kws:
+        out.append("재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비")
+    if not out:
+        out.append("등기부등본 최신본·전입세대 열람으로 권리 재확인")
+    return out[:5]
+
+
 def _next_actions_default(source: str | None, risk_level: str, days_left: int | None) -> list[str]:
     actions: list[str] = []
     if risk_level == "high":
@@ -722,6 +745,13 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
         item_id = r["id"]
         item_type = DEMO_TYPE_INJECT.get(idx, r["item_type"])
         flags = _flags_for(conn, item_id)
+        # 데모: 일부 물건에 '대금미납 재매각' 위험 키워드 주입 (해당 케이스 확보)
+        if idx % 11 == 0:
+            flags = flags + [{
+                "keyword": "대금미납 재매각", "flag_type": "resale",
+                "risk_level": "medium", "severity": "medium",
+                "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
+            }]
         risk_level = "low"
         for fl in flags:
             if fl.get("risk_level") == "high":
@@ -808,6 +838,7 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "region": region,
             "item_type": item_type,
             "minimum_to_market_ratio": mtm_ratio,
+            "additional_checklist": _additional_checklist(flags),
             **_conf_breakdown(confidence, item_id),
             **sf,
             "appraisal_price": appr,
@@ -1090,6 +1121,7 @@ FALLBACK_TYPES = ["아파트", "오피스텔", "빌라", "상가", "토지"]
 KEYWORD_POOL = [
     "임차인", "전입세대", "대항력", "유치권", "법정지상권",
     "위반건축물", "관리비 체납", "선순위임차인", "점유자 미상", "명도",
+    "공유지분", "농지취득자격증명", "분묘기지권", "대금미납 재매각",
 ]
 
 
@@ -1192,6 +1224,7 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "region": region,
             "item_type": item_type,
             "minimum_to_market_ratio": round(minb / market * 100, 1) if market else None,
+            "additional_checklist": _additional_checklist(flags),
             **_conf_breakdown(confidence, i),
             **sf,
             "appraisal_price": appr,

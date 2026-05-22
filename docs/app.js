@@ -41,8 +41,13 @@ const QUICK_CHIPS = [
   { id: "field_survey", label: "현장조사 필요" },
   { id: "tenant_warn",  label: "임차인 주의" },
   { id: "lien_warn",    label: "유치권 주의" },
+  { id: "superficies_warn", label: "법정지상권 주의" },
   { id: "share_warn",   label: "지분매각 주의" },
   { id: "farm_warn",    label: "농지 주의" },
+  { id: "tenant_yes",   label: "임차인 있는 물건" },
+  { id: "tenant_no",    label: "임차인 없는 물건" },
+  { id: "special_free", label: "특수위험 제외" },
+  { id: "high_exclude", label: "고위험 제외" },
 ];
 
 const AGENT_EXAMPLES = [
@@ -248,8 +253,12 @@ const STATE = {
     roi_max: null,
     bid_date_from: "",
     bid_date_to: "",
-    exclude_flags: [],  // 제외할 위험 키워드
-    include_flags: [],  // 반드시 포함할 위험 키워드
+    exclude_flags: [],  // 제외할 위험 키워드 (= exclude_risk_keywords)
+    include_flags: [],  // 반드시 포함할 위험 키워드 (= include_risk_keywords)
+    exclude_high_risk_keywords: false,  // high 위험 키워드 포함 물건 제외
+    tenant_only: false,        // 임차인 관련 키워드 있는 물건만
+    no_tenant_only: false,     // 임차인 관련 키워드 없는 물건만
+    special_risk_free: false,  // 특수위험(유치권·법정지상권·지분·농지·분묘) 없는 물건만
   },
 };
 
@@ -342,6 +351,7 @@ function syncControlsFromState() {
   document.querySelectorAll("[data-exclude]").forEach((chk) => { chk.checked = exSet.has(chk.dataset.exclude); });
   const inSet = new Set(f.include_flags || []);
   document.querySelectorAll("[data-include]").forEach((chk) => { chk.checked = inSet.has(chk.dataset.include); });
+  document.querySelectorAll("[data-toggle]").forEach((chk) => { chk.checked = !!f[chk.dataset.toggle]; });
   // 보기 토글
   document.querySelectorAll(".view-btn").forEach((b) => {
     const active = b.dataset.view === STATE.view;
@@ -619,6 +629,23 @@ function bindFilterEvents() {
       applyFilters();
     });
   });
+  // 특수 토글 (고위험 제외 / 임차인 있는·없는 / 특수위험 없음)
+  document.querySelectorAll("[data-toggle]").forEach((chk) => {
+    chk.addEventListener("change", () => {
+      const key = chk.dataset.toggle;
+      STATE.filters[key] = chk.checked;
+      // 상호배타: 임차인 있는 ↔ 없는
+      if (key === "tenant_only" && chk.checked) {
+        STATE.filters.no_tenant_only = false;
+        const o = document.querySelector('[data-toggle="no_tenant_only"]'); if (o) o.checked = false;
+      }
+      if (key === "no_tenant_only" && chk.checked) {
+        STATE.filters.tenant_only = false;
+        const o = document.querySelector('[data-toggle="tenant_only"]'); if (o) o.checked = false;
+      }
+      applyFilters();
+    });
+  });
   // 고급 필터 펼치기/접기
   const advToggle = $("adv-toggle");
   if (advToggle) advToggle.addEventListener("click", () => {
@@ -707,8 +734,13 @@ function chipMatch(chip, it) {
                                 : _hasText([...(it.next_actions || []), ...(it.checklist || [])], "현장");
     case "tenant_warn":  return _hasRiskKeyword(it, "임차");
     case "lien_warn":    return _hasRiskKeyword(it, "유치권");
+    case "superficies_warn": return _hasRiskKeyword(it, "법정지상권");
     case "share_warn":   return _hasRiskKeyword(it, "지분");
     case "farm_warn":    return _hasRiskKeyword(it, "농지");
+    case "tenant_yes":   return itemHasAnyRiskKeyword(it, TENANT_KEYWORDS);
+    case "tenant_no":    return !itemHasAnyRiskKeyword(it, TENANT_KEYWORDS);
+    case "special_free": return !itemHasAnyRiskKeyword(it, SPECIAL_RISK_KEYWORDS);
+    case "high_exclude": return !itemHasHighRiskKeyword(it);
     default: return true;
   }
 }
@@ -730,8 +762,53 @@ function _riskKeywords(it) {
     : (it.risk_flags || []).map((f) => f && f.keyword);
   return a.filter(Boolean);
 }
+
+// 위험 키워드 그룹
+const TENANT_KEYWORDS = ["임차인", "전입세대", "대항력", "선순위임차인"];
+const SPECIAL_RISK_KEYWORDS = ["유치권", "법정지상권", "지분", "공유지분", "농지취득자격증명", "농지", "분묘기지권"];
+
+// 물건의 위험 관련 텍스트를 모두 합쳐 검색 대상 문자열로 (배열/문자열/null 안전)
+function getRiskSearchText(item) {
+  if (!item) return "";
+  const parts = [];
+  const pushArr = (a) => { (a || []).forEach((x) => {
+    if (!x) return;
+    if (typeof x === "string") parts.push(x);
+    else if (x.keyword) parts.push(x.keyword);
+    if (x && x.description) parts.push(x.description);
+  }); };
+  pushArr(item.risk_keywords);
+  pushArr(item.risk_flags);
+  pushArr(item.warnings);
+  pushArr(item.checklist);
+  pushArr(item.additional_checklist);
+  pushArr(item.next_actions);
+  [item.recommendation_reason, item.caution_reason, item.detail_summary,
+   item.agent_opinion, item.document_status, item.risk_level].forEach((s) => {
+    if (s) parts.push(String(s));
+  });
+  return parts.join(" ");
+}
+function itemHasRiskKeyword(item, keyword) {
+  if (!keyword) return false;
+  return getRiskSearchText(item).includes(keyword);
+}
+function itemHasAnyRiskKeyword(item, keywords) {
+  return (keywords || []).some((k) => itemHasRiskKeyword(item, k));
+}
+function itemHasAllIncludedRiskKeywords(item, keywords) {
+  return (keywords || []).every((k) => itemHasRiskKeyword(item, k));
+}
+function itemHasExcludedRiskKeyword(item, keywords) {
+  return (keywords || []).some((k) => itemHasRiskKeyword(item, k));
+}
+// high 위험 키워드 포함 여부 (risk_flags 의 risk_level=high 또는 risk_level==='high')
+function itemHasHighRiskKeyword(item) {
+  if (item.risk_level === "high") return true;
+  return (item.risk_flags || []).some((f) => f && f.risk_level === "high");
+}
 function _hasRiskKeyword(it, sub) {
-  return _riskKeywords(it).some((k) => String(k).includes(sub));
+  return itemHasRiskKeyword(it, sub);
 }
 function _hasText(arr, sub) {
   return (arr || []).some((s) => String(s || "").includes(sub));
@@ -846,9 +923,17 @@ function applyFilters() {
   if (f.bid_date_from) out = out.filter((it) => _bidStart(it) && _bidStart(it) >= f.bid_date_from);
   if (f.bid_date_to)   out = out.filter((it) => _bidStart(it) && _bidStart(it) <= f.bid_date_to);
   if (f.exclude_flags && f.exclude_flags.length)
-    out = out.filter((it) => !f.exclude_flags.some((kw) => _hasRiskKeyword(it, kw)));
+    out = out.filter((it) => !itemHasExcludedRiskKeyword(it, f.exclude_flags));
   if (f.include_flags && f.include_flags.length)
-    out = out.filter((it) => f.include_flags.every((kw) => _hasRiskKeyword(it, kw)));
+    out = out.filter((it) => itemHasAllIncludedRiskKeywords(it, f.include_flags));
+  if (f.exclude_high_risk_keywords)
+    out = out.filter((it) => !itemHasHighRiskKeyword(it));
+  if (f.tenant_only)
+    out = out.filter((it) => itemHasAnyRiskKeyword(it, TENANT_KEYWORDS));
+  if (f.no_tenant_only)
+    out = out.filter((it) => !itemHasAnyRiskKeyword(it, TENANT_KEYWORDS));
+  if (f.special_risk_free)
+    out = out.filter((it) => !itemHasAnyRiskKeyword(it, SPECIAL_RISK_KEYWORDS));
 
   // 초보자 모드: 고위험, 복잡한 물건 제외
   if (BEGINNER_MODE_ENABLED) {
@@ -1199,6 +1284,28 @@ function noteBadgeHtml(it) {
   const preview = (n.text || "").replace(/\s+/g, " ").slice(0, 40);
   return `<span class="note-badge" title="메모: ${escapeHtml(preview)}">📝</span>`;
 }
+// 위험 키워드 칩 (고위험 강조 + 포함 필터 매칭 표시)
+function riskKeywordChipsHtml(it) {
+  const flags = it.risk_flags || [];
+  const inc = STATE.filters.include_flags || [];
+  const matched = (kw) => inc.some((k) => kw.includes(k));
+  let chips = "";
+  if (flags.length) {
+    chips = flags.slice(0, 5).map((f) => {
+      const kw = (f && (f.keyword || f.flag_type)) || "";
+      if (!kw) return "";
+      const cls = "rk-chip" + (f.risk_level === "high" ? " rk-high" : "") + (matched(kw) ? " rk-matched" : "");
+      return `<span class="${cls}">${escapeHtml(kw)}</span>`;
+    }).filter(Boolean).join("");
+  } else {
+    const kws = _riskKeywords(it);
+    chips = kws.length
+      ? kws.slice(0, 5).map((k) => `<span class="rk-chip${matched(k) ? " rk-matched" : ""}">${escapeHtml(k)}</span>`).join("")
+      : `<span class="rk-chip rk-none">특이사항 없음</span>`;
+  }
+  return `<div class="item-risk-kw" aria-label="위험 키워드">${chips}</div>`;
+}
+
 function itemCardHtml(it) {
   const grade = it.recommendation_grade || "C";
   const risk = it.risk_level || "medium";
@@ -1230,6 +1337,7 @@ function itemCardHtml(it) {
         <span class="k">추천점수</span><span class="v">${escapeHtml(String(it.recommendation_score ?? "-"))}</span>
       </div>
       ${it.recommendation_reason ? `<div class="item-reason">${escapeHtml(it.recommendation_reason)}</div>` : ""}
+      ${riskKeywordChipsHtml(it)}
       <div class="item-foot">
         <span>${escapeHtml(due)}</span>
         <span>· 유찰 ${escapeHtml(String(it.fail_count ?? 0))}회</span>
@@ -1339,6 +1447,11 @@ function _activeFilterChips() {
   if (f.bid_date_to) chips.push({ key: "bid_date_to", label: `기일 ~${f.bid_date_to}`, clear: () => { STATE.filters.bid_date_to = ""; const n = $("f-date-to"); if (n) n.value = ""; } });
   (f.exclude_flags || []).forEach((kw) => chips.push({ key: `ex_${kw}`, label: `${kw} 제외`, clear: () => { STATE.filters.exclude_flags = STATE.filters.exclude_flags.filter((x) => x !== kw); const c = document.querySelector(`[data-exclude="${kw}"]`); if (c) c.checked = false; } }));
   (f.include_flags || []).forEach((kw) => chips.push({ key: `in_${kw}`, label: `${kw} 포함`, clear: () => { STATE.filters.include_flags = STATE.filters.include_flags.filter((x) => x !== kw); const c = document.querySelector(`[data-include="${kw}"]`); if (c) c.checked = false; } }));
+  const toggleChip = (key, label) => { if (f[key]) chips.push({ key, label, clear: () => { STATE.filters[key] = false; const c = document.querySelector(`[data-toggle="${key}"]`); if (c) c.checked = false; } }); };
+  toggleChip("exclude_high_risk_keywords", "고위험 제외");
+  toggleChip("tenant_only", "임차인 있는 물건");
+  toggleChip("no_tenant_only", "임차인 없는 물건");
+  toggleChip("special_risk_free", "특수위험 제외");
   return chips;
 }
 
@@ -3052,12 +3165,18 @@ function openDetailById(id) {
   const body = $("detail-body");
   const grade = it.recommendation_grade || "C";
   const risk = it.risk_level || "medium";
-  const flags = (it.risk_flags || []).map((f) => f.keyword || f.flag_type || "키워드");
-  const flagList = flags.length
-    ? `<ul>${flags.map((k) => `<li>${escapeHtml(k)}</li>`).join("")}</ul>`
-    : `<p class="caption">검출된 위험 키워드 없음</p>`;
-  const checklist = (it.checklist || []).length
-    ? `<ul>${it.checklist.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
+  const rawFlags = it.risk_flags || [];
+  const flagList = rawFlags.length
+    ? `<div class="detail-risk-kw">${rawFlags.map((f) => {
+        const kw = (f && (f.keyword || f.flag_type)) || "키워드";
+        const hi = f && f.risk_level === "high";
+        return `<span class="rk-chip${hi ? " rk-high" : ""}">${escapeHtml(kw)}${hi ? " ⚠" : ""}</span>`;
+      }).join("")}</div>`
+      + (it.caution_reason ? `<p class="caption">${escapeHtml(it.caution_reason)}</p>` : "")
+    : `<p class="caption">검출된 위험 키워드 없음 (특이사항 없음)</p>`;
+  const allChecks = [...(it.checklist || []), ...(it.additional_checklist || [])];
+  const checklist = allChecks.length
+    ? `<ul>${allChecks.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
     : `<p class="caption">추가 확인사항 없음</p>`;
   const next = (it.next_actions || []).length
     ? `<ul>${it.next_actions.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
@@ -3122,8 +3241,9 @@ function openDetailById(id) {
     </div>
 
     <div class="detail-section">
-      <h3>위험 분석</h3>
+      <h3>위험 분석 — 주요 위험 키워드</h3>
       ${flagList}
+      <p class="caption">권리분석 표시는 참고용 위험 체크리스트이며, 법률·투자 판단을 단정하지 않습니다.</p>
     </div>
 
     <div class="detail-section">

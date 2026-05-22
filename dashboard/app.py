@@ -246,6 +246,13 @@ if tab_sel == "통합검색":
             )
             pmin = st.number_input("최저가 하한 (만원)", value=0, step=1000)
             pmax = st.number_input("최저가 상한 (만원, 0=제한없음)", value=0, step=1000)
+            # 위험 키워드 포함/제외
+            _rk_pool = ["유치권", "법정지상권", "지분", "농지취득자격증명", "분묘기지권"]
+            f_exclude_kw = st.multiselect("위험 키워드 제외", _rk_pool)
+            kc1, kc2, kc3 = st.columns(3)
+            f_no_high = kc1.checkbox("고위험 제외")
+            f_tenant_only = kc2.checkbox("임차인 있는 물건만")
+            f_special_free = kc3.checkbox("특수위험 없는 물건만")
 
         from core.utils import days_until as _days_until
         SOURCE_REVERSE = {"경매": "auction", "공매": "public_sale"}
@@ -281,6 +288,15 @@ if tab_sel == "통합검색":
                 if d is None or d < 0 or d > limit: return False
             if pmin and (it.get("min_bid_price") or 0) < pmin: return False
             if pmax and (it.get("min_bid_price") or 0) > pmax: return False
+            # 위험 키워드 포함/제외
+            _rtext = " ".join(
+                ((fl.get("keyword", "") + " " + fl.get("description", "")) if isinstance(fl, dict) else str(fl))
+                for fl in (it.get("risk_flags") or [])
+            )
+            if f_exclude_kw and any(kw in _rtext for kw in f_exclude_kw): return False
+            if f_no_high and it.get("risk_level") == "high": return False
+            if f_tenant_only and not any(k in _rtext for k in ("임차인", "전입세대", "대항력", "선순위임차인")): return False
+            if f_special_free and any(k in _rtext for k in ("유치권", "법정지상권", "지분", "공유지분", "농지취득자격증명", "농지", "분묘기지권")): return False
             return True
 
         result = [it for it in merged if _passes(it)]

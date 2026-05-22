@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T12:04:12",
+  "generated_at": "2026-05-22T13:10:19",
   "source": "db",
   "summary": {
     "total_items": 100,
@@ -20,11 +20,11 @@
       "X": 53
     },
     "risk_distribution": {
-      "low": 6,
-      "medium": 17,
+      "low": 5,
+      "medium": 18,
       "high": 77
     },
-    "data_timestamp": "2026-05-22T12:04:12"
+    "data_timestamp": "2026-05-22T13:10:19"
   },
   "briefing": {
     "run_date": "2026-05-08",
@@ -243,8 +243,8 @@
     }
   ],
   "risk_summary": {
-    "low": 6,
-    "medium": 17,
+    "low": 5,
+    "medium": 18,
     "high": 77,
     "top_flags": [
       {
@@ -299,6 +299,9 @@
       "region": "부산광역시",
       "item_type": "다세대",
       "minimum_to_market_ratio": 16.4,
+      "additional_checklist": [
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.798,
       "legal_confidence": 0.818,
       "document_confidence": 0.738,
@@ -316,9 +319,10 @@
       "item_group": "주거용 건물",
       "risk_keywords": [
         "법정지상권",
-        "관리비 체납"
+        "관리비 체납",
+        "대금미납 재매각"
       ],
-      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 관리비 체납 - 인수 부담 발생 가능",
+      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 관리비 체납 - 인수 부담 발생 가능; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": false,
@@ -347,6 +351,13 @@
           "risk_level": "medium",
           "severity": 4,
           "description": "관리비 체납 - 인수 부담 발생 가능"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 59.0,
@@ -453,6 +464,10 @@
       "region": "경기도",
       "item_type": "다세대",
       "minimum_to_market_ratio": 71.0,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "농지취득자격증명 발급 가능 여부 사전 확인"
+      ],
       "price_confidence": 0.838,
       "legal_confidence": 0.858,
       "document_confidence": 0.778,
@@ -647,6 +662,9 @@
       "region": "부산광역시",
       "item_type": "단독주택",
       "minimum_to_market_ratio": 99.5,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.89,
       "legal_confidence": 0.91,
       "document_confidence": 0.94,
@@ -807,6 +825,9 @@
       "region": "인천광역시",
       "item_type": "다가구주택",
       "minimum_to_market_ratio": 34.2,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.83,
       "legal_confidence": 0.85,
       "document_confidence": 0.88,
@@ -995,6 +1016,9 @@
       "region": "서울특별시",
       "item_type": "공장",
       "minimum_to_market_ratio": 87.7,
+      "additional_checklist": [
+        "농지취득자격증명 발급 가능 여부 사전 확인"
+      ],
       "price_confidence": 0.857,
       "legal_confidence": 0.877,
       "document_confidence": 0.907,
@@ -1178,6 +1202,10 @@
       "region": "대구광역시",
       "item_type": "창고",
       "minimum_to_market_ratio": 569.9,
+      "additional_checklist": [
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.835,
       "legal_confidence": 0.855,
       "document_confidence": 0.885,
@@ -1356,6 +1384,9 @@
       "region": "서울특별시",
       "item_type": "차량",
       "minimum_to_market_ratio": 153.1,
+      "additional_checklist": [
+        "농지취득자격증명 발급 가능 여부 사전 확인"
+      ],
       "price_confidence": 0.788,
       "legal_confidence": 0.808,
       "document_confidence": 0.838,
@@ -1518,6 +1549,9 @@
       "region": "서울특별시",
       "item_type": "차량",
       "minimum_to_market_ratio": 35.0,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.778,
       "legal_confidence": 0.798,
       "document_confidence": 0.828,
@@ -1704,6 +1738,9 @@
       "region": "대전광역시",
       "item_type": "단독주택",
       "minimum_to_market_ratio": 43.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.83,
       "legal_confidence": 0.85,
       "document_confidence": 0.88,
@@ -1876,6 +1913,9 @@
       "region": "서울특별시",
       "item_type": "연립",
       "minimum_to_market_ratio": 41.3,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.745,
       "legal_confidence": 0.765,
       "document_confidence": 0.795,
@@ -2022,6 +2062,10 @@
       "region": "대구광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 112.3,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.865,
       "legal_confidence": 0.755,
       "document_confidence": 0.785,
@@ -2201,6 +2245,10 @@
       "region": "경기도",
       "item_type": "토지",
       "minimum_to_market_ratio": 96.8,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.63,
       "legal_confidence": 0.52,
       "document_confidence": 0.55,
@@ -2222,9 +2270,10 @@
         "대항력",
         "임차인",
         "전입세대",
-        "특이사항 없음"
+        "특이사항 없음",
+        "대금미납 재매각"
       ],
-      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 선순위 임차인 존재 시 보증금 인수 가능성; 대항력 있는 임차인 가능성 - 보증금 인수 검토 필요; 임차인 존재 - 전입/확정/배당요구 확인 필요; 전입세대 존재 - 임차 관계 확인 필요; 특이사항 미발견 - 일반적 진행",
+      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 선순위 임차인 존재 시 보증금 인수 가능성; 대항력 있는 임차인 가능성 - 보증금 인수 검토 필요; 임차인 존재 - 전입/확정/배당요구 확인 필요; 전입세대 존재 - 임차 관계 확인 필요; 특이사항 미발견 - 일반적 진행; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": true,
@@ -2281,6 +2330,13 @@
           "risk_level": "low",
           "severity": 1,
           "description": "특이사항 미발견 - 일반적 진행"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 5.0,
@@ -2438,6 +2494,10 @@
       "region": "광주광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 15.7,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.845,
       "legal_confidence": 0.735,
       "document_confidence": 0.765,
@@ -2618,6 +2678,9 @@
       "region": "경기도",
       "item_type": "빌라",
       "minimum_to_market_ratio": 458.8,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.798,
       "legal_confidence": 0.688,
       "document_confidence": 0.828,
@@ -2779,6 +2842,11 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 87.4,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.825,
       "legal_confidence": 0.715,
       "document_confidence": 0.855,
@@ -2978,6 +3046,9 @@
       "region": "인천광역시",
       "item_type": "토지",
       "minimum_to_market_ratio": 54.2,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.815,
       "legal_confidence": 0.705,
       "document_confidence": 0.845,
@@ -3130,6 +3201,9 @@
       "region": "서울특별시",
       "item_type": "상가",
       "minimum_to_market_ratio": 11.3,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.83,
       "legal_confidence": 0.89,
       "document_confidence": 0.86,
@@ -3295,6 +3369,10 @@
       "region": "대구광역시",
       "item_type": "토지",
       "minimum_to_market_ratio": 407.9,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토"
+      ],
       "price_confidence": 0.643,
       "legal_confidence": 0.703,
       "document_confidence": 0.673,
@@ -3456,6 +3534,10 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 35.5,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.735,
       "legal_confidence": 0.795,
       "document_confidence": 0.765,
@@ -3641,6 +3723,9 @@
       "region": "인천광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 23.1,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.573,
       "legal_confidence": 0.633,
       "document_confidence": 0.603,
@@ -3779,6 +3864,9 @@
       "region": "경기도",
       "item_type": "빌라",
       "minimum_to_market_ratio": 149.1,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.778,
       "legal_confidence": 0.838,
       "document_confidence": 0.808,
@@ -3938,6 +4026,9 @@
       "region": "경기도",
       "item_type": "토지",
       "minimum_to_market_ratio": 96.8,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.543,
       "legal_confidence": 0.603,
       "document_confidence": 0.573,
@@ -4128,6 +4219,10 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 74.9,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인",
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.795,
       "legal_confidence": 0.855,
       "document_confidence": 0.825,
@@ -4145,9 +4240,10 @@
       "item_group": "주거용 건물",
       "risk_keywords": [
         "법정지상권",
-        "위반건축물"
+        "위반건축물",
+        "대금미납 재매각"
       ],
-      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 위반건축물 등재 - 시정명령 이행 여부 확인 필요",
+      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 위반건축물 등재 - 시정명령 이행 여부 확인 필요; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": true,
@@ -4176,6 +4272,13 @@
           "risk_level": "medium",
           "severity": 5,
           "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 20.4,
@@ -4297,6 +4400,9 @@
       "region": "대전광역시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 57.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.617,
       "legal_confidence": 0.547,
       "document_confidence": 0.517,
@@ -4420,6 +4526,10 @@
       "region": "서울특별시",
       "item_type": "상가",
       "minimum_to_market_ratio": 30.8,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인",
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토"
+      ],
       "price_confidence": 0.917,
       "legal_confidence": 0.847,
       "document_confidence": 0.927,
@@ -4592,6 +4702,9 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 833.7,
+      "additional_checklist": [
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.808,
       "legal_confidence": 0.738,
       "document_confidence": 0.818,
@@ -4760,6 +4873,9 @@
       "region": "경기도",
       "item_type": "아파트",
       "minimum_to_market_ratio": 131.4,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.798,
       "legal_confidence": 0.728,
       "document_confidence": 0.808,
@@ -4920,6 +5036,10 @@
       "region": "서울특별시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 63.8,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.9,
       "legal_confidence": 0.83,
       "document_confidence": 0.91,
@@ -5111,6 +5231,9 @@
       "region": "대전광역시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 90.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.828,
       "legal_confidence": 0.758,
       "document_confidence": 0.838,
@@ -5276,6 +5399,9 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 96.8,
+      "additional_checklist": [
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토"
+      ],
       "price_confidence": 0.593,
       "legal_confidence": 0.523,
       "document_confidence": 0.603,
@@ -5467,6 +5593,9 @@
       "region": "경기도",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 95.8,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.758,
       "legal_confidence": 0.688,
       "document_confidence": 0.768,
@@ -5609,6 +5738,10 @@
       "region": "광주광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 150.6,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.81,
       "legal_confidence": 0.74,
       "document_confidence": 0.82,
@@ -5804,6 +5937,9 @@
       "region": "경기도",
       "item_type": "토지",
       "minimum_to_market_ratio": 71.6,
+      "additional_checklist": [
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토"
+      ],
       "price_confidence": 0.512,
       "legal_confidence": 0.442,
       "document_confidence": 0.522,
@@ -5995,6 +6131,10 @@
       "region": "경기도",
       "item_type": "아파트",
       "minimum_to_market_ratio": 145.4,
+      "additional_checklist": [
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토",
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.765,
       "legal_confidence": 0.865,
       "document_confidence": 0.775,
@@ -6013,9 +6153,10 @@
       "risk_keywords": [
         "공유지분",
         "점유자 미상",
-        "명도"
+        "명도",
+        "대금미납 재매각"
       ],
-      "caution_reason": "지분 매각 - 단독 처분 제약 가능성; 점유자 미상 - 명도 협의 어려울 수 있음; 명도 필요 가능성 - 명도 비용/시간 발생 가능",
+      "caution_reason": "지분 매각 - 단독 처분 제약 가능성; 점유자 미상 - 명도 협의 어려울 수 있음; 명도 필요 가능성 - 명도 비용/시간 발생 가능; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": true,
@@ -6051,6 +6192,13 @@
           "risk_level": "medium",
           "severity": 4,
           "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 5.0,
@@ -6166,6 +6314,10 @@
       "region": "경기도",
       "item_type": "아파트",
       "minimum_to_market_ratio": 22.4,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.718,
       "legal_confidence": 0.818,
       "document_confidence": 0.728,
@@ -6345,6 +6497,10 @@
       "region": "서울특별시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 200.5,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.682,
       "legal_confidence": 0.782,
       "document_confidence": 0.802,
@@ -6512,6 +6668,9 @@
       "region": "대전광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 26.3,
+      "additional_checklist": [
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토"
+      ],
       "price_confidence": 0.89,
       "legal_confidence": 0.86,
       "document_confidence": 0.88,
@@ -6690,6 +6849,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 116.6,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.868,
       "legal_confidence": 0.838,
       "document_confidence": 0.858,
@@ -6822,6 +6984,10 @@
       "region": "경기도",
       "item_type": "빌라",
       "minimum_to_market_ratio": 104.3,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인",
+        "농지취득자격증명 발급 가능 여부 사전 확인"
+      ],
       "price_confidence": 0.82,
       "legal_confidence": 0.79,
       "document_confidence": 0.81,
@@ -6988,6 +7154,9 @@
       "region": "광주광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 17.9,
+      "additional_checklist": [
+        "농지취득자격증명 발급 가능 여부 사전 확인"
+      ],
       "price_confidence": 0.785,
       "legal_confidence": 0.755,
       "document_confidence": 0.775,
@@ -7146,6 +7315,9 @@
       "region": "대전광역시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 582.8,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.825,
       "legal_confidence": 0.795,
       "document_confidence": 0.815,
@@ -7319,6 +7491,9 @@
       "region": "광주광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 17.7,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.702,
       "legal_confidence": 0.672,
       "document_confidence": 0.692,
@@ -7452,6 +7627,9 @@
       "region": "인천광역시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 298.2,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.83,
       "legal_confidence": 0.8,
       "document_confidence": 0.82,
@@ -7616,6 +7794,9 @@
       "region": "대구광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 66.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.795,
       "legal_confidence": 0.765,
       "document_confidence": 0.785,
@@ -7782,6 +7963,9 @@
       "region": "서울특별시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 621.4,
+      "additional_checklist": [
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.423,
       "legal_confidence": 0.393,
       "document_confidence": 0.413,
@@ -7797,27 +7981,37 @@
       "sigungu": "영등포구",
       "dong": "여의도동",
       "item_group": "주거용 건물",
-      "risk_keywords": [],
-      "caution_reason": "low 위험 — 기본 권리분석 확인 권장",
+      "risk_keywords": [
+        "대금미납 재매각"
+      ],
+      "caution_reason": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "문서 미공개 — 매각물건명세서·현황조사서 미열람 (mock)",
       "documents_missing": true,
       "field_survey_needed": true,
-      "agent_opinion": "시세 매칭 표본 부족, low 위험",
+      "agent_opinion": "시세 매칭 표본 부족, medium 위험",
       "appraisal_price": 150000,
       "min_bid_price": 138000,
       "minimum_price": 138000,
       "market_price": 22209,
-      "expected_profit": -117291,
-      "expected_profit_rate": -85.0,
+      "expected_profit": -118041,
+      "expected_profit_rate": -85.5,
       "fail_count": 0,
       "bid_date": "2026-05-10~2026-05-12",
       "days_left": -12,
-      "risk_level": "low",
-      "risk_flags": [],
-      "recommendation_score": 15.0,
+      "risk_level": "medium",
+      "risk_flags": [
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
+        }
+      ],
+      "recommendation_score": 5.0,
       "recommendation_grade": "X",
       "confidence_score": 0.443,
-      "recommendation_reason": "시세 매칭 표본 부족, low 위험",
+      "recommendation_reason": "시세 매칭 표본 부족, medium 위험",
       "warnings": [],
       "next_actions": [
         "입찰기간 확인",
@@ -7828,7 +8022,7 @@
         "등기부등본 최신본 확인",
         "현장조사 1회"
       ],
-      "detail_summary": "감정가 150,000만원 / 최저가 138,000만원 / 추정시세 22,209만원 / 차익 -117,291만원 / 위험 low / 신뢰도 0.44",
+      "detail_summary": "감정가 150,000만원 / 최저가 138,000만원 / 추정시세 22,209만원 / 차익 -118,041만원 / 위험 medium / 신뢰도 0.44",
       "change_events": [],
       "change_tags": [],
       "is_new": false,
@@ -7845,21 +8039,21 @@
           "label": "예상 차익",
           "contribution": 0,
           "max": 35,
-          "note": "-117,291만원 추정"
+          "note": "-118,041만원 추정"
         },
         {
           "key": "roi",
           "label": "수익률",
           "contribution": 0,
           "max": 25,
-          "note": "-85.0%"
+          "note": "-85.5%"
         },
         {
           "key": "risk",
           "label": "위험도",
-          "contribution": 20,
+          "contribution": 10,
           "max": 20,
-          "note": "낮음"
+          "note": "보통"
         },
         {
           "key": "confidence",
@@ -7877,11 +8071,11 @@
         }
       ],
       "beginner_friendly": false,
-      "beginner_reason": "위험 낮음",
-      "simple_risk_summary": "낮음 · 상대적으로 안전",
+      "beginner_reason": "추가 검토 필요",
+      "simple_risk_summary": "보통 · 주의할 점: 대금미납 재매각",
       "simple_profit_summary": "수익 예상 어려움 (손실 위험)",
-      "simple_next_action": "시간 있으니 천천히 검토",
-      "why_recommended": "시세 매칭 표본 부족, low 위험",
+      "simple_next_action": "시간 있으니 천천히 검토 → 등기부등본 확인",
+      "why_recommended": "시세 매칭 표본 부족, medium 위험",
       "what_to_check": "등기부등본 최신본 확인",
       "easy_explanation": "에 대해 전문가 상담이 필요합니다.",
       "glossary_terms": []
@@ -7895,6 +8089,9 @@
       "region": "광주광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 11.4,
+      "additional_checklist": [
+        "농지취득자격증명 발급 가능 여부 사전 확인"
+      ],
       "price_confidence": 0.623,
       "legal_confidence": 0.593,
       "document_confidence": 0.613,
@@ -8041,6 +8238,9 @@
       "region": "부산광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 7.6,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.492,
       "legal_confidence": 0.462,
       "document_confidence": 0.592,
@@ -8159,6 +8359,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 36.6,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.78,
       "legal_confidence": 0.75,
       "document_confidence": 0.88,
@@ -8306,6 +8509,9 @@
       "region": "대구광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 45.6,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.758,
       "legal_confidence": 0.728,
       "document_confidence": 0.858,
@@ -8501,6 +8707,10 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 307.6,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.94,
       "legal_confidence": 0.78,
       "document_confidence": 0.91,
@@ -8700,6 +8910,10 @@
       "region": "경기도",
       "item_type": "토지",
       "minimum_to_market_ratio": 288.8,
+      "additional_checklist": [
+        "농지취득자격증명 발급 가능 여부 사전 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.855,
       "legal_confidence": 0.865,
       "document_confidence": 0.825,
@@ -8843,6 +9057,10 @@
       "region": "경기도",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 45.8,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.693,
       "legal_confidence": 0.703,
       "document_confidence": 0.663,
@@ -9040,6 +9258,9 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 100.4,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.785,
       "legal_confidence": 0.795,
       "document_confidence": 0.755,
@@ -9205,6 +9426,9 @@
       "region": "대전광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 15.1,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.9,
       "legal_confidence": 0.91,
       "document_confidence": 0.87,
@@ -9404,6 +9628,9 @@
       "region": "경기도",
       "item_type": "상가",
       "minimum_to_market_ratio": 51.4,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.765,
       "legal_confidence": 0.775,
       "document_confidence": 0.735,
@@ -9557,6 +9784,10 @@
       "region": "서울특별시",
       "item_type": "상가",
       "minimum_to_market_ratio": 16.5,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.83,
       "legal_confidence": 0.84,
       "document_confidence": 0.8,
@@ -9576,9 +9807,10 @@
         "법정지상권",
         "대항력",
         "임차인",
-        "전입세대"
+        "전입세대",
+        "대금미납 재매각"
       ],
-      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 대항력 있는 임차인 가능성 - 보증금 인수 검토 필요; 임차인 존재 - 전입/확정/배당요구 확인 필요; 전입세대 존재 - 임차 관계 확인 필요",
+      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 대항력 있는 임차인 가능성 - 보증금 인수 검토 필요; 임차인 존재 - 전입/확정/배당요구 확인 필요; 전입세대 존재 - 임차 관계 확인 필요; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": true,
@@ -9621,6 +9853,13 @@
           "risk_level": "medium",
           "severity": 5,
           "description": "전입세대 존재 - 임차 관계 확인 필요"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 59.0,
@@ -9753,6 +9992,9 @@
       "region": "경기도",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 110.7,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.758,
       "legal_confidence": 0.768,
       "document_confidence": 0.728,
@@ -9933,6 +10175,9 @@
       "region": "부산광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 144.5,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.748,
       "legal_confidence": 0.758,
       "document_confidence": 0.828,
@@ -10109,6 +10354,9 @@
       "region": "경기도",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 94.7,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.575,
       "legal_confidence": 0.585,
       "document_confidence": 0.655,
@@ -10293,6 +10541,9 @@
       "region": "경기도",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 104.4,
+      "additional_checklist": [
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.652,
       "legal_confidence": 0.662,
       "document_confidence": 0.732,
@@ -10444,6 +10695,10 @@
       "region": "부산광역시",
       "item_type": "토지",
       "minimum_to_market_ratio": 128.9,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.768,
       "legal_confidence": 0.778,
       "document_confidence": 0.848,
@@ -10617,6 +10872,9 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 94.7,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.482,
       "legal_confidence": 0.492,
       "document_confidence": 0.562,
@@ -10841,6 +11099,10 @@
       "region": "경기도",
       "item_type": "토지",
       "minimum_to_market_ratio": 89.9,
+      "additional_checklist": [
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.94,
       "legal_confidence": 0.82,
       "document_confidence": 0.89,
@@ -11003,6 +11265,11 @@
       "region": "경기도",
       "item_type": "아파트",
       "minimum_to_market_ratio": 48.6,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인",
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.88,
       "legal_confidence": 0.76,
       "document_confidence": 0.83,
@@ -11184,6 +11451,9 @@
       "region": "경기도",
       "item_type": "상가",
       "minimum_to_market_ratio": 132.8,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.732,
       "legal_confidence": 0.612,
       "document_confidence": 0.682,
@@ -11315,6 +11585,9 @@
       "region": "경기도",
       "item_type": "상가",
       "minimum_to_market_ratio": 16.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.835,
       "legal_confidence": 0.715,
       "document_confidence": 0.785,
@@ -11464,6 +11737,9 @@
       "region": "대전광역시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 376.6,
+      "additional_checklist": [
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.85,
       "legal_confidence": 0.73,
       "document_confidence": 0.8,
@@ -11480,9 +11756,10 @@
       "dong": "관평동",
       "item_group": "주거용 건물",
       "risk_keywords": [
-        "법정지상권"
+        "법정지상권",
+        "대금미납 재매각"
       ],
-      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요",
+      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": false,
@@ -11504,6 +11781,13 @@
           "risk_level": "high",
           "severity": 8,
           "description": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 5.0,
@@ -11619,6 +11903,9 @@
       "region": "서울특별시",
       "item_type": "상가",
       "minimum_to_market_ratio": 53.0,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.702,
       "legal_confidence": 0.752,
       "document_confidence": 0.652,
@@ -11745,6 +12032,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 80.4,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.83,
       "legal_confidence": 0.88,
       "document_confidence": 0.89,
@@ -11930,6 +12220,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 81.1,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.532,
       "legal_confidence": 0.582,
       "document_confidence": 0.592,
@@ -12114,6 +12407,9 @@
       "region": "경기도",
       "item_type": "상가",
       "minimum_to_market_ratio": 24.1,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.86,
       "legal_confidence": 0.91,
       "document_confidence": 0.92,
@@ -12309,6 +12605,9 @@
       "region": "대전광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 46.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.8,
       "legal_confidence": 0.85,
       "document_confidence": 0.86,
@@ -12483,6 +12782,10 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 67.4,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.565,
       "legal_confidence": 0.615,
       "document_confidence": 0.625,
@@ -12695,6 +12998,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 81.1,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.543,
       "legal_confidence": 0.593,
       "document_confidence": 0.603,
@@ -12903,6 +13209,9 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 92.7,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.795,
       "legal_confidence": 0.845,
       "document_confidence": 0.855,
@@ -13075,6 +13384,10 @@
       "region": "대전광역시",
       "item_type": "토지",
       "minimum_to_market_ratio": 115.6,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.865,
       "legal_confidence": 0.785,
       "document_confidence": 0.795,
@@ -13282,6 +13595,10 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 95.1,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "공유자 우선매수 신고 가능성·공유물분할 청구 검토"
+      ],
       "price_confidence": 0.905,
       "legal_confidence": 0.825,
       "document_confidence": 0.835,
@@ -13491,6 +13808,10 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 586.5,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인",
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.858,
       "legal_confidence": 0.778,
       "document_confidence": 0.788,
@@ -13508,9 +13829,10 @@
       "item_group": "주거용 건물",
       "risk_keywords": [
         "법정지상권",
-        "위반건축물"
+        "위반건축물",
+        "대금미납 재매각"
       ],
-      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 위반건축물 등재 - 시정명령 이행 여부 확인 필요",
+      "caution_reason": "법정지상권 성립 가능성 - 토지/건물 소유관계 확인 필요; 위반건축물 등재 - 시정명령 이행 여부 확인 필요; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": true,
@@ -13539,6 +13861,13 @@
           "risk_level": "medium",
           "severity": 5,
           "description": "위반건축물 등재 - 시정명령 이행 여부 확인 필요"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 5.0,
@@ -13655,6 +13984,10 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 19.2,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인",
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.885,
       "legal_confidence": 0.805,
       "document_confidence": 0.815,
@@ -13851,6 +14184,9 @@
       "region": "인천광역시",
       "item_type": "토지",
       "minimum_to_market_ratio": 267.9,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.838,
       "legal_confidence": 0.758,
       "document_confidence": 0.878,
@@ -14016,6 +14352,9 @@
       "region": "대전광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 16.8,
+      "additional_checklist": [
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.778,
       "legal_confidence": 0.698,
       "document_confidence": 0.818,
@@ -14176,6 +14515,9 @@
       "region": "경기도",
       "item_type": "상가",
       "minimum_to_market_ratio": 148.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.532,
       "legal_confidence": 0.452,
       "document_confidence": 0.572,
@@ -14308,6 +14650,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 206.5,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.82,
       "legal_confidence": 0.74,
       "document_confidence": 0.86,
@@ -14476,6 +14821,9 @@
       "region": "대전광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 12.1,
+      "additional_checklist": [
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.798,
       "legal_confidence": 0.718,
       "document_confidence": 0.838,
@@ -14637,6 +14985,9 @@
       "region": "인천광역시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 610.6,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.577,
       "legal_confidence": 0.667,
       "document_confidence": 0.617,
@@ -14774,6 +15125,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 31.2,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.79,
       "legal_confidence": 0.88,
       "document_confidence": 0.83,
@@ -14928,6 +15282,9 @@
       "region": "서울특별시",
       "item_type": "상가",
       "minimum_to_market_ratio": 82.4,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.768,
       "legal_confidence": 0.858,
       "document_confidence": 0.808,
@@ -15115,6 +15472,10 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 51.3,
+      "additional_checklist": [
+        "농지취득자격증명 발급 가능 여부 사전 확인",
+        "위반건축물 이행강제금·양성화 가능성 확인"
+      ],
       "price_confidence": 0.692,
       "legal_confidence": 0.782,
       "document_confidence": 0.732,
@@ -15261,6 +15622,11 @@
       "region": "인천광역시",
       "item_type": "토지",
       "minimum_to_market_ratio": 36.9,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인",
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.94,
       "legal_confidence": 0.9,
       "document_confidence": 0.85,
@@ -15280,9 +15646,10 @@
         "분묘기지권",
         "점유자 미상",
         "위반건축물",
-        "명도"
+        "명도",
+        "대금미납 재매각"
       ],
-      "caution_reason": "분묘기지권 가능성 - 처분/이용 제약 가능성; 점유자 미상 - 명도 협의 어려울 수 있음; 위반건축물 등재 - 시정명령 이행 여부 확인 필요; 명도 필요 가능성 - 명도 비용/시간 발생 가능",
+      "caution_reason": "분묘기지권 가능성 - 처분/이용 제약 가능성; 점유자 미상 - 명도 협의 어려울 수 있음; 위반건축물 등재 - 시정명령 이행 여부 확인 필요; 명도 필요 가능성 - 명도 비용/시간 발생 가능; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": true,
@@ -15325,6 +15692,13 @@
           "risk_level": "medium",
           "severity": 4,
           "description": "명도 필요 가능성 - 명도 비용/시간 발생 가능"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 59.0,
@@ -15452,6 +15826,9 @@
       "region": "경기도",
       "item_type": "아파트",
       "minimum_to_market_ratio": 32.0,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.818,
       "legal_confidence": 0.778,
       "document_confidence": 0.728,
@@ -15635,6 +16012,9 @@
       "region": "서울특별시",
       "item_type": "토지",
       "minimum_to_market_ratio": 39.5,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.808,
       "legal_confidence": 0.768,
       "document_confidence": 0.828,
@@ -15781,6 +16161,9 @@
       "region": "인천광역시",
       "item_type": "상가",
       "minimum_to_market_ratio": 13.1,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.835,
       "legal_confidence": 0.795,
       "document_confidence": 0.855,
@@ -15963,6 +16346,9 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 129.2,
+      "additional_checklist": [
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.875,
       "legal_confidence": 0.835,
       "document_confidence": 0.895,
@@ -16134,6 +16520,10 @@
       "region": "서울특별시",
       "item_type": "오피스텔",
       "minimum_to_market_ratio": 37.2,
+      "additional_checklist": [
+        "위반건축물 이행강제금·양성화 가능성 확인",
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.865,
       "legal_confidence": 0.825,
       "document_confidence": 0.885,
@@ -16301,6 +16691,9 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 52.1,
+      "additional_checklist": [
+        "전입세대 열람내역서·확정일자 부여현황 발급 확인"
+      ],
       "price_confidence": 0.768,
       "legal_confidence": 0.728,
       "document_confidence": 0.788,
@@ -16496,6 +16889,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 60.9,
+      "additional_checklist": [
+        "유치권 신고서·점유 개시 시점·피담보채권 확인"
+      ],
       "price_confidence": 0.82,
       "legal_confidence": 0.78,
       "document_confidence": 0.84,
@@ -16651,6 +17047,9 @@
       "region": "서울특별시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 230.6,
+      "additional_checklist": [
+        "분묘기지권 성립 여부·개장 협의 비용 확인"
+      ],
       "price_confidence": 0.785,
       "legal_confidence": 0.745,
       "document_confidence": 0.805,
@@ -16822,6 +17221,9 @@
       "region": "부산광역시",
       "item_type": "빌라",
       "minimum_to_market_ratio": 52.2,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.738,
       "legal_confidence": 0.698,
       "document_confidence": 0.758,
@@ -16988,6 +17390,9 @@
       "region": "서울특별시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 23.0,
+      "additional_checklist": [
+        "등기부등본 최신본·전입세대 열람으로 권리 재확인"
+      ],
       "price_confidence": 0.778,
       "legal_confidence": 0.738,
       "document_confidence": 0.798,
@@ -17156,6 +17561,9 @@
       "region": "대전광역시",
       "item_type": "아파트",
       "minimum_to_market_ratio": 20.0,
+      "additional_checklist": [
+        "재매각 사유 확인·입찰보증금 비율(통상 20~30%) 준비"
+      ],
       "price_confidence": 0.768,
       "legal_confidence": 0.728,
       "document_confidence": 0.788,
@@ -17173,9 +17581,10 @@
       "item_group": "주거용 건물",
       "risk_keywords": [
         "관리비 체납",
-        "특이사항 없음"
+        "특이사항 없음",
+        "대금미납 재매각"
       ],
-      "caution_reason": "관리비 체납 - 인수 부담 발생 가능; 특이사항 미발견 - 일반적 진행",
+      "caution_reason": "관리비 체납 - 인수 부담 발생 가능; 특이사항 미발견 - 일반적 진행; 전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요",
       "document_status": "매각물건명세서·현황조사서·감정평가서 열람 가능 (mock)",
       "documents_missing": false,
       "field_survey_needed": false,
@@ -17204,6 +17613,13 @@
           "risk_level": "low",
           "severity": 1,
           "description": "특이사항 미발견 - 일반적 진행"
+        },
+        {
+          "keyword": "대금미납 재매각",
+          "flag_type": "resale",
+          "risk_level": "medium",
+          "severity": "medium",
+          "description": "전 낙찰자 대금 미납으로 재매각 — 입찰보증금 비율 확인 필요"
         }
       ],
       "recommendation_score": 69.0,

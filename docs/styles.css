@@ -1257,6 +1257,42 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
 }
 .adv-flags .chk input { width: 18px; height: 18px; }
 
+/* ── 위험 키워드 칩 (카드·상세) ────────────────────── */
+.item-risk-kw, .detail-risk-kw {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 8px 0 2px;
+}
+.rk-chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--color-surface-3, #eef1f4);
+  color: var(--color-text, #333);
+  border: 1px solid var(--color-border, #e0e0e0);
+  white-space: nowrap;
+}
+.rk-chip.rk-high {
+  background: #fdecec;
+  color: #c0392b;
+  border-color: #f3c2c2;
+  font-weight: 700;
+}
+.rk-chip.rk-matched {
+  outline: 2px solid var(--color-primary, #1f77b4);
+  outline-offset: 1px;
+}
+.rk-chip.rk-none {
+  background: #eaf6ec;
+  color: #2e7d32;
+  border-color: #cce8d4;
+}
+:root[data-theme="dark"] .rk-chip.rk-high { background: #3a1f1f; color: #ff9a9a; border-color: #5a2a2a; }
+:root[data-theme="dark"] .rk-chip.rk-none { background: #1e2f22; color: #9fd9a8; border-color: #2c4a33; }
+
 /* ── 현재 적용 필터 칩 ────────────────────────── */
 .applied-filters {
   display: flex;

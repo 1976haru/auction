@@ -404,12 +404,29 @@
             </label>
           </div>
           <fieldset class="adv-flags">
-            <legend>위험 키워드</legend>
-            <label class="chk"><input type="checkbox" id="f-ex-lien" data-exclude="유치권" /> 유치권 제외</label>
-            <label class="chk"><input type="checkbox" id="f-ex-superficies" data-exclude="법정지상권" /> 법정지상권 제외</label>
-            <label class="chk"><input type="checkbox" id="f-ex-share" data-exclude="지분" /> 지분매각 제외</label>
-            <label class="chk"><input type="checkbox" id="f-ex-farm" data-exclude="농지" /> 농지 제외</label>
-            <label class="chk"><input type="checkbox" id="f-in-tenant" data-include="임차" /> 임차인 포함만</label>
+            <legend>위험 키워드 — 포함</legend>
+            <label class="chk"><input type="checkbox" data-include="임차인" /> 임차인 포함</label>
+            <label class="chk"><input type="checkbox" data-include="유치권" /> 유치권 포함</label>
+            <label class="chk"><input type="checkbox" data-include="법정지상권" /> 법정지상권 포함</label>
+            <label class="chk"><input type="checkbox" data-include="지분" /> 지분매각 포함</label>
+            <label class="chk"><input type="checkbox" data-include="농지취득자격증명" /> 농취증 포함</label>
+            <label class="chk"><input type="checkbox" data-include="점유자 미상" /> 점유자 미상 포함</label>
+            <label class="chk"><input type="checkbox" data-include="관리비 체납" /> 관리비 체납 포함</label>
+            <label class="chk"><input type="checkbox" data-include="위반건축물" /> 위반건축물 포함</label>
+            <label class="chk"><input type="checkbox" data-include="대금미납 재매각" /> 대금미납 재매각 포함</label>
+            <label class="chk"><input type="checkbox" data-include="명도" /> 명도 필요 포함</label>
+          </fieldset>
+          <fieldset class="adv-flags">
+            <legend>위험 키워드 — 제외 / 한정</legend>
+            <label class="chk"><input type="checkbox" data-exclude="유치권" /> 유치권 제외</label>
+            <label class="chk"><input type="checkbox" data-exclude="법정지상권" /> 법정지상권 제외</label>
+            <label class="chk"><input type="checkbox" data-exclude="지분" /> 지분매각 제외</label>
+            <label class="chk"><input type="checkbox" data-exclude="농지취득자격증명" /> 농취증 제외</label>
+            <label class="chk"><input type="checkbox" data-exclude="분묘기지권" /> 분묘기지권 제외</label>
+            <label class="chk"><input type="checkbox" id="f-ex-high" data-toggle="exclude_high_risk_keywords" /> 고위험 키워드 전체 제외</label>
+            <label class="chk"><input type="checkbox" id="f-tenant-only" data-toggle="tenant_only" /> 임차인 있는 물건만</label>
+            <label class="chk"><input type="checkbox" id="f-no-tenant" data-toggle="no_tenant_only" /> 임차인 없는 물건만</label>
+            <label class="chk"><input type="checkbox" id="f-special-free" data-toggle="special_risk_free" /> 특수위험 없는 물건만</label>
           </fieldset>
         </div>
 
