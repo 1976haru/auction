@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T10:01:38",
+  "generated_at": "2026-05-22T10:31:30",
   "source": "db",
   "summary": {
     "total_items": 100,
@@ -11,7 +11,20 @@
     "recommended_items": 5,
     "urgent_items": 11,
     "beginner_candidate_items": 4,
-    "beginner_mode_default": false
+    "beginner_mode_default": false,
+    "grade_distribution": {
+      "A": 2,
+      "B": 8,
+      "C": 33,
+      "D": 4,
+      "X": 53
+    },
+    "risk_distribution": {
+      "low": 6,
+      "medium": 17,
+      "high": 77
+    },
+    "data_timestamp": "2026-05-22T10:31:30"
   },
   "briefing": {
     "run_date": "2026-05-08",

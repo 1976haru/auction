@@ -2673,7 +2673,29 @@ footer {
   footer { padding: 20px 0 28px; }
 }
 
-/* ── 오늘의 경매 현황 카드 ───────────────────────── */
+/* ── 서비스 히어로 (서비스명·부제·배지·데이터 기준) ── */
+.app-hero { display: flex; flex-direction: column; gap: 6px; }
+.app-title {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: #fff;
+}
+.app-subtitle {
+  margin: 0;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.4;
+}
+.app-data-ts {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* ── 핵심 지표 요약 카드 ───────────────────────── */
 .app-status { margin-top: 2px; }
 .status-head {
   font-size: 0.85rem;
@@ -2684,7 +2706,7 @@ footer {
 }
 .status-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 .status-card {
@@ -2714,6 +2736,54 @@ footer {
 .status-card.stat-urgent .status-value { color: #ffe6b3; }
 .status-card.stat-beginner .status-value { color: #cdeccd; }
 .status-card.stat-rec .status-value { color: #d6ecff; }
+.status-card.stat-analyzed .status-value { color: #e3e3ff; }
+.status-card.stat-gradea .status-value { color: #cdeccd; }
+
+/* ── 빠른 진입 버튼 ───────────────────────── */
+.app-quicknav { margin-top: 2px; }
+.quicknav-head {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+.quicknav-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+@media (min-width: 560px) {
+  .quicknav-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.quicknav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 8px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.25;
+  transition: background 0.12s, border-color 0.12s;
+  touch-action: manipulation;
+}
+.quicknav-btn:active {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+@media (hover: hover) {
+  .quicknav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
 
 /* 초보자 라벨 pill */
 .beginner-pill {
@@ -2811,7 +2881,9 @@ footer {
 /* ── PC: 홈을 넓은 웹 대시보드처럼 ───────────────── */
 @media (min-width: 900px) {
   .app-home-inner { max-width: 1200px; margin: 0 auto; }
-  .status-grid { grid-template-columns: repeat(7, 1fr); }
+  .app-title { font-size: 1.85rem; }
+  .status-grid { grid-template-columns: repeat(6, 1fr); }
+  .quicknav-grid { grid-template-columns: repeat(8, 1fr); }
   .cat-grid { grid-template-columns: repeat(8, 1fr); }
   .util-grid { grid-template-columns: repeat(8, 1fr); }
   .app-main-buttons { grid-template-columns: 1fr 1fr; max-width: 720px; }

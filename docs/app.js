@@ -4328,7 +4328,27 @@ function renderAppHome() {
   }
 
   renderStatusCards();
+  renderDataTimestamp();
   renderTodayItems();
+}
+
+function renderDataTimestamp() {
+  const node = $("app-data-ts");
+  if (!node) return;
+  const s = (STATE.data && STATE.data.summary) || {};
+  const raw = s.data_timestamp || (STATE.data && STATE.data.generated_at) || "";
+  let text = "데이터 기준: 알 수 없음";
+  if (raw) {
+    const d = new Date(raw);
+    if (!isNaN(d.getTime())) {
+      const pad = (n) => String(n).padStart(2, "0");
+      text = `데이터 기준: ${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} `
+        + `${pad(d.getHours())}:${pad(d.getMinutes())} (mock)`;
+    } else {
+      text = `데이터 기준: ${escapeHtml(String(raw))} (mock)`;
+    }
+  }
+  node.textContent = text;
 }
 
 function renderStatusCards() {
@@ -4336,18 +4356,21 @@ function renderStatusCards() {
   if (!grid) return;
   clearChildren(grid);
   const s = (STATE.data && STATE.data.summary) || {};
-  // 초보자 후보 수: summary 값 우선, 없으면 items 에서 계산
-  const beginnerCount = (s.beginner_candidate_items != null)
-    ? s.beginner_candidate_items
-    : STATE.items.filter((it) => it.beginner_friendly).length;
+  const gradeA = (s.grade_distribution && s.grade_distribution.A != null)
+    ? s.grade_distribution.A
+    : STATE.items.filter((it) => it.recommendation_grade === "A").length;
+  const highRisk = (s.high_risk_items != null)
+    ? s.high_risk_items
+    : (s.risk_distribution && s.risk_distribution.high != null
+        ? s.risk_distribution.high
+        : STATE.items.filter((it) => it.risk_level === "high").length);
   const cards = [
     { label: "전체 물건", value: s.total_items ?? STATE.items.length, cls: "stat-total" },
-    { label: "경매", value: s.auction_count ?? "-", cls: "stat-auction" },
-    { label: "공매", value: s.public_sale_count ?? "-", cls: "stat-public" },
+    { label: "분석 완료", value: s.analyzed_items ?? STATE.items.length, cls: "stat-analyzed" },
     { label: "추천 후보", value: s.recommended_items ?? "-", cls: "stat-rec" },
-    { label: "초보자 후보", value: beginnerCount, cls: "stat-beginner" },
-    { label: "고위험", value: s.high_risk_items ?? "-", cls: "stat-risk" },
+    { label: "고위험 후보", value: highRisk, cls: "stat-risk" },
     { label: "입찰임박", value: s.urgent_items ?? "-", cls: "stat-urgent" },
+    { label: "A등급 후보", value: gradeA, cls: "stat-gradea" },
   ];
   cards.forEach((c) => {
     const card = el(
@@ -4498,8 +4521,58 @@ function bindAppHome() {
     exploreBtn.addEventListener("click", () => scrollToSection("section-items"));
   }
 
+  // 빠른 진입 버튼
+  document.querySelectorAll(".quicknav-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const fn = QUICKNAV_ACTIONS[btn.dataset.quick];
+      if (fn) fn();
+    });
+  });
+
   bindGlossary();
 }
+
+// 필터 섹션을 펼치고 특정 select 로 포커스 이동
+function openFiltersAndFocus(selectId) {
+  const body = $("filter-body");
+  const toggle = $("filter-toggle");
+  if (body && body.hidden && toggle) toggle.click();
+  scrollToSection("section-filters");
+  const sel = $(selectId);
+  if (sel) setTimeout(() => { sel.focus(); }, 350);
+}
+
+// 칩 기반 빠른 필터 적용 + 결과로 스크롤
+function applyChipAndScroll(chipId) {
+  STATE.filters.chip = chipId;
+  if (typeof renderQuickChips === "function") renderQuickChips();
+  applyFilters();
+  scrollToSection("section-items");
+}
+
+// 빠른 진입 버튼 → 섹션 스크롤 / 필터 적용
+const QUICKNAV_ACTIONS = {
+  search: () => {
+    scrollToSection("search-section");
+    const q = $("q-input");
+    if (q) setTimeout(() => q.focus(), 350);
+  },
+  court: () => {
+    openFiltersAndFocus("f-region");
+    showToast("데모 데이터에는 법원 구분이 없어 지역 필터로 안내합니다.", null);
+    setTimeout(hideToast, 2800);
+  },
+  region: () => openFiltersAndFocus("f-region"),
+  type:   () => openFiltersAndFocus("f-type"),
+  rec:    () => scrollToSection("section-recommendations"),
+  urgent: () => applyChipAndScroll("imminent"),
+  risk:   () => applyChipAndScroll("high_risk"),
+  ai:     () => {
+    scrollToSection("section-agent-search");
+    const aq = $("agent-q");
+    if (aq) setTimeout(() => aq.focus(), 350);
+  },
+};
 
 // ── 용어 쉽게 설명 (초보자 권리분석 용어집) ──────────
 const GLOSSARY = {

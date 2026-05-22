@@ -1150,6 +1150,15 @@ def _fallback_payload() -> dict[str, Any]:
                             if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0),
         "beginner_candidate_items": sum(1 for it in items if it.get("beginner_friendly")),
         "beginner_mode_default": False,
+        "grade_distribution": {
+            g: sum(1 for it in items if it.get("recommendation_grade") == g)
+            for g in ("A", "B", "C", "D", "X")
+        },
+        "risk_distribution": {
+            r: sum(1 for it in items if it.get("risk_level") == r)
+            for r in ("low", "medium", "high")
+        },
+        "data_timestamp": datetime.now().isoformat(timespec="seconds"),
     }
     briefing = {
         "summary": (
@@ -1202,6 +1211,15 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     )
     summary["beginner_candidate_items"] = sum(1 for it in items if it.get("beginner_friendly"))
     summary["beginner_mode_default"] = False
+    summary["grade_distribution"] = {
+        g: sum(1 for it in items if it.get("recommendation_grade") == g)
+        for g in ("A", "B", "C", "D", "X")
+    }
+    summary["risk_distribution"] = {
+        r: sum(1 for it in items if it.get("risk_level") == r)
+        for r in ("low", "medium", "high")
+    }
+    summary["data_timestamp"] = datetime.now().isoformat(timespec="seconds")
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "source": "db",

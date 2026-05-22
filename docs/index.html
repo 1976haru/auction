@@ -48,12 +48,16 @@
   <!-- ★ 홈 화면: 에이전트 옥션 파인더 v1 -->
   <header class="app-home" id="section-app-home">
     <div class="container app-home-inner">
-      <!-- 헤더 배지 -->
-      <div class="app-badges">
-        <span class="badge badge-app">에이전트 옥션 파인더</span>
-        <span class="badge badge-version">v1</span>
-        <span class="badge badge-mock">Mock API 기반</span>
-        <span class="badge badge-no-bid">실제 입찰 없음</span>
+      <!-- 서비스 히어로 (서비스명 · 부제 · 배지 · 데이터 기준) -->
+      <div class="app-hero">
+        <h1 class="app-title">경매·공매 지능형 에이전트</h1>
+        <p class="app-subtitle">법원경매·공매 mock 데이터를 검색·필터·AI 자연어로 탐색</p>
+        <div class="app-badges">
+          <span class="badge badge-app">에이전트 옥션 파인더 v1</span>
+          <span class="badge badge-mock">Mock API 기반 데모</span>
+          <span class="badge badge-no-bid">실제 입찰·금전거래·외부전송 없음</span>
+        </div>
+        <p class="app-data-ts caption" id="app-data-ts">데이터 기준: —</p>
       </div>
 
       <!-- AI 브리핑 (큼) -->
@@ -63,11 +67,26 @@
         <div class="briefing-sub">초보자 친화적 물건 중심으로 추천</div>
       </div>
 
-      <!-- 오늘의 경매 현황 (숫자 카드) -->
+      <!-- 핵심 지표 요약 카드 -->
       <div class="app-status" id="app-status">
-        <div class="status-head">오늘의 경매 현황</div>
+        <div class="status-head">핵심 지표 한눈에</div>
         <div class="status-grid" id="status-grid"></div>
       </div>
+
+      <!-- 빠른 진입 버튼 -->
+      <nav class="app-quicknav" aria-label="빠른 진입">
+        <div class="quicknav-head">빠른 진입</div>
+        <div class="quicknav-grid">
+          <button class="quicknav-btn" data-quick="search" type="button">🔎 통합검색</button>
+          <button class="quicknav-btn" data-quick="court" type="button">🏛 법원별 보기</button>
+          <button class="quicknav-btn" data-quick="region" type="button">📍 지역별 보기</button>
+          <button class="quicknav-btn" data-quick="type" type="button">🏢 물건종류별</button>
+          <button class="quicknav-btn" data-quick="rec" type="button">⭐ 오늘의 추천</button>
+          <button class="quicknav-btn" data-quick="urgent" type="button">⏰ 입찰임박</button>
+          <button class="quicknav-btn" data-quick="risk" type="button">⚠ 고위험 주의</button>
+          <button class="quicknav-btn" data-quick="ai" type="button">🤖 AI 에이전트 검색</button>
+        </div>
+      </nav>
 
       <!-- 메인 버튼 (2열) -->
       <div class="app-main-buttons">
@@ -195,7 +214,7 @@
   </header>
 
   <!-- 검색 바 (스티키) -->
-  <section class="search-section">
+  <section class="search-section" id="search-section">
     <div class="container search-inner">
       <div class="search-bar">
         <input type="search" id="q-input" placeholder="주소 / 사건번호 / 물건명 / 키워드 검색" aria-label="통합 검색 (주소·사건번호·물건명·키워드)" autocomplete="off" aria-haspopup="listbox" aria-controls="search-suggest" />
