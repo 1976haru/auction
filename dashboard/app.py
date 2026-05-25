@@ -567,15 +567,72 @@ elif tab_sel == "오늘의 추천 TOP 5":
 # 4. 전체 물건 -----------------------------------------------------
 elif tab_sel == "전체 물건":
     st.header("전체 물건")
-    items = _get_items(1000)
-    if not items:
-        st.info("물건이 없습니다. `python scripts/generate_mock_data.py --count 100` 실행")
+    # 법원/기관 필드를 포함해 enrich (연번 15 보조 반영)
+    eitems = None
+    try:
+        from scripts import export_static_dashboard as _exp
+        _conn = get_connection()
+        eitems = _exp._items_sample(_conn, picks_by_id=_exp._picks_by_id(_conn))
+        _conn.close()
+        _exp._assign_courts(eitems)
+        _exp._ensure_agent_test_cases(eitems)
+    except Exception:  # noqa: BLE001
+        eitems = None
+
+    if eitems:
+        # 법원/기관 selectbox + 권역 필터 (연번 15 작업12)
+        courts = sorted({it.get("court_name") for it in eitems if it.get("court_name")})
+        agencies = sorted({it.get("agency_name") for it in eitems if it.get("agency_name")})
+        groups = ["서울권", "수도권", "충청권", "강원권", "영남권", "호남권", "제주권"]
+        groups = [g for g in groups if any(it.get("court_group") == g for it in eitems)]
+        fc1, fc2 = st.columns(2)
+        sel_court = fc1.selectbox("법원/기관 필터", ["전체"] + courts + agencies)
+        sel_group = fc2.selectbox("법원 권역 필터", ["전체"] + groups)
+
+        view = eitems
+        if sel_court != "전체":
+            view = [it for it in view if it.get("court_name") == sel_court
+                    or it.get("agency_name") == sel_court]
+        if sel_group != "전체":
+            view = [it for it in view if it.get("court_group") == sel_group]
+
+        rec = sum(1 for it in view if (it.get("recommendation_grade") in ("A", "B")
+                                       or (it.get("recommendation_score") or 0) >= 60))
+        mc1, mc2, mc3 = st.columns(3)
+        mc1.metric("물건 수", len(view))
+        mc2.metric("추천 후보 수", rec)
+        mc3.metric("A등급 수", sum(1 for it in view if it.get("recommendation_grade") == "A"))
+
+        # 법원별 물건 수 / 추천 후보 수 분포
+        st.markdown("##### 법원별 물건 수 · 추천 후보 수")
+        court_rows = {}
+        for it in eitems:
+            name = it.get("court_name") or it.get("agency_name")
+            if not name:
+                continue
+            r = court_rows.setdefault(name, {"법원/기관": name, "물건 수": 0, "추천 후보": 0})
+            r["물건 수"] += 1
+            if it.get("recommendation_grade") in ("A", "B") or (it.get("recommendation_score") or 0) >= 60:
+                r["추천 후보"] += 1
+        cdf = pd.DataFrame(sorted(court_rows.values(), key=lambda x: -x["물건 수"]))
+        st.dataframe(cdf, use_container_width=True, hide_index=True)
+
+        df = pd.DataFrame(view)
+        cols = [c for c in ["id", "source", "court_name", "agency_name", "court_group",
+                            "item_type", "address", "appraisal_price", "min_bid_price",
+                            "expected_profit", "risk_level", "recommendation_grade",
+                            "fail_count", "bid_date"] if c in df.columns]
+        st.dataframe(df[cols], use_container_width=True, hide_index=True)
     else:
-        df = pd.DataFrame(items)
-        cols = [c for c in ["id", "source", "item_type", "address_full",
-                            "appraisal_price", "min_bid_price", "fail_count",
-                            "bid_date"] if c in df.columns]
-        st.dataframe(df[cols], use_container_width=True)
+        items = _get_items(1000)
+        if not items:
+            st.info("물건이 없습니다. `python scripts/generate_mock_data.py --count 100` 실행")
+        else:
+            df = pd.DataFrame(items)
+            cols = [c for c in ["id", "source", "item_type", "address_full",
+                                "appraisal_price", "min_bid_price", "fail_count",
+                                "bid_date"] if c in df.columns]
+            st.dataframe(df[cols], use_container_width=True)
 
 # 5. AI 에이전트 검색 ----------------------------------------------
 elif tab_sel == "AI 에이전트 검색":

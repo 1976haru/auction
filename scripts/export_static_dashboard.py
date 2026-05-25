@@ -37,7 +37,7 @@ OUT_PATH = ROOT / "docs" / "data" / "mock_dashboard.json"
 RSS_PATH = ROOT / "docs" / "feed.xml"
 RSS_BASE_URL = "https://1976haru.github.io/auction/"
 RSS_LIMIT = 50
-SAMPLE_LIMIT = 120
+SAMPLE_LIMIT = 200
 TOP_LIMIT = 5
 
 
@@ -223,6 +223,116 @@ COURT_BY_SIDO = {
     "제주특별자치도": "제주지방법원",
 }
 
+# ── 연번 15: 법원별 데이터 ────────────────────────────────────────
+# 법원 → 권역(court_region 짧은 표기) · 권역그룹(court_group)
+COURT_META = {
+    "서울중앙지방법원": {"region": "서울", "group": "서울권"},
+    "서울동부지방법원": {"region": "서울", "group": "서울권"},
+    "서울남부지방법원": {"region": "서울", "group": "서울권"},
+    "서울북부지방법원": {"region": "서울", "group": "서울권"},
+    "서울서부지방법원": {"region": "서울", "group": "서울권"},
+    "의정부지방법원": {"region": "경기", "group": "수도권"},
+    "인천지방법원": {"region": "인천", "group": "수도권"},
+    "수원지방법원": {"region": "경기", "group": "수도권"},
+    "춘천지방법원": {"region": "강원", "group": "강원권"},
+    "대전지방법원": {"region": "대전", "group": "충청권"},
+    "청주지방법원": {"region": "충북", "group": "충청권"},
+    "대구지방법원": {"region": "대구", "group": "영남권"},
+    "부산지방법원": {"region": "부산", "group": "영남권"},
+    "울산지방법원": {"region": "울산", "group": "영남권"},
+    "창원지방법원": {"region": "경남", "group": "영남권"},
+    "광주지방법원": {"region": "광주", "group": "호남권"},
+    "전주지방법원": {"region": "전북", "group": "호남권"},
+    "제주지방법원": {"region": "제주", "group": "제주권"},
+}
+# 본원 → 지원(데모용) — 일부 물건을 지원으로 표시
+COURT_BRANCHES = {
+    "수원지방법원": ["성남지원", "안산지원", "안양지원", "평택지원", "여주지원"],
+    "의정부지방법원": ["고양지원"],
+    "대전지방법원": ["천안지원", "서산지원"],
+    "광주지방법원": ["순천지원", "목포지원"],
+    "대구지방법원": ["포항지원"],
+    "창원지방법원": ["마산지원", "진주지원"],
+}
+# 시·도 → 관할 가능한 본원 후보(수도권은 여러 법원으로 분산)
+SIDO_TO_COURTS = {
+    "서울특별시": ["서울중앙지방법원", "서울동부지방법원", "서울남부지방법원",
+                "서울북부지방법원", "서울서부지방법원"],
+    "경기도": ["수원지방법원", "의정부지방법원"],
+    "인천광역시": ["인천지방법원"],
+    "부산광역시": ["부산지방법원"],
+    "대구광역시": ["대구지방법원"],
+    "대전광역시": ["대전지방법원"],
+    "광주광역시": ["광주지방법원"],
+    "울산광역시": ["울산지방법원"],
+    "세종특별자치시": ["대전지방법원"],
+    "강원특별자치도": ["춘천지방법원"],
+    "충청북도": ["청주지방법원"],
+    "충청남도": ["대전지방법원"],
+    "전북특별자치도": ["전주지방법원"],
+    "전라남도": ["광주지방법원"],
+    "경상북도": ["대구지방법원"],
+    "경상남도": ["창원지방법원"],
+    "제주특별자치도": ["제주지방법원"],
+}
+# 공매 기관(데모) — 대부분 캠코, 일부 지자체/금융기관
+PUBLIC_AGENCIES = [
+    {"name": "한국자산관리공사", "type": "공공기관", "region": "전국"},
+    {"name": "한국자산관리공사", "type": "공공기관", "region": "전국"},
+    {"name": "한국자산관리공사", "type": "공공기관", "region": "전국"},
+    {"name": "서울특별시청", "type": "지자체", "region": "서울"},
+    {"name": "경기도청", "type": "지자체", "region": "경기"},
+    {"name": "국민건강보험공단", "type": "공공기관", "region": "전국"},
+]
+COURT_REGION_GROUP = {
+    "서울": "서울권", "경기": "수도권", "인천": "수도권", "강원": "강원권",
+    "대전": "충청권", "충북": "충청권", "충남": "충청권", "세종": "충청권",
+    "대구": "영남권", "부산": "영남권", "울산": "영남권", "경남": "영남권", "경북": "영남권",
+    "광주": "호남권", "전북": "호남권", "전남": "호남권", "제주": "제주권",
+}
+
+
+def _assign_courts(items: list[dict]) -> None:
+    """연번 15: 경매 item 에 법원 필드를, 공매 item 에 기관 필드를 결정적으로 부여.
+
+    시·도(관할) 기준으로 법원을 고르되 수도권(서울 5개 법원·경기 2개 법원)은
+    골고루 분산하고, 일부는 지원(court_type='지원')으로 표시한다.
+    """
+    for idx, it in enumerate(items):
+        seed = int(it.get("id") or idx)
+        if it.get("source") == "auction":
+            sido = it.get("sido") or _extract_region(it.get("address"))
+            cands = SIDO_TO_COURTS.get(sido) or ["지방법원"]
+            court = cands[seed % len(cands)]
+            meta = COURT_META.get(court, {"region": "기타", "group": "기타"})
+            court_type, branch = "본원", ""
+            branches = COURT_BRANCHES.get(court)
+            if branches and seed % 4 == 0:
+                branch = branches[(seed // 4) % len(branches)]
+                court_type = "지원"
+            it["court_name"] = court
+            it["court_region"] = meta["region"]
+            it["court_group"] = meta["group"]
+            it["court_type"] = court_type
+            it["court_branch"] = branch
+            it["sale_type"] = "법원경매"
+            it["source_site"] = "court"
+            it["agency_name"] = ""
+            it["agency_type"] = ""
+            it["agency_region"] = ""
+        else:
+            ag = PUBLIC_AGENCIES[seed % len(PUBLIC_AGENCIES)]
+            it["agency_name"] = ag["name"]
+            it["agency_type"] = ag["type"]
+            it["agency_region"] = ag["region"]
+            it["court_name"] = ""
+            it["court_region"] = ""
+            it["court_group"] = ""
+            it["court_type"] = ""
+            it["court_branch"] = ""
+            it["sale_type"] = "공매"
+            it["source_site"] = "onbid"
+
 ITEM_GROUP_BY_TYPE = {
     "아파트": "주거용 건물",
     "오피스텔": "주거용 건물",
@@ -380,7 +490,7 @@ def _ensure_db_seeded() -> bool:
         if conn and _has_items(conn):
             conn.close()
             return True
-        gen_mock(count=120, seed=42, reset=False)
+        gen_mock(count=200, seed=42, reset=False)
         try:
             from agents.legal_risk_agent import analyze_all as analyze_risk
             from agents.price_analysis_agent import analyze_all as analyze_price
@@ -765,30 +875,64 @@ def _recompute_for_minbid(it: dict) -> None:
     ))
 
 
-def _ensure_agent_test_cases(items: list[dict]) -> None:
-    """연번 12 자연어 검색 데모가 항상 결과를 내도록 핵심 케이스를 보장한다.
+def _set_court(it: dict, court: str) -> None:
+    """item 의 법원 필드를 일관되게 세팅(테스트 케이스 보정용)."""
+    meta = COURT_META.get(court, {"region": "기타", "group": "기타"})
+    it["source"] = "auction"
+    it["court_name"] = court
+    it["court_region"] = meta["region"]
+    it["court_group"] = meta["group"]
+    it["court_type"] = "본원"
+    it["court_branch"] = ""
+    it["sale_type"] = "법원경매"
+    it["source_site"] = "court"
+    it["agency_name"] = ""
+    it["agency_type"] = ""
+    it["agency_region"] = ""
 
-    대부분의 케이스(수원지방법원 아파트·공매 상가·유치권/법정지상권/지분/농지·A등급·
-    유찰 2회+·입찰 7일 이내·고위험 고수익 등)는 이미 충분하다. 다만
-    "부산지방법원 토지 중 저평가" 조합은 표본이 적어 0건이 되기 쉬우므로
-    부산지방법원(부산 경매) 물건 1건을 토지·저평가로 결정적으로 보정한다.
+
+def _ensure_agent_test_cases(items: list[dict]) -> None:
+    """연번 12·15 자연어/법원 검색 데모가 항상 결과를 내도록 핵심 케이스를 보장한다.
+
+    수원지방법원 아파트 / 부산지방법원 토지(저평가) / 인천지방법원 오피스텔 /
+    서울중앙지방법원 상가 조합을 결정적으로 1건씩 확보한다.
     """
     if not items:
         return
-    busan = [it for it in items if (it.get("court_name") or "") == "부산지방법원"]
-    if not busan:
-        return
-    # 이미 토지군이면 그 물건을, 아니면 첫 부산 물건을 토지로 전환
-    land = [it for it in busan
-            if it.get("item_group") == "토지" or it.get("item_type") in ("토지", "전", "답", "임야")]
-    target = (land or busan)[0]
-    target["item_type"] = "토지"
-    target["item_group"] = "토지"
-    # 저평가: 최저가를 추정시세의 약 55% 로 낮춰 minimum_to_market_ratio ≤ 85% 보장
-    m = target.get("market_price") or 0
-    if m > 0:
-        target["min_bid_price"] = int(m * 0.55)
-        _recompute_for_minbid(target)
+    used: set = set()
+
+    def pick(court: str, item_type: str, item_group: str | None = None):
+        # 우선 해당 법원·종류가 이미 있으면 재사용, 없으면 미사용 item 하나를 보정
+        for it in items:
+            if id(it) in used:
+                continue
+            if (it.get("court_name") or "") == court and (it.get("item_type") or "") == item_type:
+                used.add(id(it))
+                return it
+        for it in items:
+            if id(it) in used or it.get("source") != "auction":
+                continue
+            _set_court(it, court)
+            it["item_type"] = item_type
+            if item_group:
+                it["item_group"] = item_group
+            used.add(id(it))
+            return it
+        return None
+
+    # 1) 수원지방법원 아파트
+    pick("수원지방법원", "아파트")
+    # 2) 인천지방법원 오피스텔
+    pick("인천지방법원", "오피스텔")
+    # 3) 서울중앙지방법원 상가
+    pick("서울중앙지방법원", "상가")
+    # 4) 부산지방법원 토지(저평가)
+    busan = pick("부산지방법원", "토지", "토지")
+    if busan:
+        m = busan.get("market_price") or 0
+        if m > 0:
+            busan["min_bid_price"] = int(m * 0.55)
+            _recompute_for_minbid(busan)
 
 
 def _change_tags_from_events(events: list[dict], is_new: bool) -> list[dict]:
@@ -1541,6 +1685,8 @@ def _build_distributions(items: list[dict]) -> dict[str, Any]:
                       or "미공개" in (it.get("document_status") or ""))
     return {
         "court_distribution": count_by(lambda it: it.get("court_name")),
+        "court_region_distribution": count_by(lambda it: it.get("court_region")),
+        "court_group_distribution": count_by(lambda it: it.get("court_group")),
         "agency_distribution": count_by(lambda it: it.get("agency_name")),
         "region_distribution": count_by(lambda it: it.get("sido") or it.get("region")),
         "type_distribution": count_by(lambda it: it.get("item_type")),
@@ -1552,6 +1698,12 @@ def _build_distributions(items: list[dict]) -> dict[str, Any]:
             "present": len(items) - doc_missing,
             "missing": doc_missing,
         },
+        "top_courts": _group_summary(
+            [it for it in items if it.get("court_name")],
+            lambda it: it.get("court_name"), top=8, label_key="court"),
+        "top_agencies": _group_summary(
+            [it for it in items if it.get("agency_name")],
+            lambda it: it.get("agency_name"), top=8, label_key="agency"),
     }
 
 
@@ -1827,7 +1979,8 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
 
 def _fallback_payload() -> dict[str, Any]:
     rnd = random.Random(42)
-    items = _fallback_items(rnd, n=100)
+    items = _fallback_items(rnd, n=200)
+    _assign_courts(items)
     _ensure_agent_test_cases(items)
     rs = _risk_summary_from_items(items)
 
@@ -1927,6 +2080,7 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     items = _items_sample(conn, picks_by_id=picks)
     if not items:
         return _fallback_payload()
+    _assign_courts(items)
     _ensure_agent_test_cases(items)
 
     recs = _recommendations_from_items(items, TOP_LIMIT)

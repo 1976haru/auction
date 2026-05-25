@@ -280,6 +280,7 @@ const STATE = {
     flag: "",     // 위험 키워드 단일 (예: "임차인")
     // ── 고급 필터 ──
     court: "",        // 법원/기관 (court_name 또는 agency_name)
+    court_group: "",  // 법원 권역 (서울권/수도권/충청권/강원권/영남권/호남권/제주권)
     sido: "",
     sigungu: "",
     dong: "",
@@ -374,6 +375,7 @@ function syncControlsFromState() {
   // ── 고급 필터 동기화 ──
   const setVal = (id, v) => { const n = $(id); if (n) n.value = (v ?? ""); };
   setVal("f-court", f.court);
+  setVal("f-court-group", f.court_group);
   setVal("f-group", f.item_group);
   setVal("f-confidence", f.confidence);
   setVal("f-doc", f.document_status);
@@ -573,6 +575,10 @@ function populateFilterOptions() {
     ...STATE.items.map((it) => it.agency_name).filter(Boolean),
   ])).sort((a, b) => String(a).localeCompare(String(b), "ko"));
   _fillSelect("f-court", courts);
+  // 법원 권역(court_group) — 고정 순서 우선, 데이터에 있는 값만
+  const GROUP_ORDER = ["서울권", "수도권", "충청권", "강원권", "영남권", "호남권", "제주권"];
+  const presentGroups = new Set(STATE.items.map((it) => it.court_group).filter(Boolean));
+  _fillSelect("f-court-group", GROUP_ORDER.filter((g) => presentGroups.has(g)));
   _fillSelect("f-group", uniqSorted((it) => it.item_group));
   _fillSelect("f-sido", uniqSorted((it) => it.sido || it.region));
   refreshSigunguOptions();
@@ -611,6 +617,7 @@ function bindFilterEvents() {
     "f-sort":      (v) => { STATE.filters.sort = v || "score_desc"; updateSortCurrent(); },
     // ── 고급 필터 ──
     "f-court":     (v) => STATE.filters.court = v,
+    "f-court-group": (v) => STATE.filters.court_group = v,
     "f-group":     (v) => STATE.filters.item_group = v,
     "f-confidence":(v) => STATE.filters.confidence = v,
     "f-doc":       (v) => STATE.filters.document_status = v,
@@ -910,7 +917,7 @@ function searchableText(it) {
   return [
     it.title, it.address, it.region, it.sido, it.sigungu, it.dong,
     it.case_no, it.item_no, it.mgmt_no,
-    it.court_name, it.court_region, it.agency_name, it.source_site, it.sale_type,
+    it.court_name, it.court_region, it.court_group, it.court_branch, it.agency_name, it.agency_region, it.source_site, it.sale_type,
     it.item_type, it.item_group, it.risk_level,
     ...(riskKw || []),
     it.recommendation_reason, it.caution_reason, it.agent_opinion, it.document_status,
@@ -965,6 +972,7 @@ function applyFilters() {
   if (f.court) out = out.filter((it) =>
     it.court_name === f.court || it.agency_name === f.court ||
     it.court_region === f.court || it.source_site === f.court);
+  if (f.court_group) out = out.filter((it) => (it.court_group || "") === f.court_group);
   if (f.sido)    out = out.filter((it) => (it.sido || it.region || "") === f.sido);
   if (f.sigungu) out = out.filter((it) => (it.sigungu || "") === f.sigungu);
   if (f.dong)    out = out.filter((it) => (it.dong || "") === f.dong);
@@ -3861,7 +3869,8 @@ function detailBodyHtml(it) {
       <h3>📋 기본정보</h3>
       <div class="detail-grid">
         <span class="k">경매/공매</span><span class="v">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "-")}</span>
-        <span class="k">법원/기관명</span><span class="v">${escapeHtml(courtOrAgency(it))}</span>
+        <span class="k">법원/기관명</span><span class="v">${escapeHtml(courtOrAgency(it))}${it.court_branch ? " " + escapeHtml(it.court_branch) : ""}</span>
+        <span class="k">법원 권역</span><span class="v">${escapeHtml(it.court_group || it.court_region || it.agency_region || "-")}</span>
         <span class="k">사건번호</span><span class="v">${escapeHtml(it.case_no || "-")}</span>
         <span class="k">관리번호</span><span class="v">${escapeHtml(it.mgmt_no || "-")}</span>
         <span class="k">물건명</span><span class="v">${escapeHtml(it.title || "-")}</span>
@@ -4788,6 +4797,14 @@ function parseAgentQuery(text) {
     cond("기관 · 공매(공공기관)");
     intent.assumptions.push("기관 세부 구분 데이터가 제한적이라 공매 전체로 해석했습니다.");
   }
+  // ── 법원 권역 ──
+  if (!intent.filters.court) {
+    for (const grp of ["서울권", "수도권", "충청권", "강원권", "영남권", "호남권", "제주권"]) {
+      if (q.includes(grp.toLowerCase())) {
+        intent.filters.court_group = grp; cond(`권역 · ${grp}`); break;
+      }
+    }
+  }
 
   // ── 경매 / 공매 ──
   if (has("공매")) { intent.filters.source = "public_sale"; cond("구분 · 공매"); }
@@ -4916,7 +4933,7 @@ function applyAgentFiltersToState(intent) {
   STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
   const f = STATE.filters;
   const af = intent.filters || {};
-  ["court", "sido", "sigungu", "dong", "item_type", "item_group",
+  ["court", "court_group", "sido", "sigungu", "dong", "item_type", "item_group",
    "source", "risk", "grade", "document_status", "chip"].forEach((k) => {
     if (af[k] !== undefined && af[k] !== null && af[k] !== "") f[k] = af[k];
   });
