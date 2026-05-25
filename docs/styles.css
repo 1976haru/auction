@@ -1468,6 +1468,93 @@ body:has(.compare-tray:not([hidden])) { padding-bottom: 88px; }
   .briefing-priority-grid { grid-template-columns: 1fr; }
 }
 
+/* ── 연번 14: 통계 요약 섹션 ─────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.stat-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--color-surface);
+}
+.stat-card.stat-wide { grid-column: span 2; }
+@media (max-width: 760px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-card.stat-wide { grid-column: span 1; }
+}
+.stat-card h3 { margin: 0 0 10px; font-size: 0.92rem; }
+
+/* bar UI */
+.sbar { display: grid; gap: 8px; }
+.sbar-row {
+  display: grid;
+  grid-template-columns: 5.5em 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.sbar-label { font-size: 0.82rem; color: var(--color-text-muted); }
+.sbar-track { height: 10px; border-radius: 999px; background: var(--color-tap-bg); overflow: hidden; }
+.sbar-fill { display: block; height: 100%; border-radius: 999px; background: var(--color-primary); }
+.sbar-fill.low { background: #2ca02c; }
+.sbar-fill.medium { background: #e6a700; }
+.sbar-fill.high { background: #c0392b; }
+.sbar-val { font-size: 0.82rem; white-space: nowrap; }
+.sbar-extra { grid-column: 2 / -1; margin-top: -2px; }
+
+/* ranking list */
+.rank-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.rank-row { display: grid; gap: 3px; }
+.rank-main { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.rank-name { font-weight: 700; font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-count { font-size: 0.82rem; color: var(--color-text-muted); white-space: nowrap; }
+.rank-bar { height: 8px; border-radius: 999px; background: var(--color-tap-bg); overflow: hidden; }
+.rank-fill { display: block; height: 100%; border-radius: 999px; background: var(--color-primary); }
+.rank-sub { line-height: 1.4; }
+.rank-top {
+  justify-self: start;
+  margin-top: 2px;
+  border: 1px solid var(--color-border);
+  background: var(--color-input);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 0.76rem;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (hover: hover) { .rank-top:hover { border-color: var(--color-primary); } }
+.rank-more { margin-top: 10px; }
+.rank-more summary { cursor: pointer; font-size: 0.82rem; color: var(--color-primary); }
+.rank-more .rank-list { margin-top: 10px; }
+
+/* keyword cloud */
+.kw-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+.kw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-input);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.kw-badge span {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 6px;
+  font-size: 0.74rem;
+}
+@media (hover: hover) { .kw-badge:hover { border-color: var(--color-primary); } }
+
 /* ── Mini charts ─────────────────────────── */
 .charts-head {
   display: flex;

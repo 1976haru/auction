@@ -1491,6 +1491,70 @@ def _briefing_action_items(items: list[dict]) -> list[dict]:
     return actions
 
 
+def _build_distributions(items: list[dict]) -> dict[str, Any]:
+    """연번 14 통계 섹션용 분포 데이터(summary 보강용). 정적 JSON 직접 소비자를 위한 사본."""
+    def count_by(key_fn):
+        m: dict[str, int] = {}
+        for it in items:
+            k = key_fn(it)
+            if not k:
+                continue
+            m[k] = m.get(k, 0) + 1
+        return dict(sorted(m.items(), key=lambda x: -x[1]))
+
+    # 입찰기일 버킷
+    def bid_bucket(it):
+        d = it.get("days_left")
+        if d is None or d == "":
+            return "기일 미정"
+        if d < 0:
+            return "기일 미정"
+        if d == 0:
+            return "오늘"
+        if d <= 3:
+            return "3일 이내"
+        if d <= 7:
+            return "7일 이내"
+        if d <= 14:
+            return "14일 이내"
+        if d <= 30:
+            return "30일 이내"
+        return "30일 초과"
+
+    def fail_bucket(it):
+        n = it.get("fail_count") or 0
+        return "3회 이상" if n >= 3 else f"{n}회"
+
+    # 위험 키워드 분포
+    kw_counts: dict[str, int] = {}
+    for it in items:
+        seen = set()
+        for kw in (it.get("risk_keywords") or
+                   [f.get("keyword") for f in (it.get("risk_flags") or [])]):
+            if not kw or kw in seen:
+                continue
+            seen.add(kw)
+            kw_counts[kw] = kw_counts.get(kw, 0) + 1
+    risk_kw = dict(sorted(kw_counts.items(), key=lambda x: -x[1])[:12])
+
+    doc_missing = sum(1 for it in items if it.get("documents_missing")
+                      or "미공개" in (it.get("document_status") or ""))
+    return {
+        "court_distribution": count_by(lambda it: it.get("court_name")),
+        "agency_distribution": count_by(lambda it: it.get("agency_name")),
+        "region_distribution": count_by(lambda it: it.get("sido") or it.get("region")),
+        "type_distribution": count_by(lambda it: it.get("item_type")),
+        "item_group_distribution": count_by(lambda it: it.get("item_group")),
+        "bid_date_distribution": count_by(bid_bucket),
+        "fail_count_distribution": count_by(fail_bucket),
+        "risk_keyword_distribution": risk_kw,
+        "document_status_distribution": {
+            "present": len(items) - doc_missing,
+            "missing": doc_missing,
+        },
+    }
+
+
 def _confidence_summary_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     try:
         row = conn.execute(
@@ -1831,6 +1895,7 @@ def _fallback_payload() -> dict[str, Any]:
             r: sum(1 for it in items if it.get("risk_level") == r)
             for r in ("low", "medium", "high")
         },
+        **_build_distributions(items),
         "data_timestamp": datetime.now().isoformat(timespec="seconds"),
     }
     confidence = {
@@ -1887,6 +1952,7 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
         r: sum(1 for it in items if it.get("risk_level") == r)
         for r in ("low", "medium", "high")
     }
+    summary.update(_build_distributions(items))
     summary["data_timestamp"] = datetime.now().isoformat(timespec="seconds")
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),

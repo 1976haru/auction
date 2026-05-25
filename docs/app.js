@@ -1040,6 +1040,7 @@ function applyFilters() {
   renderItemsHead();
   renderAppliedFilters();
   renderCharts();
+  renderStatsSection(STATE.filtered);
   renderPersonalRecs();
   pushUrlState();
 }
@@ -2406,6 +2407,302 @@ function renderCharts() {
   renderPriceHistogramChart(items);
   const cap = $("charts-caption");
   if (cap) cap.textContent = `현재 필터 결과 ${items.length}건 기준`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   연번 14: 통계 섹션 — 현재 필터 결과(STATE.filtered) 기준 집계
+   외부 라이브러리/CDN 없이 bar·ranking·badge UI 로만 렌더한다.
+════════════════════════════════════════════════════════════ */
+function _statPct(n, total) { return total ? (n / total * 100) : 0; }
+function _statAvg(arr, fn) {
+  const v = arr.map(fn).filter((x) => x !== null && x !== undefined && !isNaN(x));
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
+}
+function isRecommendedItem(it) {
+  if (it.recommendation_grade === "A" || it.recommendation_grade === "B") return true;
+  return (it.recommendation_score || 0) >= 60;
+}
+function _isUrgentItem(it) {
+  return it.days_left !== null && it.days_left !== undefined && it.days_left >= 0 && it.days_left <= 7;
+}
+// 종류 버킷 (작업4: 빌라/연립/다세대·단독/다가구·공장/창고 묶음)
+function typeBucket(t) {
+  t = t || "";
+  if (/아파트/.test(t)) return "아파트";
+  if (/오피스텔/.test(t)) return "오피스텔";
+  if (/빌라|연립|다세대/.test(t)) return "빌라/연립/다세대";
+  if (/단독|다가구/.test(t)) return "단독/다가구";
+  if (/상가|근린/.test(t)) return "상가";
+  if (/토지|임야/.test(t)) return "토지";
+  if (/공장|창고/.test(t)) return "공장/창고";
+  if (/차량/.test(t)) return "차량";
+  return t || "기타";
+}
+
+// 그룹 집계 (법원/기관/지역/종류/그룹 공통)
+function buildGroupStats(items, keyFn) {
+  const map = new Map();
+  items.forEach((it) => {
+    const k = keyFn(it);
+    if (!k) return;
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(it);
+  });
+  const out = [];
+  for (const [name, arr] of map) {
+    const rep = arr.reduce((best, x) =>
+      (getRecScore(x) > getRecScore(best) ||
+       (getRecScore(x) === getRecScore(best) && getExpectedProfit(x) > getExpectedProfit(best)))
+        ? x : best, arr[0]);
+    out.push({
+      name,
+      count: arr.length,
+      recommended: arr.filter(isRecommendedItem).length,
+      gradeA: arr.filter((x) => x.recommendation_grade === "A").length,
+      highRisk: arr.filter((x) => x.risk_level === "high").length,
+      urgent: arr.filter(_isUrgentItem).length,
+      avgRoi: _statAvg(arr, (x) => _roiPct(x.expected_profit_rate)),
+      avgProfit: _statAvg(arr, (x) => getExpectedProfit(x)),
+      topItem: rep,
+    });
+  }
+  out.sort((a, b) => b.count - a.count || b.recommended - a.recommended);
+  return out;
+}
+const buildCourtStats  = (items) => buildGroupStats(items, (it) => it.court_name);
+const buildAgencyStats = (items) => buildGroupStats(items, (it) => it.agency_name);
+const buildRegionStats = (items) => buildGroupStats(items, (it) => it.sido || it.region);
+const buildSigunguStats = (items) => buildGroupStats(items, (it) =>
+  (it.sido && it.sigungu) ? `${it.sido} ${it.sigungu}` : (it.sigungu || ""));
+const buildTypeStats   = (items) => buildGroupStats(items, (it) => typeBucket(it.item_type));
+const buildGroupStatsByGroup = (items) => buildGroupStats(items, (it) => it.item_group);
+
+// 위험도별
+function buildRiskStats(items) {
+  const total = items.length;
+  const levels = ["none", "low", "medium", "high"];
+  return levels.map((lv) => {
+    const arr = items.filter((it) => (it.risk_level || "medium") === lv);
+    return {
+      level: lv, label: { none: "위험없음", low: "낮음", medium: "보통", high: "높음" }[lv],
+      count: arr.length, pct: _statPct(arr.length, total),
+      avgProfit: _statAvg(arr, (x) => getExpectedProfit(x)),
+      recommended: arr.filter(isRecommendedItem).length,
+    };
+  }).filter((r) => r.count > 0 || r.level !== "none");
+}
+// 추천등급별
+function buildGradeStats(items) {
+  const total = items.length;
+  return ["A", "B", "C", "D", "X"].map((g) => {
+    const arr = items.filter((it) => (it.recommendation_grade || "C") === g);
+    const rep = arr.length ? arr.reduce((b, x) => getRecScore(x) > getRecScore(b) ? x : b, arr[0]) : null;
+    return {
+      grade: g, count: arr.length, pct: _statPct(arr.length, total),
+      avgProfit: _statAvg(arr, (x) => getExpectedProfit(x)),
+      avgRoi: _statAvg(arr, (x) => _roiPct(x.expected_profit_rate)),
+      topItem: rep,
+    };
+  });
+}
+// 입찰기일별
+function bidDateBucket(it) {
+  const d = it.days_left;
+  if (d === null || d === undefined || d === "") return "기일 미정";
+  if (d < 0) return "기일 미정";
+  if (d === 0) return "오늘";
+  if (d <= 3) return "3일 이내";
+  if (d <= 7) return "7일 이내";
+  if (d <= 14) return "14일 이내";
+  if (d <= 30) return "30일 이내";
+  return "30일 초과";
+}
+function buildBidDateStats(items) {
+  const order = ["오늘", "3일 이내", "7일 이내", "14일 이내", "30일 이내", "30일 초과", "기일 미정"];
+  return order.map((label) => {
+    const arr = items.filter((it) => bidDateBucket(it) === label);
+    return {
+      label, count: arr.length,
+      recommended: arr.filter(isRecommendedItem).length,
+      highRisk: arr.filter((x) => x.risk_level === "high").length,
+      avgProfit: _statAvg(arr, (x) => getExpectedProfit(x)),
+    };
+  }).filter((r) => r.count > 0);
+}
+// 유찰횟수별
+function buildFailCountStats(items) {
+  const buckets = [
+    { label: "0회", test: (n) => n === 0 },
+    { label: "1회", test: (n) => n === 1 },
+    { label: "2회", test: (n) => n === 2 },
+    { label: "3회 이상", test: (n) => n >= 3 },
+  ];
+  return buckets.map((b) => {
+    const arr = items.filter((it) => b.test(it.fail_count || 0));
+    return {
+      label: b.label, count: arr.length,
+      avgMinPrice: _statAvg(arr, (x) => getMinBidPrice(x)),
+      avgProfit: _statAvg(arr, (x) => getExpectedProfit(x)),
+      avgRoi: _statAvg(arr, (x) => _roiPct(x.expected_profit_rate)),
+      recommended: arr.filter(isRecommendedItem).length,
+    };
+  }).filter((r) => r.count > 0);
+}
+// 고위험 키워드 TOP
+function buildRiskKeywordStats(items, limit) {
+  const m = new Map();
+  items.forEach((it) => {
+    const seen = new Set();
+    _riskKeywords(it).forEach((kw) => {
+      if (!kw || seen.has(kw)) return;
+      seen.add(kw);
+      m.set(kw, (m.get(kw) || 0) + 1);
+    });
+  });
+  return [...m.entries()].map(([kw, count]) => ({ kw, count }))
+    .sort((a, b) => b.count - a.count).slice(0, limit || 10);
+}
+// 경매/공매 비율
+function buildSourceStats(items) {
+  const total = items.length;
+  return [
+    { label: "경매", key: "auction" },
+    { label: "공매", key: "public_sale" },
+  ].map((s) => {
+    const arr = items.filter((it) => it.source === s.key);
+    return { label: s.label, count: arr.length, pct: _statPct(arr.length, total),
+             extra: `추천 ${arr.filter(isRecommendedItem).length}` };
+  });
+}
+// 시세 신뢰도 분포
+function buildConfidenceStats(items) {
+  const bands = [
+    { label: "높음 (0.8+)", key: "high" },
+    { label: "보통 (0.6~0.8)", key: "medium" },
+    { label: "낮음 (0.4~0.6)", key: "low" },
+    { label: "매우 낮음 (<0.4)", key: "very_low" },
+  ];
+  const total = items.length;
+  return bands.map((b) => {
+    const arr = items.filter((it) => _confBand(it.confidence_score ?? it.price_confidence) === b.key);
+    return { label: b.label, key: b.key, count: arr.length, pct: _statPct(arr.length, total) };
+  });
+}
+// 문서상태 분포
+function buildDocumentStatusStats(items) {
+  const total = items.length;
+  const missing = items.filter((it) => _docsMissing(it));
+  const present = items.filter((it) => !_docsMissing(it));
+  return [
+    { label: "문서 공개", count: present.length, pct: _statPct(present.length, total), key: "present" },
+    { label: "문서 미공개", count: missing.length, pct: _statPct(missing.length, total), key: "missing" },
+  ];
+}
+
+// ── 렌더 헬퍼 ──
+function statRankingCard(title, rows, opts) {
+  opts = opts || {};
+  if (!rows.length) return `<div class="stat-card stat-wide"><h3>${escapeHtml(title)}</h3><p class="caption">데이터 없음</p></div>`;
+  const max = Math.max(1, ...rows.map((r) => r.count));
+  const line = (r) => `
+    <li class="rank-row">
+      <div class="rank-main">
+        <span class="rank-name" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</span>
+        <span class="rank-count">${r.count}건</span>
+      </div>
+      <span class="rank-bar" aria-hidden="true"><span class="rank-fill" style="width:${(r.count / max * 100).toFixed(1)}%"></span></span>
+      <div class="rank-sub caption">추천 ${r.recommended} · A ${r.gradeA} · 고위험 ${r.highRisk}${opts.urgent ? ` · 임박 ${r.urgent}` : ""} · 평균ROI ${fmtPct(r.avgRoi)} · 평균차익 ${fmtMan(Math.round(r.avgProfit))}</div>
+      ${opts.rep && r.topItem ? `<button class="rank-top" type="button" data-stat-id="${escapeHtml(String(r.topItem.id))}">대표: [${escapeHtml(r.topItem.recommendation_grade || "-")}] ${escapeHtml((r.topItem.title || "-").length > 20 ? (r.topItem.title || "").slice(0, 20) + "…" : (r.topItem.title || "-"))}</button>` : ""}
+    </li>`;
+  const head = rows.slice(0, 5).map(line).join("");
+  const rest = rows.slice(5, 12);
+  const more = rest.length
+    ? `<details class="rank-more"><summary>더 보기 (+${rest.length})</summary><ul class="rank-list">${rest.map(line).join("")}</ul></details>` : "";
+  return `<div class="stat-card stat-wide"><h3>${escapeHtml(title)}</h3><ul class="rank-list">${head}</ul>${more}</div>`;
+}
+
+function statBarCard(title, rows, opts) {
+  opts = opts || {};
+  if (!rows.length) return `<div class="stat-card"><h3>${escapeHtml(title)}</h3><p class="caption">데이터 없음</p></div>`;
+  const total = rows.reduce((a, r) => a + r.count, 0);
+  const max = Math.max(1, ...rows.map((r) => r.count));
+  const body = rows.map((r) => `
+    <div class="sbar-row">
+      <span class="sbar-label">${escapeHtml(r.label)}</span>
+      <span class="sbar-track" aria-hidden="true"><span class="sbar-fill${opts.fillCls ? " " + opts.fillCls(r) : ""}" style="width:${(r.count / max * 100).toFixed(1)}%"></span></span>
+      <span class="sbar-val">${r.count}건 <span class="caption">(${_statPct(r.count, total).toFixed(0)}%)</span></span>
+      ${r.extra ? `<span class="sbar-extra caption">${escapeHtml(r.extra)}</span>` : ""}
+    </div>`).join("");
+  return `<div class="stat-card"><h3>${escapeHtml(title)}</h3><div class="sbar">${body}</div></div>`;
+}
+
+function statKeywordCard(title, rows) {
+  const body = rows.length
+    ? rows.map((r) => `<button class="kw-badge" type="button" data-stat-kw="${escapeHtml(r.kw)}" title="'${escapeHtml(r.kw)}' 포함 물건만 보기"><b>${escapeHtml(r.kw)}</b> <span>${r.count}</span></button>`).join("")
+    : `<span class="caption">검출된 위험 키워드 없음</span>`;
+  return `<div class="stat-card stat-wide"><h3>${escapeHtml(title)}</h3><div class="kw-cloud">${body}</div></div>`;
+}
+
+function renderStatsSection(items) {
+  const grid = $("stats-grid");
+  if (!grid) return;
+  const cap = $("stats-caption");
+  if (cap) {
+    cap.textContent = (items.length === STATE.items.length)
+      ? `전체 ${items.length}건 기준`
+      : `현재 필터 결과 ${items.length}건 기준 (전체 ${STATE.items.length}건)`;
+  }
+  if (!items.length) {
+    grid.innerHTML = `<p class="caption">조건에 맞는 물건이 없어 통계를 표시할 수 없습니다.</p>`;
+    return;
+  }
+
+  const riskFill = (r) => ({ none: "low", low: "low", medium: "medium", high: "high" }[r.level] || "");
+  const cards = [];
+  // 분포(bar) 카드
+  cards.push(statBarCard("위험도별", buildRiskStats(items).map((r) => ({
+    label: r.label, count: r.count,
+    extra: `평균차익 ${fmtMan(Math.round(r.avgProfit))} · 추천 ${r.recommended}`,
+    level: r.level,
+  })), { fillCls: riskFill }));
+  cards.push(statBarCard("추천등급별", buildGradeStats(items).map((r) => ({
+    label: `${r.grade}등급`, count: r.count,
+    extra: `평균차익 ${fmtMan(Math.round(r.avgProfit))} · ROI ${fmtPct(r.avgRoi)}` +
+      (r.topItem ? ` · 대표 #${r.topItem.id}` : ""),
+  }))));
+  cards.push(statBarCard("입찰기일별", buildBidDateStats(items).map((r) => ({
+    label: r.label, count: r.count,
+    extra: `추천 ${r.recommended} · 고위험 ${r.highRisk} · 평균차익 ${fmtMan(Math.round(r.avgProfit))}`,
+  }))));
+  cards.push(statBarCard("유찰횟수별", buildFailCountStats(items).map((r) => ({
+    label: r.label, count: r.count,
+    extra: `평균최저가 ${fmtMan(Math.round(r.avgMinPrice))} · 평균차익 ${fmtMan(Math.round(r.avgProfit))} · ROI ${fmtPct(r.avgRoi)} · 추천 ${r.recommended}`,
+  }))));
+  cards.push(statBarCard("경매/공매 비율", buildSourceStats(items)));
+  cards.push(statBarCard("시세 신뢰도 분포", buildConfidenceStats(items)));
+  cards.push(statBarCard("문서상태 분포", buildDocumentStatusStats(items)));
+  // 랭킹 카드
+  cards.push(statRankingCard("법원별 요약", buildCourtStats(items), { rep: true, urgent: true }));
+  cards.push(statRankingCard("기관별 요약", buildAgencyStats(items), { rep: true, urgent: true }));
+  cards.push(statRankingCard("지역별 요약 (시도)", buildRegionStats(items), { rep: true }));
+  cards.push(statRankingCard("지역별 요약 (시군구)", buildSigunguStats(items), { rep: true }));
+  cards.push(statRankingCard("물건종류별 요약", buildTypeStats(items), { rep: true }));
+  cards.push(statRankingCard("물건그룹별 요약", buildGroupStatsByGroup(items), { rep: true }));
+  // 키워드 TOP
+  cards.push(statKeywordCard("고위험 키워드 TOP", buildRiskKeywordStats(items, 12)));
+
+  grid.innerHTML = cards.join("");
+
+  // 대표 물건 → 상세, 키워드 → 필터
+  grid.querySelectorAll(".rank-top[data-stat-id]").forEach((btn) => {
+    btn.addEventListener("click", () => openDetailById(btn.dataset.statId));
+  });
+  grid.querySelectorAll(".kw-badge[data-stat-kw]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      _briefingApplyFlag(btn.dataset.statKw);
+      scrollToSection("section-items");
+    });
+  });
 }
 
 /* ─── 사용자 피드백 기반 맞춤 추천 ──────────────────────────── */

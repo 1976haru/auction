@@ -479,6 +479,42 @@ if tab_sel == "오늘의 브리핑":
                 ("농지자격", "farmland"), ("임차인", "tenant"), ("문서미공개", "document_missing"),
             ]):
                 col.metric(label, rp.get(key, 0))
+
+            # ── 연번 14 통계 요약(보조 반영): 분포 표 ──
+            st.divider()
+            st.markdown("### 📊 통계 요약 (전체 데이터 기준)")
+            dist = _exp._build_distributions(_eitems)
+
+            def _dist_df(d, col_name):
+                return pd.DataFrame(
+                    [{col_name: k, "물건 수": v} for k, v in d.items()]
+                )
+
+            sc1, sc2 = st.columns(2)
+            with sc1:
+                st.markdown("**법원별 물건 수**")
+                st.dataframe(_dist_df(dist["court_distribution"], "법원"),
+                             use_container_width=True, hide_index=True)
+                st.markdown("**지역별(시도) 물건 수**")
+                st.dataframe(_dist_df(dist["region_distribution"], "지역"),
+                             use_container_width=True, hide_index=True)
+                st.markdown("**종류별 물건 수**")
+                st.dataframe(_dist_df(dist["type_distribution"], "종류"),
+                             use_container_width=True, hide_index=True)
+            with sc2:
+                st.markdown("**위험도별 물건 수**")
+                _risk = {lv: sum(1 for it in _eitems if it.get("risk_level") == lv)
+                         for lv in ("low", "medium", "high")}
+                st.dataframe(_dist_df(_risk, "위험도"),
+                             use_container_width=True, hide_index=True)
+                st.markdown("**추천등급별 물건 수**")
+                _grade = {g: sum(1 for it in _eitems if it.get("recommendation_grade") == g)
+                          for g in ("A", "B", "C", "D", "X")}
+                st.dataframe(_dist_df(_grade, "등급"),
+                             use_container_width=True, hide_index=True)
+                st.markdown("**입찰기일별 물건 수**")
+                st.dataframe(_dist_df(dist["bid_date_distribution"], "입찰기일"),
+                             use_container_width=True, hide_index=True)
         except Exception as e:  # noqa: BLE001
             st.caption(f"브리핑 강화 정보를 불러오지 못했습니다: {e}")
 
