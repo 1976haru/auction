@@ -488,17 +488,32 @@ elif tab_sel == "전체 물건":
 # 5. AI 에이전트 검색 ----------------------------------------------
 elif tab_sel == "AI 에이전트 검색":
     st.header("AI 에이전트 검색")
+    st.caption("자연어 한 줄을 rule-based 로 해석해 조건·정렬·추천 결과를 보여줍니다.")
     examples = [
-        "시세차익 가장 큰 물건 5개만 찾아줘",
-        "공매만 보고 수익률 높은 물건 10개",
-        "서울 아파트 중 위험 낮은 물건 3개",
-        "유치권 있는 물건은 제외해줘",
-        "요즘 괜찮은 거 있어?",
+        "시세차익 큰 물건 5개 찾아줘",
+        "서울 아파트 중 위험 낮은 물건 보여줘",
+        "수원지방법원 아파트만 보여줘",
+        "부산지방법원 토지 중 저평가 물건 찾아줘",
+        "공매 상가 중 수익률 높은 것 보여줘",
+        "입찰기일 7일 이내 후보 보여줘",
+        "유치권 있는 물건 제외해줘",
+        "법정지상권 있는 물건 제외해줘",
+        "지분매각 제외하고 보여줘",
+        "농지취득자격증명 필요한 물건 제외",
+        "고위험이어도 수익 큰 물건 따로 보여줘",
+        "A등급만 보여줘",
+        "유찰 2회 이상 중 저평가 물건",
+        "오늘 뭐부터 봐야 돼?",
+        "내가 좋아할 만한 물건 있어?",
     ]
-    cols = st.columns(len(examples))
-    for i, ex in enumerate(examples):
-        if cols[i].button(ex, key=f"ex_{i}"):
-            st.session_state["agent_query"] = ex
+    # 예시 버튼을 4개씩 줄바꿈해 배치 (좁은 화면에서도 안 깨지게)
+    per_row = 4
+    for start in range(0, len(examples), per_row):
+        row = examples[start:start + per_row]
+        cols = st.columns(per_row)
+        for j, ex in enumerate(row):
+            if cols[j].button(ex, key=f"ex_{start + j}"):
+                st.session_state["agent_query"] = ex
     q = st.text_input("자연어 입력", value=st.session_state.get("agent_query", examples[0]))
     if st.button("실행", type="primary"):
         with st.spinner("에이전트가 분석 중..."):

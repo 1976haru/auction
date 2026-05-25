@@ -53,9 +53,19 @@ const QUICK_CHIPS = [
 const AGENT_EXAMPLES = [
   "시세차익 큰 물건 5개 찾아줘",
   "서울 아파트 중 위험 낮은 물건 보여줘",
+  "수원지방법원 아파트만 보여줘",
+  "부산지방법원 토지 중 저평가 물건 찾아줘",
+  "공매 상가 중 수익률 높은 것 보여줘",
   "입찰기일 7일 이내 후보 보여줘",
+  "유치권 있는 물건 제외해줘",
+  "법정지상권 있는 물건 제외해줘",
+  "지분매각 제외하고 보여줘",
+  "농지취득자격증명 필요한 물건 제외",
   "고위험이어도 수익 큰 물건 따로 보여줘",
+  "A등급만 보여줘",
+  "유찰 2회 이상 중 저평가 물건",
   "오늘 뭐부터 봐야 돼?",
+  "내가 좋아할 만한 물건 있어?",
 ];
 
 // 한 번에 여러 필터를 세팅하는 프리셋 — chipMatch 가 처리하지 못하는 조건은
@@ -4246,159 +4256,382 @@ function bindSearch() {
 }
 
 // ── AI agent (rule-based intent) ─────────────────
-function parseIntent(text) {
-  const q = (text || "").toLowerCase();
-  const intent = { sort: null, filters: {}, limit: null, note: [] };
-
-  // 지역
-  const regionPatterns = ["서울", "경기", "인천", "부산", "대전", "대구", "광주", "울산", "세종", "강원"];
-  for (const r of regionPatterns) {
-    if (q.includes(r)) {
-      intent.filters.regionContains = r;
-      intent.note.push(`지역: ${r}`);
-      break;
-    }
-  }
-  // 물건종류
-  const typePatterns = ["아파트", "오피스텔", "빌라", "상가", "토지"];
-  for (const t of typePatterns) {
-    if (q.includes(t)) {
-      intent.filters.item_type = t;
-      intent.note.push(`종류: ${t}`);
-      break;
-    }
-  }
-  // 경매/공매
-  if (q.includes("공매")) { intent.filters.source = "public_sale"; intent.note.push("공매"); }
-  else if (q.includes("경매")) { intent.filters.source = "auction"; intent.note.push("경매"); }
-
-  // 위험
-  if (q.includes("위험 낮은") || q.includes("저위험") || q.includes("안전")) {
-    intent.filters.risk = "low"; intent.note.push("저위험");
-  } else if (q.includes("고위험") || q.includes("위험 높은")) {
-    intent.filters.risk = "high"; intent.note.push("고위험");
-  }
-
-  // 입찰기일
-  const dueMatch = q.match(/(\d+)\s*일\s*이내/);
-  if (dueMatch) {
-    intent.filters.due_max = Number(dueMatch[1]);
-    intent.note.push(`${dueMatch[1]}일 이내`);
-  } else if (q.includes("임박")) {
-    intent.filters.due_max = 7; intent.note.push("입찰임박");
-  }
-
-  // 정렬
-  if (q.includes("수익률")) { intent.sort = "roi_desc"; intent.note.push("수익률 높은순"); }
-  else if (q.includes("차익") || q.includes("수익")) { intent.sort = "profit_desc"; intent.note.push("차익 큰순"); }
-  else if (q.includes("점수") || q.includes("추천")) { intent.sort = "score_desc"; intent.note.push("추천점수 순"); }
-  else if (q.includes("저렴") || q.includes("싼") || q.includes("저가")) { intent.sort = "price_asc"; intent.note.push("최저가 낮은순"); }
-
-  // 개수
-  const cntMatch = q.match(/(\d+)\s*(개|건)/);
-  if (cntMatch) {
-    intent.limit = Math.max(1, Math.min(50, Number(cntMatch[1])));
-    intent.note.push(`상위 ${intent.limit}개`);
-  }
-
-  // 법원/기관
-  const COURTS = ["서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원",
-    "서울서부지방법원", "의정부지방법원", "인천지방법원", "수원지방법원", "대전지방법원",
-    "대구지방법원", "부산지방법원", "광주지방법원", "울산지방법원", "창원지방법원",
-    "제주지방법원", "춘천지방법원", "청주지방법원", "전주지방법원"];
-  for (const c of COURTS) {
-    if (q.includes(c)) { intent.filters.court = c; intent.note.push(`법원: ${c}`); break; }
-  }
-  if (!intent.filters.court && (q.includes("캠코") || q.includes("자산관리공사"))) {
-    intent.filters.court = "한국자산관리공사"; intent.note.push("기관: 한국자산관리공사");
-  }
-
-  // 물건그룹
-  if (q.includes("주거")) { intent.filters.item_group = "주거용 건물"; intent.note.push("주거용"); }
-  else if (q.includes("상업")) { intent.filters.item_group = "상업용 건물"; intent.note.push("상업용"); }
-
-  // 유찰 N회 이상
-  const failMatch = q.match(/유찰\s*(\d+)\s*회/);
-  if (failMatch) { intent.filters.fail_min = Number(failMatch[1]); intent.note.push(`유찰 ${failMatch[1]}회+`); }
-
-  // 문서 상태
-  if (q.includes("미공개")) {
-    if (/(빼|제외|말고)/.test(q)) { intent.filters.document_status = "present"; intent.note.push("문서 있음"); }
-    else { intent.filters.document_status = "missing"; intent.note.push("문서 미공개"); }
-  }
-
-  // 위험 키워드 제외 / 포함
-  intent.filters.exclude_flags = [];
-  ["유치권", "법정지상권", "지분", "농지"].forEach((kw) => {
-    if (q.includes(kw) && /(제외|빼|말고)/.test(q)) { intent.filters.exclude_flags.push(kw); intent.note.push(`${kw} 제외`); }
+// 데이터에 실재하는 지역(시도/시군구/동) 인덱스 — parseAgentQuery 에서 자동 매칭
+let _GEO_INDEX = null;
+function buildGeoIndex() {
+  if (_GEO_INDEX) return _GEO_INDEX;
+  const sido = new Set(), sigungu = new Set(), dong = new Set(), region = new Set();
+  (STATE.items || []).forEach((it) => {
+    if (it.sido) sido.add(it.sido);
+    if (it.region) region.add(it.region);
+    if (it.sigungu) sigungu.add(it.sigungu);
+    if (it.dong) dong.add(it.dong);
   });
-  intent.filters.include_flags = [];
-  if (q.includes("임차") && /(포함|만)/.test(q)) { intent.filters.include_flags.push("임차"); intent.note.push("임차인 포함"); }
+  // 긴 문자열 우선 매칭(예: "성남시 분당구" 가 "성남시" 보다 먼저)
+  const byLenDesc = (a, b) => b.length - a.length;
+  // 짧은 지역 표현("서울"·"부산")도 매칭되도록 시도명에서 행정 접미사를 떼어 매핑
+  const stripSido = (s) => s.replace(/(특별자치시|특별자치도|특별시|광역시|자치도|도|시)$/u, "");
+  const shortSido = [...sido]
+    .map((full) => [stripSido(full), full])
+    .filter(([k]) => k.length >= 2)
+    .sort((a, b) => b[0].length - a[0].length);
+  _GEO_INDEX = {
+    sido: [...sido].sort(byLenDesc),
+    region: [...region].sort(byLenDesc),
+    sigungu: [...sigungu].sort(byLenDesc),
+    dong: [...dong].sort(byLenDesc),
+    shortSido,
+  };
+  return _GEO_INDEX;
+}
 
-  // 오늘 뭐부터 등 모호한 입력 → 추천점수 정렬 + top5
-  if (!intent.sort && (q.includes("뭐부터") || q.includes("오늘") || q.includes("괜찮") || !q)) {
-    intent.sort = "score_desc";
-    if (!intent.limit) intent.limit = 5;
-    intent.note.push("오늘 우선 후보");
+// 법원 전체 목록 (체크리스트 연번 12 기준)
+const AGENT_COURTS = [
+  "서울중앙지방법원", "서울동부지방법원", "서울남부지방법원", "서울북부지방법원",
+  "서울서부지방법원", "의정부지방법원", "인천지방법원", "수원지방법원", "대전지방법원",
+  "대구지방법원", "부산지방법원", "광주지방법원", "울산지방법원", "창원지방법원",
+  "제주지방법원", "춘천지방법원", "청주지방법원", "전주지방법원",
+];
+// 법원명 → 도시 접두(짧은 표현도 매칭: "수원 법원")
+const AGENT_COURT_PREFIX = {
+  "수원지방법원": "수원", "인천지방법원": "인천", "대전지방법원": "대전",
+  "대구지방법원": "대구", "부산지방법원": "부산", "광주지방법원": "광주",
+  "울산지방법원": "울산", "창원지방법원": "창원", "제주지방법원": "제주",
+  "춘천지방법원": "춘천", "청주지방법원": "청주", "전주지방법원": "전주",
+  "의정부지방법원": "의정부",
+};
+// 물건종류 패턴 → STATE.filters 매핑 ({type} 또는 {group})
+const AGENT_TYPE_RULES = [
+  { kw: "아파트", type: "아파트" },
+  { kw: "오피스텔", type: "오피스텔" },
+  { kw: "근린상가", type: "상가" },
+  { kw: "상가", type: "상가" },
+  { kw: "빌라", type: "빌라" },
+  { kw: "연립", type: "연립" },
+  { kw: "다세대", type: "다세대" },
+  { kw: "다가구", type: "다가구주택" },
+  { kw: "단독", type: "단독주택" },
+  { kw: "공장", type: "공장" },
+  { kw: "창고", type: "창고" },
+  { kw: "차량", type: "차량" },
+  { kw: "선박", type: "선박" },
+  { kw: "기계", type: "기계" },
+  { kw: "임야", group: "토지" },
+  { kw: "토지", group: "토지" },
+  { kw: "전답", group: "토지" },
+];
+
+function parseAgentQuery(text) {
+  const raw = (text || "").trim();
+  const q = raw.toLowerCase();
+  const intent = {
+    raw, filters: {}, sort: null, limit: null,
+    intentNote: [], conditions: [], assumptions: [],
+    cautions: [], nextActions: [], actionPlan: false, matched: false,
+  };
+  const has = (...keys) => keys.some((k) => q.includes(k.toLowerCase()));
+  const cond = (label) => { intent.conditions.push(label); intent.matched = true; };
+
+  // ── action plan: "오늘 뭐부터 / 추천 / 내가 좋아할" ──
+  if (has("뭐부터", "뭐 봐", "뭐봐", "어디부터", "오늘 뭐", "오늘뭐") ||
+      (has("오늘") && has("봐", "볼", "할"))) {
+    intent.actionPlan = true; intent.matched = true;
+    intent.intentNote.push("오늘 우선 검토 후보 + 입찰임박 + 고위험 주의를 함께 정리");
+  }
+  if (has("좋아할", "추천해", "관심 있을", "괜찮은 거")) {
+    intent.actionPlan = true; intent.matched = true;
+    intent.intentNote.push("추천점수 높은 후보를 우선 제시");
   }
 
+  // ── 법원 / 기관 ──
+  let courtMatched = false;
+  for (const c of AGENT_COURTS) {
+    const prefix = AGENT_COURT_PREFIX[c];
+    if (q.includes(c) || (prefix && q.includes(prefix) && has("법원"))) {
+      intent.filters.court = c; cond(`법원 · ${c}`); courtMatched = true; break;
+    }
+  }
+  if (!courtMatched && has("캠코", "자산관리공사", "온비드")) {
+    intent.filters.court = "한국자산관리공사";
+    intent.filters.source = "public_sale";
+    cond("기관 · 한국자산관리공사(캠코)");
+  } else if (!courtMatched && has("지자체", "공공기관", "금융기관")) {
+    intent.filters.source = "public_sale";
+    cond("기관 · 공매(공공기관)");
+    intent.assumptions.push("기관 세부 구분 데이터가 제한적이라 공매 전체로 해석했습니다.");
+  }
+
+  // ── 경매 / 공매 ──
+  if (has("공매")) { intent.filters.source = "public_sale"; cond("구분 · 공매"); }
+  else if (has("경매")) { intent.filters.source = "auction"; cond("구분 · 경매"); }
+
+  // ── 물건종류 ──
+  for (const r of AGENT_TYPE_RULES) {
+    if (q.includes(r.kw)) {
+      if (r.type) { intent.filters.item_type = r.type; cond(`종류 · ${r.type}`); }
+      else { intent.filters.item_group = r.group; cond(`종류 · ${r.group}`);
+             if (r.group === "토지") intent.assumptions.push("토지: 전·답·임야 등 토지군(item_group=토지)으로 해석했습니다."); }
+      break;
+    }
+  }
+
+  // ── 지역(시도/시군구/동) 자동 매칭 ──
+  const geo = buildGeoIndex();
+  if (!intent.filters.court) {
+    const sg = geo.sigungu.find((v) => q.includes(v.toLowerCase()));
+    let sd = geo.sido.find((v) => q.includes(v.toLowerCase()))
+          || geo.region.find((v) => q.includes(v.toLowerCase()));
+    if (!sd) {
+      const hit = geo.shortSido.find(([k]) => q.includes(k.toLowerCase()));
+      if (hit) sd = hit[1];
+    }
+    const dg = geo.dong.find((v) => q.includes(v.toLowerCase()));
+    if (sd) { intent.filters.sido = sd; cond(`지역 · ${sd}`); }
+    if (sg) { intent.filters.sigungu = sg; cond(`지역 · ${sg}`); }
+    if (dg && !sg) { intent.filters.dong = dg; cond(`지역 · ${dg}`); }
+  }
+
+  // ── 위험 포함/제외 ──
+  const excludeCtx = /(제외|빼|말고|없는|없이|뺀)/.test(q);
+  intent.filters.exclude_flags = [];
+  [["유치권", "유치권"], ["법정지상권", "법정지상권"], ["지분", "지분"],
+   ["농지취득자격증명", "농지"], ["농지", "농지"], ["분묘", "분묘"]].forEach(([kw, store]) => {
+    if (q.includes(kw) && excludeCtx && !intent.filters.exclude_flags.includes(store)) {
+      intent.filters.exclude_flags.push(store); cond(`${store} 제외`);
+    }
+  });
+  if (has("고위험 제외", "고위험은 빼", "위험한 건 빼", "안전한 것만") || (has("고위험") && excludeCtx)) {
+    intent.filters.exclude_high_risk_keywords = true; cond("고위험 키워드 제외");
+  }
+  if (has("특수위험 제외", "특수권리 제외")) {
+    intent.filters.special_risk_free = true; cond("특수위험 제외");
+  }
+  // 임차인 있는/없는
+  if (has("임차인 없는", "임차인 없이", "세입자 없는")) {
+    intent.filters.no_tenant_only = true; cond("임차인 없는 물건");
+  } else if (has("임차인 있는", "임차인 낀", "세입자 있는") ||
+             (has("임차") && /(있는|낀|포함|만)/.test(q))) {
+    intent.filters.tenant_only = true; cond("임차인 있는 물건");
+  }
+
+  // ── 위험도 목표 ──
+  const includeHighRisk = has("고위험이어도", "고위험이라도", "위험해도", "위험하지만", "위험하더라도");
+  if (includeHighRisk) {
+    intent.matched = true;
+    intent.assumptions.push("고위험 물건도 제외하지 않고 차익이 큰 순으로 정렬했습니다.");
+    intent.cautions.push("고위험 물건이 포함되어 있습니다 — 권리분석·현장조사를 반드시 확인하세요.");
+  } else if (has("위험 낮은", "저위험", "안전한", "위험 적은")) {
+    intent.filters.risk = "low"; cond("위험도 · 낮음");
+  } else if (has("위험 높은") || (has("고위험") && !excludeCtx)) {
+    intent.filters.risk = "high"; cond("위험도 · 높음");
+  }
+
+  // ── 저평가 ──
+  if (has("저평가", "저렴한 시세", "시세보다 싼", "싸게 나온")) {
+    intent.filters.chip = "undervalued"; cond("저평가(최저가 ≤ 시세 85%)");
+    intent.assumptions.push("저평가 기준: 최저가가 추정시세의 85% 이하인 물건입니다.");
+    if (!intent.sort) intent.sort = "profit_desc";
+  }
+
+  // ── 등급 ──
+  const gradeMatch = q.match(/([abcd])\s*등급/i);
+  if (gradeMatch) { intent.filters.grade = gradeMatch[1].toUpperCase(); cond(`등급 · ${gradeMatch[1].toUpperCase()}`); }
+
+  // ── 유찰 N회 이상 ──
+  const failMatch = q.match(/유찰\s*(\d+)\s*회/);
+  if (failMatch) { intent.filters.fail_min = Number(failMatch[1]); cond(`유찰 ${failMatch[1]}회 이상`); }
+  else if (has("유찰 많은", "여러 번 유찰", "유찰된")) { intent.filters.fail_min = 1; cond("유찰 1회 이상"); }
+
+  // ── 입찰기일 ──
+  const dueMatch = q.match(/(\d+)\s*일\s*이내/);
+  if (dueMatch) { intent.filters.due_max = Number(dueMatch[1]); cond(`입찰 ${dueMatch[1]}일 이내`); }
+  else if (has("이번 주", "이번주")) { intent.filters.due_max = 7; cond("이번 주 입찰"); }
+  else if (has("오늘 입찰", "오늘 마감")) { intent.filters.due_max = 0; cond("오늘 입찰"); }
+  else if (has("임박", "곧 마감", "마감 임박")) { intent.filters.due_max = 7; cond("입찰임박(7일 이내)"); }
+
+  // ── 문서 상태 ──
+  if (has("미공개")) {
+    if (excludeCtx) { intent.filters.document_status = "present"; cond("문서 공개된 것만"); }
+    else { intent.filters.document_status = "missing"; cond("문서 미공개"); }
+  }
+
+  // ── 정렬(목표) ──
+  if (!intent.sort) {
+    if (has("수익률")) { intent.sort = "roi_desc"; }
+    else if (has("시세차익", "차익", "수익 큰", "수익이 큰", "많이 남")) { intent.sort = "profit_desc"; }
+    else if (has("추천점수", "점수 높은", "추천")) { intent.sort = "score_desc"; }
+    else if (has("저렴", "싼", "최저가 낮은", "저가")) { intent.sort = "min_price_asc"; }
+    else if (has("기일 가까운", "임박")) { intent.sort = "due_asc"; }
+    else if (intent.filters.risk === "low" || has("위험 낮은순")) { intent.sort = "risk_asc"; }
+  }
+  if (includeHighRisk && !has("수익률")) intent.sort = "profit_desc";
+
+  // 정렬 라벨을 의도 노트에 추가
+  if (intent.sort) intent.intentNote.push(`정렬 · ${SORT_LABEL[intent.sort] || intent.sort}`);
+
+  // ── 개수 ──
+  const cntMatch = q.match(/(\d+)\s*(개|건|곳)/);
+  if (cntMatch) { intent.limit = Math.max(1, Math.min(50, Number(cntMatch[1]))); cond(`상위 ${intent.limit}건`); }
+
+  // 매칭 못한 모호한 입력 → fallback (추천 TOP)
+  if (!intent.matched && !intent.actionPlan) {
+    intent.actionPlan = true;
+    intent.fallback = true;
+  }
   return intent;
 }
 
-function runAgentSearch(text) {
-  const intent = parseIntent(text);
-  let arr = STATE.items.slice();
-  const f = intent.filters;
-  if (f.regionContains) arr = arr.filter((it) => (it.region || "").includes(f.regionContains));
-  if (f.item_type) arr = arr.filter((it) => (it.item_type || "").includes(f.item_type));
-  if (f.source) arr = arr.filter((it) => it.source === f.source);
-  if (f.risk) arr = arr.filter((it) => it.risk_level === f.risk);
-  if (f.due_max !== undefined) arr = arr.filter((it) =>
-    it.days_left !== null && it.days_left !== undefined &&
-    it.days_left >= 0 && it.days_left <= f.due_max);
-  // ── 고급 필터 연동 ──
-  if (f.court) arr = arr.filter((it) =>
-    (it.court_name || "").includes(f.court) || (it.agency_name || "").includes(f.court));
-  if (f.item_group) arr = arr.filter((it) => (it.item_group || "") === f.item_group);
-  if (f.fail_min !== undefined) arr = arr.filter((it) => (it.fail_count || 0) >= f.fail_min);
-  if (f.document_status === "missing") arr = arr.filter((it) => _docsMissing(it));
-  if (f.document_status === "present") arr = arr.filter((it) => !_docsMissing(it));
-  if (f.exclude_flags && f.exclude_flags.length)
-    arr = arr.filter((it) => !f.exclude_flags.some((kw) => _hasRiskKeyword(it, kw)));
-  if (f.include_flags && f.include_flags.length)
-    arr = arr.filter((it) => f.include_flags.every((kw) => _hasRiskKeyword(it, kw)));
+let AGENT_ACTIVE = false;
 
-  arr = sortItems(arr, intent.sort || "score_desc");
-  const limit = intent.limit || 10;
-  const result = arr.slice(0, limit);
+// intent.filters 를 STATE.filters 로 머지 (기존 필터 초기화 후 AI 조건만 적용)
+function applyAgentFiltersToState(intent) {
+  STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
+  const f = STATE.filters;
+  const af = intent.filters || {};
+  ["court", "sido", "sigungu", "dong", "item_type", "item_group",
+   "source", "risk", "grade", "document_status", "chip"].forEach((k) => {
+    if (af[k] !== undefined && af[k] !== null && af[k] !== "") f[k] = af[k];
+  });
+  if (af.due_max !== undefined) f.due_max = af.due_max;
+  if (af.fail_min !== undefined) f.fail_min = af.fail_min;
+  if (af.exclude_flags && af.exclude_flags.length) f.exclude_flags = af.exclude_flags.slice();
+  if (af.exclude_high_risk_keywords) f.exclude_high_risk_keywords = true;
+  if (af.special_risk_free) f.special_risk_free = true;
+  if (af.tenant_only) f.tenant_only = true;
+  if (af.no_tenant_only) f.no_tenant_only = true;
+  if (intent.sort) f.sort = intent.sort;
+}
 
-  const root = $("agent-result");
-  root.classList.add("show");
-  root.innerHTML = `
-    <h3>AI 결과 — ${escapeHtml(intent.note.join(" · ") || "기본 정렬")} (${result.length}건)</h3>
-    <p class="caption">자연어를 rule-based 로 해석해 현재 mock 데이터를 다시 정렬·필터한 결과입니다.</p>
-    <div class="agent-result-grid"></div>
-  `;
-  const grid = root.querySelector(".agent-result-grid");
-  if (!result.length) {
-    grid.appendChild(el(`<p class="caption">조건에 맞는 물건이 없습니다.</p>`));
+// 카드 목록을 컨테이너에 채우고 탭/관심/비교 바인딩
+function fillAgentCards(container, items) {
+  if (!items.length) {
+    container.appendChild(el(`<p class="caption">조건에 맞는 물건이 없습니다.</p>`));
     return;
   }
-  result.forEach((it) => {
+  items.forEach((it) => {
     const card = el(itemCardHtml(it));
-    bindTap(card, () => openDetailById(it.id), {
-      onLongPress: () => toggleCompare(it.id),
-    });
+    bindTap(card, () => openDetailById(it.id), { onLongPress: () => toggleCompare(it.id) });
     wireFavoriteButtons(card);
     wireCompareButtons(card);
-    grid.appendChild(card);
+    container.appendChild(card);
   });
+}
+
+function _chipRow(label, arr) {
+  if (!arr || !arr.length) return "";
+  return `<div class="agent-line"><span class="agent-line-label">${escapeHtml(label)}</span>
+    <span class="agent-chips">${arr.map((c) => `<span class="agent-cond-chip">${escapeHtml(c)}</span>`).join("")}</span></div>`;
+}
+function _listRow(label, arr) {
+  if (!arr || !arr.length) return "";
+  return `<div class="agent-line"><span class="agent-line-label">${escapeHtml(label)}</span>
+    <ul class="agent-sublist">${arr.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul></div>`;
+}
+
+function runAgentSearch(text) {
+  const intent = parseAgentQuery(text);
+  const root = $("agent-result");
+  root.classList.add("show");
+
+  // ── 액션 플랜 / fallback 모드 ──
+  if (intent.actionPlan) {
+    // 필터 전체 초기화(전체 목록), 점수순
+    STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
+    AGENT_ACTIVE = true;
+    syncControlsFromState(); renderQuickChips(); applyFilters();
+    renderAgentActionPlan(intent);
+    scrollToSection("section-agent-search");
+    return;
+  }
+
+  // ── 일반 조건 검색 ──
+  applyAgentFiltersToState(intent);
+  AGENT_ACTIVE = true;
+  syncControlsFromState(); renderQuickChips(); applyFilters();
+
+  const matched = STATE.filtered.slice();
+  const limit = intent.limit || 5;
+  const top = matched.slice(0, limit);
+
+  const cautions = ["mock 데이터 기반 참고용입니다 — 법률·투자 판단을 단정하지 않습니다.", ...intent.cautions];
+  const nextActions = intent.nextActions.length ? intent.nextActions : [
+    "상위 후보를 눌러 상세 패널에서 의사결정 근거 확인",
+    "입찰 전 등기부등본·전입세대열람·현장조사로 교차검증",
+  ];
+
+  root.innerHTML = `
+    <div class="agent-result-head">
+      <h3>AI 검색 결과 <span class="agent-active-badge">AI 검색 조건 적용됨</span></h3>
+      <button class="btn btn-ghost agent-reset" id="agent-reset" type="button">초기화 · 전체 목록</button>
+    </div>
+    <div class="agent-interpret">
+      <div class="agent-line"><span class="agent-line-label">입력</span><span class="agent-input-echo">"${escapeHtml(intent.raw)}"</span></div>
+      ${_chipRow("해석된 의도", intent.intentNote)}
+      ${_chipRow("적용된 조건", intent.conditions.length ? intent.conditions : ["조건 없음(전체)"])}
+      ${_listRow("가정사항", intent.assumptions)}
+      <div class="agent-line"><span class="agent-line-label">추천 결과</span>
+        <span>전체 ${matched.length}건 중 상위 ${top.length}건 표시</span></div>
+      ${_listRow("주의사항", cautions)}
+      ${_listRow("다음 액션", nextActions)}
+    </div>
+    <div class="agent-result-grid"></div>
+  `;
+  $("agent-reset").addEventListener("click", () => { resetFilters(); });
+  fillAgentCards(root.querySelector(".agent-result-grid"), top);
+}
+
+// "오늘 뭐부터 봐야 돼?" 류 — 추천 TOP + 입찰임박 + 고위험 주의를 함께 정리
+function renderAgentActionPlan(intent) {
+  const root = $("agent-result");
+  const items = STATE.items.slice();
+  const topRec = sortItems(items.filter((it) => (it.recommendation_score || 0) > 0), "score_desc").slice(0, 5);
+  const imminent = sortItems(
+    items.filter((it) => it.days_left !== null && it.days_left !== undefined && it.days_left >= 0 && it.days_left <= 7),
+    "due_asc").slice(0, 5);
+  const highRisk = sortItems(items.filter((it) => it.risk_level === "high"), "profit_desc").slice(0, 5);
+
+  const title = intent.fallback ? "정확히 해석하지 못했어요 — 기본 추천 후보를 보여드립니다"
+                                : "오늘 우선 검토 가이드";
+  const guide = intent.fallback
+    ? `<p class="caption">예시: <b>시세차익 큰 물건 5개</b> · <b>수원지방법원 아파트</b> · <b>유치권 제외</b> · <b>오늘 뭐부터 볼까?</b></p>`
+    : `<p class="caption">추천점수·입찰임박·고위험을 한 번에 정리했습니다. (rule-based 해석)</p>`;
+
+  root.innerHTML = `
+    <div class="agent-result-head">
+      <h3>${escapeHtml(title)} <span class="agent-active-badge">AI 검색 조건 적용됨</span></h3>
+      <button class="btn btn-ghost agent-reset" id="agent-reset" type="button">초기화 · 전체 목록</button>
+    </div>
+    <div class="agent-interpret">
+      <div class="agent-line"><span class="agent-line-label">입력</span><span class="agent-input-echo">"${escapeHtml(intent.raw || "")}"</span></div>
+      ${guide}
+    </div>
+    <div class="agent-plan">
+      <div class="agent-plan-group">
+        <h4>⭐ 추천 후보 TOP ${topRec.length}</h4>
+        <div class="agent-result-grid" data-g="rec"></div>
+      </div>
+      <div class="agent-plan-group">
+        <h4>⏰ 입찰임박 (D-7 이내) ${imminent.length}건</h4>
+        <div class="agent-result-grid" data-g="imm"></div>
+      </div>
+      <div class="agent-plan-group">
+        <h4>⚠ 고위험 주의 ${highRisk.length}건</h4>
+        <p class="caption">수익이 커도 권리분석·현장조사 없이 입찰은 위험합니다.</p>
+        <div class="agent-result-grid" data-g="risk"></div>
+      </div>
+    </div>
+  `;
+  $("agent-reset").addEventListener("click", () => { resetFilters(); });
+  fillAgentCards(root.querySelector('[data-g="rec"]'), topRec);
+  fillAgentCards(root.querySelector('[data-g="imm"]'), imminent);
+  fillAgentCards(root.querySelector('[data-g="risk"]'), highRisk);
 }
 
 function hideAgentResult() {
   const root = $("agent-result");
   root.classList.remove("show");
   root.innerHTML = "";
+  AGENT_ACTIVE = false;
 }
 
 function bindAgentSearch() {

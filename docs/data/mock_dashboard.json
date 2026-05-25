@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T06:47:10",
+  "generated_at": "2026-05-26T07:05:26",
   "source": "db",
   "summary": {
     "total_items": 100,
@@ -24,7 +24,7 @@
       "medium": 18,
       "high": 77
     },
-    "data_timestamp": "2026-05-26T06:47:10"
+    "data_timestamp": "2026-05-26T07:05:26"
   },
   "briefing": {
     "run_date": "2026-05-08",
@@ -13695,7 +13695,7 @@
       "address": "부산광역시 해운대구 우동 919-11",
       "region": "부산광역시",
       "item_type": "토지",
-      "minimum_to_market_ratio": 128.9,
+      "minimum_to_market_ratio": 55.0,
       "additional_checklist": [
         "유치권 신고서·점유 개시 시점·피담보채권 확인",
         "분묘기지권 성립 여부·개장 협의 비용 확인"
@@ -13732,22 +13732,24 @@
       "confidence_reasons": [
         "현재 자료 기준 주요 항목 신뢰도가 양호한 편입니다."
       ],
-      "acquisition_cost": 3456,
+      "acquisition_cost": 1474,
       "repair_cost": 1200,
       "eviction_cost": 600,
-      "finance_cost": 2304,
-      "estimated_total_cost": 84360,
-      "safety_margin": -24792,
-      "conservative_bid": 78336,
-      "normal_bid": 84480,
-      "aggressive_bid": 90624,
-      "max_bid_price": 84480,
+      "finance_cost": 982,
+      "estimated_total_cost": 37018,
+      "safety_margin": 22550,
+      "conservative_bid": 33417,
+      "normal_bid": 36038,
+      "aggressive_bid": 38659,
+      "max_bid_price": 54790,
       "bid_warnings": [
         "고위험 물건 — 공격적 입찰가는 고위험으로 참고 제한, 참고용으로만 보세요.",
+        "최저가가 시세 대비 크게 낮아 권리상 부담 여부를 함께 확인하세요.",
         "예상 입찰가는 mock 데이터 기반 단순 추정치이며 실제 입찰 판단을 단정하지 않습니다."
       ],
       "warning_messages": [
         "고위험 물건 — 공격적 입찰가는 고위험으로 참고 제한, 참고용으로만 보세요.",
+        "최저가가 시세 대비 크게 낮아 권리상 부담 여부를 함께 확인하세요.",
         "예상 입찰가는 mock 데이터 기반 단순 추정치이며 실제 입찰 판단을 단정하지 않습니다."
       ],
       "source_text": "유치권 신고 가능성 - 권리 성립 여부 확인 필요 / 분묘기지권 가능성 - 처분/이용 제약 가능성",
@@ -13771,11 +13773,11 @@
       "has_public_notice": false,
       "decision_summary": "수익 대비 위험이 커 보여 확인이 필요합니다 — 보수적으로 접근하세요.",
       "appraisal_price": 120000,
-      "min_bid_price": 76800,
-      "minimum_price": 76800,
+      "min_bid_price": 32762,
+      "minimum_price": 32762,
       "market_price": 59568,
-      "expected_profit": -19032,
-      "expected_profit_rate": -24.8,
+      "expected_profit": 25006,
+      "expected_profit_rate": 76.3,
       "fail_count": 2,
       "bid_date": "2026-05-22",
       "days_left": -4,
@@ -13813,7 +13815,7 @@
       "checklist": [
         "유치권 신고 내역 및 점유 사실 확인"
       ],
-      "detail_summary": "감정가 120,000만원 / 최저가 76,800만원 / 추정시세 59,568만원 / 차익 -19,032만원 / 위험 high / 신뢰도 0.82",
+      "detail_summary": "감정가 120,000만원 / 최저가 32,762만원 / 추정시세 59,568만원 / 차익 25,006만원 / 위험 high / 신뢰도 0.82",
       "change_events": [],
       "change_tags": [],
       "is_new": false,

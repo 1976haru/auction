@@ -543,13 +543,14 @@
     <!-- AI 에이전트 검색 -->
     <section class="card" id="section-agent-search">
       <h2>AI 에이전트 검색</h2>
-      <p class="caption">자연어 한 줄로 mock 데이터를 다시 필터·정렬합니다. (rule-based 해석, 외부 API 호출 없음)</p>
+      <p class="caption">자연어 한 줄을 rule-based 로 해석해 조건·정렬·추천 결과를 보여줍니다. (외부 API 호출 없음)</p>
       <div class="agent-search">
-        <input type="search" id="agent-q" placeholder='예) "서울 아파트 중 위험 낮은 물건 보여줘"' aria-label="AI 에이전트 자연어 검색" />
+        <input type="search" id="agent-q" placeholder='예) 시세차익 큰 물건 5개 · 수원지방법원 아파트 · 유치권 제외 · 오늘 뭐부터 볼까?' aria-label="AI 에이전트 자연어 검색" />
         <button class="btn btn-primary" id="agent-go">실행</button>
       </div>
       <div class="agent-examples" id="agent-examples"></div>
-      <div class="agent-result" id="agent-result"></div>
+      <!-- 해석 결과·적용 조건·결과 요약·주의/가정·상위 카드가 모두 이 영역에 렌더됩니다 -->
+      <div class="agent-result" id="agent-result" aria-live="polite"></div>
     </section>
 
     <!-- 전체 물건 -->
