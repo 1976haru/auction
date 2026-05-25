@@ -540,6 +540,27 @@ elif tab_sel == "물건 상세분석":
         c1.metric("감정가(만원)", f"{it.get('appraisal_price', 0):,}")
         c2.metric("최저가(만원)", f"{it.get('min_bid_price', 0):,}")
         c3.metric("유찰", f"{it.get('fail_count', 0)}회")
+
+        # 📋 의사결정 요약 패널 — 정적 대시보드 상세 패널과 동일한 톤(비단정)
+        _pa = get_price_analysis(it["id"]) or {}
+        _conf = get_confidence(it["id"]) or {}
+        _overall = _conf.get("overall_confidence") or 0
+        _flags_for_panel = get_risk_flags(it["id"])
+        _has_high = any((f.get("risk_level") == "high") for f in _flags_for_panel)
+        _risk_label = "높음" if _has_high else ("보통" if _flags_for_panel else "낮음")
+        with st.container():
+            st.markdown("### 📋 의사결정 요약")
+            d1, d2, d3 = st.columns(3)
+            d1.metric("최저가/시세", f"{(_pa.get('minimum_to_market_ratio') or 0):.0f}%")
+            d2.metric("감정가/시세", f"{(_pa.get('appraisal_to_market_ratio') or 0):.0f}%")
+            d3.metric("전체 신뢰도", f"{_overall:.2f}")
+            if _has_high:
+                st.warning("고위험 키워드가 있어 공격적 입찰가는 참고 제한 — 확인 필요. 현재 자료 기준 추가 검토가 필요합니다.")
+            else:
+                st.info("현재 자료 기준 기본 권리분석·현장조사로 확인 후 검토 후보로 볼 만합니다.")
+            st.caption(f"위험도 {_risk_label} · 거래량 {(_pa.get('transaction_count') or 0)}건 "
+                       "· ※ mock 데이터 기반 참고용, 법률·투자 판단을 단정하지 않습니다.")
+
         flags = get_risk_flags(it["id"])
         st.markdown("### 위험 키워드")
         if flags:

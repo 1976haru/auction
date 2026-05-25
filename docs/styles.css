@@ -2657,6 +2657,7 @@ footer {
   transform: translate(-50%, -50%);
   width: min(720px, 92vw);
   max-height: 88vh;
+  /* 아래 #detail-modal 규칙에서 상세 패널만 넓게 키운다 */
   background: var(--color-surface);
   color: var(--color-text);
   border-radius: var(--radius);
@@ -2726,10 +2727,170 @@ footer {
 }
 .detail-grid .k { color: var(--color-text-muted); font-size: 0.86rem; }
 .detail-grid .v { font-size: 0.92rem; }
+.detail-grid.compact { gap: 4px 12px; margin-bottom: 8px; }
+.detail-grid .v.strong { font-weight: 700; }
+.detail-grid .v.neg { color: var(--color-danger, #c0392b); font-weight: 700; }
 .detail-section { margin-top: 16px; }
-.detail-section h3 { margin: 0 0 6px; font-size: 0.95rem; }
+.detail-section h3 { margin: 0 0 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .detail-section ul { margin: 4px 0 0; padding-left: 20px; }
 .detail-section li { font-size: 0.88rem; margin-bottom: 4px; }
+
+/* ── 연번 11: 상세 패널 (의사결정 근거) ───────────────────────── */
+/* PC: 상세 모달을 넓게 + 일부 섹션 2열 배치 */
+#detail-modal .modal-panel { width: min(1040px, 94vw); max-height: 90vh; }
+.detail-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  #detail-modal .modal-panel { width: 96vw; }
+  .detail-2col { grid-template-columns: 1fr; gap: 0; }
+}
+
+/* 상세 패널 카드형 섹션 외곽선 (가독성) */
+.detail-section.ds-info,
+.detail-section.ds-price, .detail-section.ds-profit,
+.detail-section.ds-bid, .detail-section.ds-risk,
+.detail-section.ds-ai, .detail-section.ds-checklist,
+.detail-section.ds-field, .detail-section.ds-docs,
+.detail-section.ds-confidence {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--color-surface);
+}
+
+/* 액션바 */
+.detail-actionbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  position: sticky;
+  top: -18px;
+  z-index: 2;
+  padding: 8px 0;
+  margin: -4px 0 6px;
+  background: var(--color-surface);
+}
+.detail-actionbar .da-spacer { flex: 1 1 auto; }
+.da-btn, .da-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-input);
+  color: var(--color-text);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  min-height: 36px;
+}
+.da-btn:active, .da-toggle:active { background: var(--color-tap-bg); }
+.da-toggle.on, .da-btn[aria-pressed="true"] {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+@media (hover: hover) {
+  .da-btn:hover, .da-toggle:hover { border-color: var(--color-primary); }
+}
+
+/* D-day pill */
+.dday-pill {
+  display: inline-block;
+  background: var(--color-tap-bg);
+  border-radius: 6px;
+  padding: 1px 7px;
+  font-size: 0.78rem;
+  margin-left: 4px;
+}
+
+/* 예상 입찰가 카드 */
+.bid-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.bid-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+  background: var(--color-input);
+}
+.bid-card.hl { border-color: var(--color-primary); }
+.bid-card.muted { opacity: 0.75; }
+.bid-card .bid-cap { display: block; font-size: 0.74rem; color: var(--color-text-muted); margin-bottom: 3px; }
+.bid-card b { font-size: 0.92rem; }
+.bid-card .bid-restricted { font-size: 0.76rem; color: var(--color-danger, #c0392b); font-weight: 600; }
+.bid-warns { margin-top: 8px; }
+.bid-warns li { font-size: 0.8rem; color: var(--color-text-muted); }
+@media (max-width: 480px) {
+  .bid-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 위험 분석 */
+.risk-sub p { margin: 6px 0; font-size: 0.86rem; }
+.risk-add-label { margin: 8px 0 2px; }
+
+/* AI 추천 */
+.ai-verdict {
+  background: var(--color-tap-bg);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  margin: 0 0 8px;
+}
+.ai-action-label { margin: 8px 0 2px; }
+
+/* 현장조사 체크리스트 */
+.field-kw-label { margin: 8px 0 4px; }
+.field-kw-block { margin: 4px 0; }
+.field-kw-title {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: var(--color-tap-bg);
+  border-radius: 6px;
+  padding: 1px 8px;
+}
+
+/* 문서 상태 */
+.doc-list { list-style: none; padding-left: 0; margin: 4px 0 0; }
+.doc-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; margin-bottom: 5px; }
+.doc-row .doc-mark { font-weight: 700; width: 1.2em; text-align: center; }
+.doc-row.ok .doc-mark { color: #2ca02c; }
+.doc-row.no .doc-mark { color: var(--color-danger, #c0392b); }
+.doc-warn { color: var(--color-danger, #c0392b); font-size: 0.84rem; margin-top: 6px; }
+
+/* 신뢰도 진행 막대 */
+.conf-bars { display: grid; gap: 6px; }
+.conf-row { display: grid; grid-template-columns: 7.5em 1fr 3em; align-items: center; gap: 8px; }
+.conf-label { font-size: 0.82rem; color: var(--color-text-muted); }
+.conf-bar { height: 9px; border-radius: 999px; background: var(--color-tap-bg); overflow: hidden; }
+.conf-fill { display: block; height: 100%; border-radius: 999px; background: #1f77b4; }
+.conf-fill.high { background: #2ca02c; }
+.conf-fill.mid { background: #e6a700; }
+.conf-fill.low { background: #c0392b; }
+.conf-val { font-size: 0.82rem; text-align: right; }
+.conf-reasons { margin-top: 6px; padding-left: 18px; }
+
+/* 면책 */
+.detail-disclaimer { margin-top: 14px; }
+
+/* 토글: 다음 확인사항만 / 위험요소만 보기 */
+.modal-body.only-actions .detail-section:not([data-action]):not(.detail-actionbar),
+.modal-body.only-actions .detail-2col:not(:has([data-action])) {
+  display: none;
+}
+.modal-body.only-risk .detail-section:not([data-risk]):not(.detail-actionbar),
+.modal-body.only-risk .detail-2col:not(:has([data-risk])) {
+  display: none;
+}
+/* 액션바는 토글 중에도 항상 표시 */
+.modal-body.only-actions .detail-actionbar,
+.modal-body.only-risk .detail-actionbar { display: flex; }
 
 /* 인쇄 전용 요소 — 평소엔 숨김 */
 .print-only { display: none !important; }

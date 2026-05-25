@@ -593,6 +593,144 @@ def _score_breakdown(profit: int, roi: float, risk_level: str,
     ]
 
 
+def _decision_summary(grade: str, risk_level: str, profit: int) -> str:
+    """단정하지 않는 한줄 판단 (검토 후보 / 확인 필요 / 추가 검토 필요 톤)."""
+    if grade == "A":
+        return "현재 자료 기준 검토 후보로 볼 만합니다 — 등기부·현장조사로 확인 필요합니다."
+    if grade == "B":
+        return "조건은 양호한 편이나, 위험 항목 보완 후 추가 검토가 필요합니다."
+    if grade == "C":
+        return "수익·위험 중 한쪽이 애매해 추가 검토가 필요한 물건입니다."
+    if grade == "D":
+        return "현재 자료 기준 신중한 접근이 필요하며 보류도 선택지입니다."
+    return "수익 대비 위험이 커 보여 확인이 필요합니다 — 보수적으로 접근하세요."
+
+
+def _detail_fields(
+    *,
+    appraisal: int,
+    minb: int,
+    market: int,
+    expected_profit: int,
+    expected_profit_rate: float,
+    risk_level: str,
+    price_trend: list[dict],
+    confidence: float,
+    conf_parts: dict,
+    repair: int,
+    eviction: int,
+    flags: list[dict],
+    documents_missing: bool,
+    source: str,
+    grade: str,
+    caution_reason: str,
+) -> dict:
+    """연번 11 상세 패널이 요구하는 추가 필드를 결정적으로 산출한다.
+
+    시세(6/12개월 평균·거래량·비율), 수익(비용 분해·안전마진),
+    예상입찰가(보수/기준/공격/최대·경고), 위험 원문 근거, 문서 상태,
+    신뢰도 사유, 비단정 한줄 판단을 모두 한 번에 만든다.
+    """
+    # ── 시세 분석 ──
+    prices = [p.get("avg_price") for p in (price_trend or []) if p.get("avg_price")]
+    counts = [p.get("count") or 0 for p in (price_trend or [])]
+    avg6 = int(sum(prices[-6:]) / len(prices[-6:])) if prices else (market or 0)
+    avg12 = int(sum(prices[-12:]) / len(prices[-12:])) if prices else (market or 0)
+    txn = int(sum(counts)) if counts else 0
+    appr_ratio = round(appraisal / market * 100, 1) if market else None
+    min_ratio = round(minb / market * 100, 1) if market else None
+    price_conf = conf_parts.get("price_confidence", confidence)
+
+    # ── 수익 분석 (비용 분해) ──
+    acquisition = int(minb * 0.045)       # 취득세·등기 등 부대비용(주거 기준 가정)
+    finance = int(minb * 0.6 * 0.05)      # 낙찰가 60% 대출·연 5% 1년 가정
+    estimated_total = minb + acquisition + repair + eviction + finance
+    safety_margin = int((market or 0) - estimated_total) if market else 0
+
+    # ── 예상 입찰가 ──
+    conservative = round(minb * 1.02)
+    normal = round(minb * 1.10)
+    aggressive = round(minb * 1.18)
+    if market:
+        max_bid = max(int(market - repair - eviction - int(market * 0.05)), normal)
+    else:
+        max_bid = aggressive
+    bid_warnings: list[str] = []
+    if risk_level == "high":
+        bid_warnings.append("고위험 물건 — 공격적 입찰가는 고위험으로 참고 제한, 참고용으로만 보세요.")
+    if not market:
+        bid_warnings.append("시세 표본이 부족해 예상 입찰가 신뢰도가 낮을 수 있습니다.")
+    if min_ratio is not None and min_ratio < 60:
+        bid_warnings.append("최저가가 시세 대비 크게 낮아 권리상 부담 여부를 함께 확인하세요.")
+    bid_warnings.append("예상 입찰가는 mock 데이터 기반 단순 추정치이며 실제 입찰 판단을 단정하지 않습니다.")
+
+    # ── 위험 분석 원문 근거 ──
+    src_parts = [f.get("description") for f in (flags or []) if f.get("description")]
+    source_text = " / ".join(src_parts) if src_parts else (caution_reason or "검출된 위험 키워드 없음")
+
+    # ── 문서 상태 ──
+    is_auction = source == "auction"
+    has_sale = not documents_missing
+    has_survey = not documents_missing
+    has_appraisal = not documents_missing
+    has_public_notice = (not documents_missing) if not is_auction else False
+    documents = [
+        {"name": "매각물건명세서", "available": has_sale},
+        {"name": "현황조사서", "available": has_survey},
+        {"name": "감정평가서", "available": has_appraisal},
+    ]
+    if not is_auction:
+        documents.append({"name": "공매 공고문", "available": has_public_notice})
+
+    # ── 신뢰도 사유 ──
+    conf_reasons: list[str] = []
+    if price_conf < 0.6:
+        conf_reasons.append("실거래 표본이 적어 시세 추정 신뢰도가 낮습니다.")
+    if conf_parts.get("legal_confidence", 1) < 0.6:
+        conf_reasons.append("권리관계 분석에 추가 확인이 필요합니다.")
+    if conf_parts.get("document_confidence", 1) < 0.6 or documents_missing:
+        conf_reasons.append("핵심 문서가 일부 미공개라 문서 완성도가 낮습니다.")
+    if conf_parts.get("address_confidence", 1) < 0.6:
+        conf_reasons.append("주소 매칭 정확도가 낮아 동일 물건 여부 확인이 필요합니다.")
+    if not conf_reasons:
+        conf_reasons.append("현재 자료 기준 주요 항목 신뢰도가 양호한 편입니다.")
+    confidence_reason = " ".join(conf_reasons)
+
+    return {
+        # 시세
+        "avg_price_6m": avg6,
+        "avg_price_12m": avg12,
+        "transaction_count": txn,
+        "appraisal_to_market_ratio": appr_ratio,
+        "confidence_reason": confidence_reason,
+        "confidence_reasons": conf_reasons,
+        # 수익
+        "acquisition_cost": acquisition,
+        "repair_cost": repair,
+        "eviction_cost": eviction,
+        "finance_cost": finance,
+        "estimated_total_cost": estimated_total,
+        "safety_margin": safety_margin,
+        # 예상 입찰가
+        "conservative_bid": conservative,
+        "normal_bid": normal,
+        "aggressive_bid": aggressive,
+        "max_bid_price": max_bid,
+        "bid_warnings": bid_warnings,
+        "warning_messages": bid_warnings,
+        # 위험 원문 근거
+        "source_text": source_text,
+        # 문서 상태
+        "documents": documents,
+        "has_sale_statement": has_sale,
+        "has_survey_report": has_survey,
+        "has_appraisal_report": has_appraisal,
+        "has_public_notice": has_public_notice,
+        # AI 한줄 판단(비단정)
+        "decision_summary": _decision_summary(grade, risk_level, expected_profit),
+    }
+
+
 def _change_tags_from_events(events: list[dict], is_new: bool) -> list[dict]:
     """change_events 와 신규 여부에서 카드용 배지 태그 목록을 추출한다."""
     tags: list[dict] = []
@@ -829,6 +967,15 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             r["address_si"], r["address_gu"], r["case_no"], flags, rec_reason, risk_level,
         )
         mtm_ratio = round(minb / market * 100, 1) if market else None
+        conf_parts = _conf_breakdown(confidence, item_id)
+        detail_fields = _detail_fields(
+            appraisal=appr, minb=minb, market=int(market) if market else 0,
+            expected_profit=expected_profit, expected_profit_rate=expected_profit_rate,
+            risk_level=risk_level, price_trend=price_trend, confidence=float(confidence),
+            conf_parts=conf_parts, repair=repair, eviction=eviction, flags=flags,
+            documents_missing=sf["documents_missing"], source=r["source"], grade=grade,
+            caution_reason=sf["caution_reason"],
+        )
         out.append({
             "id": item_id,
             "source": r["source"],
@@ -839,8 +986,9 @@ def _items_sample(conn: sqlite3.Connection, limit: int = SAMPLE_LIMIT,
             "item_type": item_type,
             "minimum_to_market_ratio": mtm_ratio,
             "additional_checklist": _additional_checklist(flags),
-            **_conf_breakdown(confidence, item_id),
+            **conf_parts,
             **sf,
+            **detail_fields,
             "appraisal_price": appr,
             "min_bid_price": minb,
             "minimum_price": minb,
@@ -1215,6 +1363,21 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             i, source, region, item_type, addr,
             None, None, case_no, flags, rec_reason, risk,
         )
+        price_trend = [
+            {"ym": (today.replace(day=1) - timedelta(days=30 * k)).strftime("%Y-%m"),
+             "avg_price": max(1, int(market * (1 + rnd.uniform(-0.12, 0.12) +
+                                               rnd.uniform(-0.04, 0.04)))),
+             "count": rnd.randrange(1, 6)}
+            for k in range(11, -1, -1)
+        ]
+        conf_parts = _conf_breakdown(confidence, i)
+        detail_fields = _detail_fields(
+            appraisal=appr, minb=minb, market=market, expected_profit=profit,
+            expected_profit_rate=roi, risk_level=risk, price_trend=price_trend,
+            confidence=float(confidence), conf_parts=conf_parts, repair=repair,
+            eviction=evict, flags=flags, documents_missing=sf["documents_missing"],
+            source=source, grade=grade, caution_reason=sf["caution_reason"],
+        )
         items.append({
             "id": i,
             "source": source,
@@ -1225,8 +1388,9 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "item_type": item_type,
             "minimum_to_market_ratio": round(minb / market * 100, 1) if market else None,
             "additional_checklist": _additional_checklist(flags),
-            **_conf_breakdown(confidence, i),
+            **conf_parts,
             **sf,
+            **detail_fields,
             "appraisal_price": appr,
             "min_bid_price": minb,
             "minimum_price": minb,
@@ -1249,13 +1413,7 @@ def _fallback_items(rnd: random.Random, n: int = 100) -> list[dict]:
             "change_events": synthetic_events,
             "change_tags": change_tags,
             "is_new": is_new,
-            "price_trend": (lambda base: [
-                {"ym": (today.replace(day=1) - timedelta(days=30 * k)).strftime("%Y-%m"),
-                 "avg_price": max(1, int(base * (1 + rnd.uniform(-0.12, 0.12) +
-                                                 rnd.uniform(-0.04, 0.04)))),
-                 "count": rnd.randrange(1, 6)}
-                for k in range(11, -1, -1)
-            ])(market),
+            "price_trend": price_trend,
             "score_breakdown": _score_breakdown(profit, roi, risk, confidence, days_offset),
             # ─── 초보자 모드 필드 ───
             "beginner_friendly": _is_beginner_friendly({

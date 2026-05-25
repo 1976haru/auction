@@ -3296,6 +3296,384 @@ function renderAgents(agents) {
 }
 
 // ── Detail modal ─────────────────────────────────
+// 상세 패널 보조 포매터
+function fmtRatio(v) {
+  if (v === null || v === undefined || isNaN(v)) return "-";
+  return Number(v).toFixed(1) + "%";
+}
+function ddayText(it) {
+  const d = it.days_left;
+  if (d === null || d === undefined || d === "") return "기일 미정";
+  if (d < 0) return "기일 경과";
+  return `D-${d}`;
+}
+function courtOrAgency(it) {
+  return it.court_name || it.agency_name || it.source_site || "-";
+}
+
+// 현장조사 기본 체크리스트
+const FIELD_BASE_CHECKS = [
+  "점유자 확인",
+  "관리비 체납 확인",
+  "내부 상태 확인",
+  "하자 확인",
+  "주변 실거래가 추가 확인",
+  "교통/상권/학군 확인",
+  "현장 접근성 확인",
+];
+// 위험 키워드별 추가 체크리스트
+const FIELD_KEYWORD_CHECKS = [
+  { match: ["임차", "전입", "대항"], label: "임차인",
+    items: ["전입일자 확인", "확정일자 확인", "배당요구 여부", "말소기준권리 선후 확인"] },
+  { match: ["유치권"], label: "유치권",
+    items: ["유치권 신고 내용 확인", "점유 계속성 확인", "공사대금 채권 여부 확인"] },
+  { match: ["지분", "공유"], label: "지분매각",
+    items: ["공유자우선매수권 확인", "지분비율 확인", "실제 사용 가능성 확인"] },
+  { match: ["농지"], label: "농지",
+    items: ["농지취득자격증명 필요 여부", "실제 이용상태 확인"] },
+  { match: ["법정지상권"], label: "법정지상권",
+    items: ["토지/건물 소유관계 확인", "건물 존재 시점 확인"] },
+];
+
+function fieldKeywordChecksHtml(it) {
+  const kws = getRiskSearchText(it);
+  const blocks = FIELD_KEYWORD_CHECKS
+    .filter((g) => g.match.some((m) => kws.includes(m)))
+    .map((g) => `
+      <div class="field-kw-block">
+        <span class="field-kw-title">${escapeHtml(g.label)}</span>
+        <ul>${g.items.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>
+      </div>`).join("");
+  return blocks || `<p class="caption">검출된 특수 위험 키워드가 없어 기본 체크리스트만 적용됩니다.</p>`;
+}
+
+// 신뢰도 진행 막대 1줄
+function confBarHtml(label, score) {
+  const v = (score === null || score === undefined || isNaN(score)) ? null : Number(score);
+  const pct = v === null ? 0 : Math.max(0, Math.min(100, v <= 1 ? v * 100 : v));
+  const band = v === null ? "" : (pct >= 80 ? "high" : pct >= 60 ? "mid" : "low");
+  const txt = v === null ? "-" : (v <= 1 ? v.toFixed(2) : Math.round(v) + "%");
+  return `
+    <div class="conf-row">
+      <span class="conf-label">${escapeHtml(label)}</span>
+      <span class="conf-bar" aria-hidden="true"><span class="conf-fill ${band}" style="width:${pct.toFixed(0)}%"></span></span>
+      <span class="conf-val">${escapeHtml(txt)}</span>
+    </div>`;
+}
+
+// 위험 키워드 chip (high 강조)
+function detailRiskChipsHtml(it) {
+  const rawFlags = it.risk_flags || [];
+  if (rawFlags.length) {
+    return `<div class="detail-risk-kw">${rawFlags.map((f) => {
+      const kw = (f && (f.keyword || f.flag_type)) || "키워드";
+      const hi = f && f.risk_level === "high";
+      return `<span class="rk-chip${hi ? " rk-high" : ""}">${escapeHtml(kw)}${hi ? " ⚠" : ""}</span>`;
+    }).join("")}</div>`;
+  }
+  const kws = _riskKeywords(it);
+  return kws.length
+    ? `<div class="detail-risk-kw">${kws.map((k) => `<span class="rk-chip">${escapeHtml(k)}</span>`).join("")}</div>`
+    : `<p class="caption">검출된 위험 키워드 없음 (특이사항 없음)</p>`;
+}
+
+// 상세정보 복사용 텍스트
+function buildDetailText(it) {
+  const L = [];
+  L.push(`[${SOURCE_LABEL[it.source] || it.source || "-"}] ${it.title || "물건"}`);
+  L.push(`주소: ${it.address || "-"}`);
+  L.push(`${courtOrAgency(it)} / 사건번호 ${it.case_no || "-"} / 관리번호 ${it.mgmt_no || "-"}`);
+  L.push(`물건종류: ${it.item_type || "-"} / 추천등급 ${it.recommendation_grade || "-"} (점수 ${it.recommendation_score ?? "-"})`);
+  L.push(`감정가 ${fmtMan(it.appraisal_price)} / 최저가 ${fmtMan(it.min_bid_price)} / 예상시세 ${fmtMan(it.market_price)}`);
+  L.push(`예상차익 ${fmtMan(it.expected_profit)} / 수익률 ${fmtRatio(_roiPct(it.expected_profit_rate))}`);
+  L.push(`예상입찰가 — 보수 ${fmtMan(it.conservative_bid)} / 기준 ${fmtMan(it.normal_bid)} / 공격 ${fmtMan(it.aggressive_bid)} / 최대 ${fmtMan(it.max_bid_price)}`);
+  L.push(`위험도: ${RISK_LABEL[it.risk_level] || it.risk_level || "-"} / 키워드 ${_riskKeywords(it).join(", ") || "없음"}`);
+  if (it.decision_summary) L.push(`판단: ${it.decision_summary}`);
+  L.push(`입찰기일: ${it.bid_date || "미정"} (${ddayText(it)})`);
+  L.push(`※ mock 데이터 기반 참고용. 실제 입찰 전 등기부·현장조사·전문가 자문 필요.`);
+  return L.join("\n");
+}
+
+function detailBodyHtml(it) {
+  const grade = it.recommendation_grade || "C";
+  const risk = it.risk_level || "medium";
+  const isHigh = risk === "high";
+  const docs = Array.isArray(it.documents) ? it.documents : [];
+  const docRows = docs.length
+    ? docs.map((d) => `<li class="doc-row ${d.available ? "ok" : "no"}">
+         <span class="doc-mark">${d.available ? "✓" : "✗"}</span>
+         <span>${escapeHtml(d.name)} — ${d.available ? "있음" : "없음"}</span></li>`).join("")
+    : `<li class="caption">문서 상태 정보 없음</li>`;
+  const allChecks = [...(it.checklist || []), ...(it.additional_checklist || [])];
+  const checklistHtml = allChecks.length
+    ? `<ul>${allChecks.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
+    : `<p class="caption">추가 확인사항 없음</p>`;
+  const nextHtml = (it.next_actions || []).length
+    ? `<ul>${it.next_actions.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
+    : `<p class="caption">다음 액션 미지정</p>`;
+  const warnHtml = (it.bid_warnings || it.warning_messages || []).length
+    ? `<ul class="bid-warns">${(it.bid_warnings || it.warning_messages).map((w) => `<li>${escapeHtml(w)}</li>`).join("")}</ul>`
+    : "";
+
+  return `
+    ${detailActionBarHtml(it)}
+
+    <!-- 1. 기본정보 -->
+    <section class="detail-section ds-info">
+      <h3>📋 기본정보</h3>
+      <div class="detail-grid">
+        <span class="k">경매/공매</span><span class="v">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "-")}</span>
+        <span class="k">법원/기관명</span><span class="v">${escapeHtml(courtOrAgency(it))}</span>
+        <span class="k">사건번호</span><span class="v">${escapeHtml(it.case_no || "-")}</span>
+        <span class="k">관리번호</span><span class="v">${escapeHtml(it.mgmt_no || "-")}</span>
+        <span class="k">물건명</span><span class="v">${escapeHtml(it.title || "-")}</span>
+        <span class="k">주소</span><span class="v">${escapeHtml(it.address || "-")}</span>
+        <span class="k">지역</span><span class="v">${escapeHtml(it.region || it.sido || "-")}</span>
+        <span class="k">물건종류</span><span class="v">${escapeHtml(it.item_type || "-")}</span>
+        <span class="k">감정가</span><span class="v">${fmtMan(it.appraisal_price)}</span>
+        <span class="k">최저가</span><span class="v">${fmtMan(it.min_bid_price)}</span>
+        <span class="k">유찰횟수</span><span class="v">${escapeHtml(String(it.fail_count ?? 0))}회</span>
+        <span class="k">입찰기일</span><span class="v">${escapeHtml(it.bid_date || "미정")} <span class="dday-pill">${escapeHtml(ddayText(it))}</span></span>
+        <span class="k">추천등급</span><span class="v"><span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span></span>
+        <span class="k">추천점수</span><span class="v">${escapeHtml(String(it.recommendation_score ?? "-"))}점</span>
+      </div>
+    </section>
+
+    <div class="detail-2col">
+      <!-- 2. 시세분석 -->
+      <section class="detail-section ds-price">
+        <h3>📈 시세분석</h3>
+        <div class="detail-grid compact">
+          <span class="k">예상시세</span><span class="v">${fmtMan(it.market_price)}</span>
+          <span class="k">최근 6개월 평균</span><span class="v">${fmtMan(it.avg_price_6m)}</span>
+          <span class="k">최근 12개월 평균</span><span class="v">${fmtMan(it.avg_price_12m)}</span>
+          <span class="k">최저가/시세 비율</span><span class="v">${fmtRatio(it.minimum_to_market_ratio)}</span>
+          <span class="k">감정가/시세 비율</span><span class="v">${fmtRatio(it.appraisal_to_market_ratio)}</span>
+          <span class="k">거래량</span><span class="v">${escapeHtml(String(it.transaction_count ?? "-"))}건</span>
+          <span class="k">시세 신뢰도</span><span class="v">${escapeHtml(String((Number(it.price_confidence ?? it.confidence_score) || 0).toFixed(2)))}</span>
+        </div>
+        ${it.confidence_reason ? `<p class="caption">시세 신뢰도 참고: ${escapeHtml(it.confidence_reason)}</p>` : ""}
+        ${renderPriceTrendSvg(it)}
+      </section>
+
+      <!-- 3. 수익분석 -->
+      <section class="detail-section ds-profit">
+        <h3>💰 수익분석</h3>
+        <div class="detail-grid compact">
+          <span class="k">예상 시세차익</span><span class="v strong">${fmtMan(it.expected_profit)}</span>
+          <span class="k">예상 수익률</span><span class="v strong">${fmtRatio(_roiPct(it.expected_profit_rate))}</span>
+          <span class="k">취득비용</span><span class="v">${fmtMan(it.acquisition_cost)}</span>
+          <span class="k">수리비</span><span class="v">${fmtMan(it.repair_cost)}</span>
+          <span class="k">명도비</span><span class="v">${fmtMan(it.eviction_cost)}</span>
+          <span class="k">금융비용</span><span class="v">${fmtMan(it.finance_cost)}</span>
+          <span class="k">총 예상비용</span><span class="v">${fmtMan(it.estimated_total_cost)}</span>
+          <span class="k">안전마진</span><span class="v ${(it.safety_margin || 0) < 0 ? "neg" : ""}">${fmtMan(it.safety_margin)}</span>
+        </div>
+        <p class="caption">비용은 mock 가정(취득세·대출 등) 기반 추정치입니다.</p>
+      </section>
+    </div>
+
+    <div class="detail-2col">
+      <!-- 4. 예상입찰가 -->
+      <section class="detail-section ds-bid">
+        <h3>🎯 예상입찰가</h3>
+        <div class="bid-cards">
+          <div class="bid-card"><span class="bid-cap">보수적</span><b>${fmtMan(it.conservative_bid)}</b></div>
+          <div class="bid-card hl"><span class="bid-cap">기준</span><b>${fmtMan(it.normal_bid)}</b></div>
+          <div class="bid-card${isHigh ? " muted" : ""}">
+            <span class="bid-cap">공격적</span>
+            ${isHigh ? `<b class="bid-restricted">고위험으로 참고 제한</b>` : `<b>${fmtMan(it.aggressive_bid)}</b>`}
+          </div>
+          <div class="bid-card"><span class="bid-cap">최대입찰가</span><b>${fmtMan(it.max_bid_price)}</b></div>
+        </div>
+        ${warnHtml}
+      </section>
+
+      <!-- 6. 위험분석 -->
+      <section class="detail-section ds-risk" data-risk="1">
+        <h3>⚠ 위험분석 <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span></h3>
+        ${detailRiskChipsHtml(it)}
+        <div class="risk-sub">
+          <p><b>위험 원문 근거</b><br><span class="caption">${escapeHtml(it.source_text || "-")}</span></p>
+          ${it.caution_reason ? `<p><b>주의 이유</b><br><span class="caption">${escapeHtml(it.caution_reason)}</span></p>` : ""}
+        </div>
+        ${(it.additional_checklist || []).length
+          ? `<p class="risk-add-label"><b>추가 확인 필요사항</b></p><ul>${it.additional_checklist.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
+          : ""}
+        <p class="caption">권리분석 표시는 참고용 위험 체크리스트이며, 법률·투자 판단을 단정하지 않습니다.</p>
+      </section>
+    </div>
+
+    <!-- 5. AI 추천 판단 -->
+    <section class="detail-section ds-ai">
+      <h3>🤖 AI 추천 판단</h3>
+      <p class="ai-verdict"><b>한줄 판단:</b> ${escapeHtml(it.decision_summary || it.agent_opinion || "-")}</p>
+      <div class="detail-grid compact">
+        <span class="k">에이전트 의견</span><span class="v">${escapeHtml(it.agent_opinion || "-")}</span>
+        <span class="k">추천 이유</span><span class="v">${escapeHtml(it.recommendation_reason || "-")}</span>
+        ${it.caution_reason ? `<span class="k">주의 이유</span><span class="v">${escapeHtml(it.caution_reason)}</span>` : ""}
+      </div>
+      <p class="ai-action-label" data-action="1"><b>다음 액션</b></p>
+      <div data-action="1">${nextHtml}</div>
+      ${renderScoreBreakdown(it)}
+      <p class="caption">※ 표현은 “검토 후보 / 확인 필요 / 추가 검토 필요 / 현재 자료 기준”처럼 단정하지 않는 참고 의견입니다.</p>
+    </section>
+
+    <!-- 7. 추가 확인사항 -->
+    <section class="detail-section ds-checklist" data-action="1">
+      <h3>📝 추가 확인사항</h3>
+      ${checklistHtml}
+    </section>
+
+    <!-- 8. 현장조사 체크리스트 -->
+    <section class="detail-section ds-field" data-action="1" data-risk="1">
+      <h3>🧭 현장조사 체크리스트</h3>
+      <ul class="field-base">${FIELD_BASE_CHECKS.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>
+      <p class="field-kw-label caption">위험 키워드별 추가 확인</p>
+      ${fieldKeywordChecksHtml(it)}
+    </section>
+
+    <div class="detail-2col">
+      <!-- 9. 문서상태 -->
+      <section class="detail-section ds-docs">
+        <h3>📄 문서상태</h3>
+        <ul class="doc-list">${docRows}</ul>
+        ${it.documents_missing
+          ? `<p class="doc-warn">⚠ 일부 핵심 문서가 미공개입니다. 입찰 전 매각물건명세서·현황조사서 열람이 필요합니다.</p>`
+          : `<p class="caption">주요 문서 열람이 가능한 상태입니다 (mock).</p>`}
+      </section>
+
+      <!-- 10. 신뢰도 -->
+      <section class="detail-section ds-confidence">
+        <h3>📊 신뢰도</h3>
+        <div class="conf-bars">
+          ${confBarHtml("전체 신뢰도", it.confidence_score)}
+          ${confBarHtml("시세 신뢰도", it.price_confidence)}
+          ${confBarHtml("권리위험 신뢰도", it.legal_confidence)}
+          ${confBarHtml("문서 완성도", it.document_confidence)}
+          ${confBarHtml("주소 매칭 신뢰도", it.address_confidence)}
+        </div>
+        ${(it.confidence_reasons || []).length
+          ? `<ul class="conf-reasons">${it.confidence_reasons.map((c) => `<li class="caption">${escapeHtml(c)}</li>`).join("")}</ul>`
+          : (it.confidence_reason ? `<p class="caption">${escapeHtml(it.confidence_reason)}</p>` : "")}
+      </section>
+    </div>
+
+    <!-- 최근 변화 -->
+    <section class="detail-section ds-changes">
+      <h3>🆕 최근 변화 (7일)</h3>
+      ${(it.change_events || []).length
+        ? `<ul>${it.change_events.map((ev) => {
+            const old = ev.old_value || "-"; const cur = ev.new_value || "-";
+            const msg = ev.message || ev.event_type || "변화";
+            return `<li>${escapeHtml(msg)} — <code>${escapeHtml(old)}</code> → <code>${escapeHtml(cur)}</code></li>`;
+          }).join("")}</ul>`
+        : `<p class="caption">최근 7일 내 기록된 변경 이력이 없습니다.</p>`}
+      ${(it.change_tags || []).length ? `<div class="detail-tags">${changeBadgesHtml(it)}</div>` : ""}
+    </section>
+
+    <!-- 입찰가 시뮬레이터 -->
+    ${renderBidSimulator(it)}
+
+    <!-- 비슷한 매물 -->
+    <section class="detail-section ds-similar">
+      <h3>🔁 비슷한 매물</h3>
+      ${renderSimilarItemsHtml(it)}
+    </section>
+
+    <!-- 메모 -->
+    <section class="detail-section note-section" data-note-item-id="${escapeHtml(String(it.id))}">
+      <h3>📝 내 메모 <span class="note-status caption" id="note-status"></span></h3>
+      <textarea class="note-input" id="note-input" rows="3" placeholder="이 매물에 대한 메모를 남겨두세요. (자기 폰에만 저장됨)" maxlength="2000">${escapeHtml((getNote(it.id) || {}).text || "")}</textarea>
+      <div class="note-actions">
+        <button class="btn btn-ghost note-clear" id="note-clear" type="button">메모 지우기</button>
+      </div>
+    </section>
+
+    <!-- 11. 면책 문구 -->
+    <p class="caption detail-disclaimer">
+      ※ 본 분석은 mock 데이터를 기반으로 한 참고용 정보입니다. 법률·투자 판단을 단정하지 않으며,
+      실제 입찰 전 등기부등본·전입세대열람·현장조사·전문가 자문이 필요합니다.
+    </p>
+  `;
+}
+
+function detailActionBarHtml(it) {
+  const fav = STATE.favorites.has(String(it.id));
+  const cmp = STATE.compare.includes(String(it.id));
+  return `
+    <div class="detail-actionbar" role="toolbar" aria-label="상세 패널 도구">
+      <button class="da-btn" data-da="fav" aria-pressed="${fav}">${fav ? "★ 관심해제" : "☆ 관심등록"}</button>
+      <button class="da-btn" data-da="compare" aria-pressed="${cmp}">${cmp ? "⇆ 비교담김" : "⇆ 비교함 추가"}</button>
+      <button class="da-btn" data-da="memo">📝 메모</button>
+      <button class="da-btn" data-da="copy">📋 복사</button>
+      <span class="da-spacer"></span>
+      <button class="da-toggle" data-da="only-actions" aria-pressed="false">✅ 다음 확인사항만</button>
+      <button class="da-toggle" data-da="only-risk" aria-pressed="false">⚠ 위험요소만</button>
+    </div>`;
+}
+
+function wireDetailExtras(it) {
+  const bar = document.querySelector(".detail-actionbar");
+  const body = $("detail-body");
+  if (!bar || !body) return;
+  const btn = (k) => bar.querySelector(`[data-da="${k}"]`);
+
+  const favBtn = btn("fav");
+  if (favBtn) favBtn.addEventListener("click", () => {
+    toggleFavorite(it.id);
+    const on = STATE.favorites.has(String(it.id));
+    favBtn.textContent = on ? "★ 관심해제" : "☆ 관심등록";
+    favBtn.setAttribute("aria-pressed", String(on));
+  });
+
+  const cmpBtn = btn("compare");
+  if (cmpBtn) cmpBtn.addEventListener("click", () => {
+    toggleCompare(it.id);
+    const on = STATE.compare.includes(String(it.id));
+    cmpBtn.textContent = on ? "⇆ 비교담김" : "⇆ 비교함 추가";
+    cmpBtn.setAttribute("aria-pressed", String(on));
+  });
+
+  const memoBtn = btn("memo");
+  if (memoBtn) memoBtn.addEventListener("click", () => {
+    const ta = body.querySelector(".note-section #note-input");
+    if (ta) { ta.scrollIntoView({ block: "center", behavior: "smooth" }); ta.focus(); }
+  });
+
+  const copyBtn = btn("copy");
+  if (copyBtn) copyBtn.addEventListener("click", async () => {
+    const text = buildDetailText(it);
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("상세정보를 복사했어요.", null);
+    } catch {
+      // 클립보드 권한 없을 때 폴백
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); showToast("상세정보를 복사했어요.", null); }
+      catch { showToast("복사에 실패했어요. 길게 눌러 직접 복사해 주세요.", null); }
+      ta.remove();
+    }
+    setTimeout(hideToast, 2200);
+  });
+
+  const onlyActions = btn("only-actions");
+  const onlyRisk = btn("only-risk");
+  const setMode = (mode) => {
+    body.classList.toggle("only-actions", mode === "actions");
+    body.classList.toggle("only-risk", mode === "risk");
+    if (onlyActions) onlyActions.setAttribute("aria-pressed", String(mode === "actions"));
+    if (onlyRisk) onlyRisk.setAttribute("aria-pressed", String(mode === "risk"));
+    if (onlyActions) onlyActions.classList.toggle("on", mode === "actions");
+    if (onlyRisk) onlyRisk.classList.toggle("on", mode === "risk");
+  };
+  if (onlyActions) onlyActions.addEventListener("click", () =>
+    setMode(body.classList.contains("only-actions") ? "" : "actions"));
+  if (onlyRisk) onlyRisk.addEventListener("click", () =>
+    setMode(body.classList.contains("only-risk") ? "" : "risk"));
+}
+
 function openDetailById(id) {
   const it = STATE.items.find((x) => String(x.id) === String(id));
   if (!it) return;
@@ -3312,126 +3690,11 @@ function openDetailById(id) {
   title.innerHTML = `${escapeHtml(it.title || "물건 상세")} ${favoriteBtnHtml(it)}`;
   wireFavoriteButtons(title);
   const body = $("detail-body");
-  const grade = it.recommendation_grade || "C";
-  const risk = it.risk_level || "medium";
-  const rawFlags = it.risk_flags || [];
-  const flagList = rawFlags.length
-    ? `<div class="detail-risk-kw">${rawFlags.map((f) => {
-        const kw = (f && (f.keyword || f.flag_type)) || "키워드";
-        const hi = f && f.risk_level === "high";
-        return `<span class="rk-chip${hi ? " rk-high" : ""}">${escapeHtml(kw)}${hi ? " ⚠" : ""}</span>`;
-      }).join("")}</div>`
-      + (it.caution_reason ? `<p class="caption">${escapeHtml(it.caution_reason)}</p>` : "")
-    : `<p class="caption">검출된 위험 키워드 없음 (특이사항 없음)</p>`;
-  const allChecks = [...(it.checklist || []), ...(it.additional_checklist || [])];
-  const checklist = allChecks.length
-    ? `<ul>${allChecks.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
-    : `<p class="caption">추가 확인사항 없음</p>`;
-  const next = (it.next_actions || []).length
-    ? `<ul>${it.next_actions.map((c) => `<li>${escapeHtml(c)}</li>`).join("")}</ul>`
-    : `<p class="caption">다음 액션 미지정</p>`;
-  const expectedBidLow = Math.round((it.min_bid_price || 0) * 1.02);
-  const expectedBidMid = Math.round((it.min_bid_price || 0) * 1.10);
-  const expectedBidHi  = Math.round((it.min_bid_price || 0) * 1.18);
-  const aiVerdict = (() => {
-    const score = it.recommendation_score || 0;
-    if (grade === "A") return "데이터 기준 검토 가치 높음 — 단, 등기부등본/현장조사 필수";
-    if (grade === "B") return "조건 충족 양호 — 위험 키워드 보완 후 재평가 권장";
-    if (grade === "C") return "보통 — 시세차익 또는 위험 항목 중 하나는 보완 필요";
-    if (grade === "D") return "검토 보류 권장 — 점수 낮음";
-    return `점수 ${score} — 수익 대비 위험 큼, 추가 확인 필수`;
-  })();
-
-  body.innerHTML = `
-    <div class="detail-grid">
-      <span class="k">구분</span><span class="v">${escapeHtml(SOURCE_LABEL[it.source] || it.source || "-")}</span>
-      <span class="k">사건번호</span><span class="v">${escapeHtml(it.case_no || "-")}</span>
-      <span class="k">주소</span><span class="v">${escapeHtml(it.address || "-")}</span>
-      <span class="k">물건종류</span><span class="v">${escapeHtml(it.item_type || "-")}</span>
-      <span class="k">감정가</span><span class="v">${fmtMan(it.appraisal_price)}</span>
-      <span class="k">최저가</span><span class="v">${fmtMan(it.min_bid_price)}</span>
-      <span class="k">예상시세</span><span class="v">${fmtMan(it.market_price)}</span>
-      <span class="k">유찰</span><span class="v">${escapeHtml(String(it.fail_count ?? 0))}회</span>
-      <span class="k">입찰기일</span><span class="v">${escapeHtml(it.bid_date || "미정")}</span>
-      <span class="k">위험도</span><span class="v"><span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span></span>
-      <span class="k">추천등급</span><span class="v"><span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span> · 점수 ${escapeHtml(String(it.recommendation_score ?? "-"))}</span>
-      <span class="k">신뢰도</span><span class="v">${escapeHtml(String((it.confidence_score || 0).toFixed(2)))}</span>
-    </div>
-
-    <div class="detail-section">
-      <h3>시세 분석</h3>
-      <p>${escapeHtml(it.detail_summary || "-")}</p>
-      ${renderPriceTrendSvg(it)}
-    </div>
-
-    <div class="detail-section">
-      <h3>예상 입찰가</h3>
-      <ul>
-        <li>보수: ${fmtMan(expectedBidLow)} (최저가 +2%)</li>
-        <li>기준: ${fmtMan(expectedBidMid)} (최저가 +10%)</li>
-        <li>공격: ${fmtMan(expectedBidHi)} (최저가 +18%)</li>
-      </ul>
-      <p class="caption">예상 입찰가는 mock 데이터 기반 단순 추정치입니다.</p>
-    </div>
-
-    ${renderBidSimulator(it)}
-
-    <div class="detail-section">
-      <h3>최근 변화 (7일)</h3>
-      ${(it.change_events || []).length
-        ? `<ul>${it.change_events.map((ev) => {
-            const old = ev.old_value || "-"; const cur = ev.new_value || "-";
-            const msg = ev.message || ev.event_type || "변화";
-            return `<li>${escapeHtml(msg)} — <code>${escapeHtml(old)}</code> → <code>${escapeHtml(cur)}</code></li>`;
-          }).join("")}</ul>`
-        : `<p class="caption">최근 7일 내 기록된 변경 이력이 없습니다.</p>`}
-      ${(it.change_tags || []).length
-        ? `<div class="detail-tags">${changeBadgesHtml(it)}</div>` : ""}
-    </div>
-
-    <div class="detail-section">
-      <h3>위험 분석 — 주요 위험 키워드</h3>
-      ${flagList}
-      <p class="caption">권리분석 표시는 참고용 위험 체크리스트이며, 법률·투자 판단을 단정하지 않습니다.</p>
-    </div>
-
-    <div class="detail-section">
-      <h3>추가 확인사항</h3>
-      ${checklist}
-    </div>
-
-    <div class="detail-section">
-      <h3>현장조사 / 다음 액션</h3>
-      ${next}
-    </div>
-
-    <div class="detail-section">
-      <h3>AI 추천 이유</h3>
-      <p>${escapeHtml(it.recommendation_reason || "-")}</p>
-      ${renderScoreBreakdown(it)}
-      <p class="caption"><b>AI 한줄 판단:</b> ${escapeHtml(aiVerdict)}</p>
-    </div>
-
-    <div class="detail-section">
-      <h3>비슷한 매물</h3>
-      ${renderSimilarItemsHtml(it)}
-    </div>
-
-    <div class="detail-section note-section" data-note-item-id="${escapeHtml(String(it.id))}">
-      <h3>내 메모 <span class="note-status caption" id="note-status"></span></h3>
-      <textarea class="note-input" id="note-input" rows="3" placeholder="이 매물에 대한 메모를 남겨두세요. 예: 1차 현장조사 완료, 임차인 만남 예정, 보증금 협의 필요 등. (자기 폰에만 저장됨)" maxlength="2000">${escapeHtml((getNote(it.id) || {}).text || "")}</textarea>
-      <div class="note-actions">
-        <button class="btn btn-ghost note-clear" id="note-clear" type="button">메모 지우기</button>
-      </div>
-    </div>
-
-    <p class="caption" style="margin-top:14px">
-      ※ 본 분석은 mock 데이터를 기반으로 한 참고용 정보입니다. 법률·투자 판단을 단정하지 않으며,
-      실제 입찰 전 등기부등본·전입세대열람·현장조사·전문가 자문이 필요합니다.
-    </p>
-  `;
+  body.classList.remove("only-actions", "only-risk");
+  body.innerHTML = detailBodyHtml(it);
   $("detail-modal").hidden = false;
   document.body.style.overflow = "hidden";
+  wireDetailExtras(it);
   wireBidSimulator();
   wireNoteSection();
   wireSimilarItems();
