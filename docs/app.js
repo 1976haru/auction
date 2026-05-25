@@ -1188,13 +1188,24 @@ function sortItems(arr, mode) {
 
 // ── Briefing / risk / confidence ───────────────────
 function renderBriefing(b, summary) {
+  b = b || {};
+  // 브리핑(briefing) 값 우선, 없으면 summary 로 폴백
+  const pick = (k) => (b[k] !== undefined && b[k] !== null) ? b[k]
+    : (summary[k] !== undefined && summary[k] !== null ? summary[k] : "-");
   const m = $("briefing-metrics");
   clearChildren(m);
   const metrics = [
-    { label: "총 분석 물건", value: summary.total_items ?? "-" },
-    { label: "추천 후보", value: summary.recommended_items ?? "-" },
-    { label: "고위험 후보", value: summary.high_risk_items ?? "-" },
-    { label: "입찰 임박(D-7)", value: summary.urgent_items ?? "-" },
+    { label: "전체 물건", value: pick("total_items") },
+    { label: "분석 완료", value: pick("analyzed_items") },
+    { label: "추천 후보", value: pick("recommended_items") },
+    { label: "고위험 후보", value: pick("high_risk_items") },
+    { label: "A등급 후보", value: pick("grade_a_items") },
+    { label: "입찰 임박(D-7)", value: pick("urgent_items") },
+    { label: "경매", value: pick("auction_count") },
+    { label: "공매", value: pick("public_sale_count") },
+    { label: "시세 매칭", value: pick("market_matched_items") },
+    { label: "문서 미공개", value: pick("document_missing_items") },
+    { label: "현장조사 필요", value: pick("field_visit_needed_items") },
   ];
   metrics.forEach((mt) => {
     m.appendChild(el(
@@ -1204,7 +1215,127 @@ function renderBriefing(b, summary) {
        </div>`
     ));
   });
-  $("briefing-summary").textContent = b && b.summary ? b.summary : "";
+  $("briefing-summary").textContent = b.briefing_text || b.summary || "";
+
+  renderBriefingPriority(b.priority_items || []);
+  renderBriefingGroups("briefing-courts", "🏛 법원별 주요 후보", b.top_courts || [], "court");
+  renderBriefingGroups("briefing-types", "🏷 종류별 주요 후보", b.top_types || [], "item_type");
+  renderBriefingRiskPoints(b.risk_points || {});
+}
+
+// 오늘 우선 확인할 물건
+function renderBriefingPriority(items) {
+  const root = $("briefing-priority");
+  if (!root) return;
+  clearChildren(root);
+  if (!items.length) return;
+  root.appendChild(el(`<h3 class="briefing-h3">⭐ 오늘 우선 확인할 물건</h3>`));
+  const grid = el(`<div class="briefing-priority-grid"></div>`);
+  items.forEach((p) => {
+    const grade = p.recommendation_grade || "C";
+    const risk = p.risk_level || "medium";
+    const due = (p.days_left !== null && p.days_left !== undefined && p.days_left >= 0)
+      ? `D-${p.days_left}` : (p.bid_date ? (p.bid_date.split("~")[0] || p.bid_date) : "기일 미정");
+    const card = el(
+      `<article class="bp-card" tabindex="0" role="button" aria-label="물건 상세 보기">
+         <div class="bp-head">
+           <span class="grade-pill grade-${escapeHtml(grade)}">${escapeHtml(grade)}</span>
+           <span class="risk-pill ${escapeHtml(risk)}">${escapeHtml(RISK_LABEL[risk] || risk)}</span>
+           <span class="bp-due">${escapeHtml(due)}</span>
+         </div>
+         <div class="bp-title">${escapeHtml(p.title || "주소 미상")}</div>
+         <div class="bp-meta caption">${escapeHtml(p.court || "-")} · ${escapeHtml(p.item_type || "-")}</div>
+         <div class="bp-profit">💰 예상차익 ${fmtMan(p.expected_profit)}</div>
+         <div class="bp-reason caption">${escapeHtml(p.reason || "")}</div>
+       </article>`
+    );
+    bindTap(card, () => openDetailById(p.id));
+    grid.appendChild(card);
+  });
+  root.appendChild(grid);
+}
+
+// 법원별 / 종류별 주요 후보
+function renderBriefingGroups(rootId, title, groups, labelKey) {
+  const root = $(rootId);
+  if (!root) return;
+  clearChildren(root);
+  if (!groups.length) return;
+  root.appendChild(el(`<h3 class="briefing-h3">${escapeHtml(title)}</h3>`));
+  const wrap = el(`<div class="briefing-group-list"></div>`);
+  groups.forEach((g) => {
+    const name = g[labelKey] || "-";
+    const ti = g.top_item || {};
+    const row = el(
+      `<div class="bg-row">
+         <div class="bg-main">
+           <span class="bg-name">${escapeHtml(name)}</span>
+           <span class="bg-stats caption">물건 ${g.count}건 · 추천 ${g.recommended} · A ${g.grade_a} · 고위험 ${g.high_risk} · 평균ROI ${fmtPct(g.avg_roi)}</span>
+         </div>
+         <button class="bg-top" type="button" title="대표 추천 물건 상세 보기">
+           <span class="grade-pill grade-${escapeHtml(ti.recommendation_grade || "C")}">${escapeHtml(ti.recommendation_grade || "-")}</span>
+           ${escapeHtml((ti.title || "-").length > 22 ? (ti.title || "").slice(0, 22) + "…" : (ti.title || "-"))}
+         </button>
+       </div>`
+    );
+    const btn = row.querySelector(".bg-top");
+    if (btn && ti.id !== undefined && ti.id !== null) {
+      btn.addEventListener("click", () => openDetailById(ti.id));
+    }
+    wrap.appendChild(row);
+  });
+  root.appendChild(wrap);
+}
+
+// 오늘 주의할 위험 포인트 — 클릭 시 해당 필터 적용
+function renderBriefingRiskPoints(rp) {
+  const root = $("briefing-risk-points");
+  if (!root) return;
+  clearChildren(root);
+  const defs = [
+    { key: "lien", label: "유치권", apply: () => _briefingApplyFlag("유치권") },
+    { key: "superficies", label: "법정지상권", apply: () => _briefingApplyFlag("법정지상권") },
+    { key: "share", label: "지분매각", apply: () => _briefingApplyFlag("지분") },
+    { key: "farmland", label: "농지취득자격증명", apply: () => _briefingApplyFlag("농지") },
+    { key: "tenant", label: "임차인 관련", apply: () => _briefingApplyToggle("tenant_only") },
+    { key: "document_missing", label: "문서 미공개", apply: () => _briefingApplyDoc() },
+  ];
+  const has = defs.some((d) => (rp[d.key] || 0) > 0);
+  if (!has) return;
+  root.appendChild(el(`<h3 class="briefing-h3">⚠ 오늘 주의할 위험 포인트</h3>`));
+  const grid = el(`<div class="risk-point-grid"></div>`);
+  defs.forEach((d) => {
+    const n = rp[d.key] || 0;
+    const btn = el(
+      `<button class="risk-point" type="button" aria-label="${escapeHtml(d.label)} 물건만 보기">
+         <span class="rp-count">${n}</span>
+         <span class="rp-label">${escapeHtml(d.label)}</span>
+       </button>`
+    );
+    btn.addEventListener("click", () => { d.apply(); scrollToSection("section-items"); });
+    grid.appendChild(btn);
+  });
+  root.appendChild(grid);
+  root.appendChild(el(`<p class="caption">버튼을 누르면 해당 위험 키워드로 전체 물건 목록을 필터링합니다.</p>`));
+}
+
+function _briefingResetThenApply(mutate) {
+  STATE.filters = JSON.parse(JSON.stringify(FILTER_DEFAULTS));
+  mutate(STATE.filters);
+  if (typeof AGENT_ACTIVE !== "undefined") AGENT_ACTIVE = false;
+  hideAgentResult();
+  syncControlsFromState();
+  renderQuickChips();
+  applyFilters();
+}
+function _briefingApplyFlag(kw) {
+  _briefingResetThenApply((f) => { f.include_flags = [kw]; });
+}
+function _briefingApplyToggle(key) {
+  _briefingResetThenApply((f) => { f[key] = true; });
+}
+function _briefingApplyDoc() {
+  _briefingResetThenApply((f) => { f.document_status = "missing"; });
 }
 
 function renderRecs(recs) {

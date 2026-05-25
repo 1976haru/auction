@@ -1244,6 +1244,253 @@ def _risk_summary_from_items(items: list[dict]) -> dict[str, Any]:
     return out
 
 
+# ── 연번 13: 브리핑 강화 ──────────────────────────────────────────
+def _item_kw_text(it: dict) -> str:
+    """물건의 위험 관련 텍스트를 한 문자열로(키워드 매칭용)."""
+    parts = [str(it.get("caution_reason") or "")]
+    parts += [str(k) for k in (it.get("risk_keywords") or [])]
+    for fl in it.get("risk_flags") or []:
+        parts.append(str(fl.get("keyword") or ""))
+        parts.append(str(fl.get("description") or ""))
+    for w in it.get("warnings") or []:
+        parts.append(str(w))
+    return " ".join(parts)
+
+
+def _is_recommended(it: dict) -> bool:
+    """검토 후보(추천 후보) 판정: A·B 등급 또는 추천점수 60 이상."""
+    if it.get("recommendation_grade") in ("A", "B"):
+        return True
+    return (it.get("recommendation_score") or 0) >= 60
+
+
+def _is_urgent(it: dict) -> bool:
+    d = it.get("days_left")
+    return d is not None and 0 <= d <= 7
+
+
+def _priority_reason(it: dict) -> str:
+    """오늘 우선 확인 한줄 이유(비단정)."""
+    bits = []
+    if it.get("recommendation_grade") == "A":
+        bits.append("A등급 검토 후보")
+    if _is_urgent(it):
+        bits.append(f"입찰 D-{it.get('days_left')}")
+    if (it.get("expected_profit") or 0) > 0:
+        bits.append(f"예상차익 {it.get('expected_profit'):,}만원")
+    if not bits:
+        bits.append(it.get("decision_summary") or it.get("recommendation_reason") or "현재 자료 기준 검토 후보")
+    return " · ".join(bits)
+
+
+def _avg_roi(items: list[dict]) -> float:
+    vals = []
+    for it in items:
+        r = it.get("expected_profit_rate")
+        if r is None:
+            continue
+        r = float(r)
+        # 분수(0.12)·퍼센트(12) 혼용 → 퍼센트 통일
+        vals.append(r * 100 if 0 < abs(r) < 1 else r)
+    return round(sum(vals) / len(vals), 1) if vals else 0.0
+
+
+def _group_summary(items: list[dict], key_fn, *, top: int = 5,
+                   label_key: str) -> list[dict]:
+    """법원/종류 등 그룹별 요약. 그룹 내 대표 추천 물건 1건 포함."""
+    groups: dict[str, list[dict]] = {}
+    for it in items:
+        k = key_fn(it)
+        if not k:
+            continue
+        groups.setdefault(k, []).append(it)
+    out: list[dict] = []
+    for name, arr in groups.items():
+        rep = max(arr, key=lambda x: (x.get("recommendation_score") or 0,
+                                      x.get("expected_profit") or 0))
+        out.append({
+            label_key: name,
+            "count": len(arr),
+            "recommended": sum(1 for x in arr if _is_recommended(x)),
+            "grade_a": sum(1 for x in arr if x.get("recommendation_grade") == "A"),
+            "high_risk": sum(1 for x in arr if x.get("risk_level") == "high"),
+            "avg_roi": _avg_roi(arr),
+            "top_item": {
+                "id": rep.get("id"),
+                "title": rep.get("title") or rep.get("address") or "주소 미상",
+                "item_type": rep.get("item_type"),
+                "recommendation_grade": rep.get("recommendation_grade"),
+                "expected_profit": rep.get("expected_profit"),
+                "risk_level": rep.get("risk_level"),
+            },
+        })
+    out.sort(key=lambda g: (-g["count"], -g["recommended"]))
+    return out[:top]
+
+
+def _priority_items(items: list[dict], *, limit: int = 6) -> list[dict]:
+    """오늘 우선 확인 물건: A등급 우선 → 추천점수 → 예상차익 → 기일 가까운,
+    고위험은 제외(별도 주의), 시세 신뢰도 high/medium 우선."""
+    def conf_band(it):
+        c = it.get("price_confidence")
+        c = it.get("confidence_score") if c is None else c
+        return (c or 0) >= 0.6  # high/medium 우선
+    cand = [it for it in items if it.get("risk_level") != "high"]
+    cand.sort(key=lambda it: (
+        0 if it.get("recommendation_grade") == "A" else 1,
+        0 if conf_band(it) else 1,
+        -(it.get("recommendation_score") or 0),
+        -(it.get("expected_profit") or 0),
+        it.get("days_left") if (it.get("days_left") is not None and it.get("days_left") >= 0) else 9999,
+    ))
+    out = []
+    for it in cand[:limit]:
+        out.append({
+            "id": it.get("id"),
+            "title": it.get("title") or it.get("address") or "주소 미상",
+            "court": it.get("court_name") or it.get("agency_name") or "-",
+            "item_type": it.get("item_type"),
+            "expected_profit": it.get("expected_profit"),
+            "expected_profit_rate": it.get("expected_profit_rate"),
+            "risk_level": it.get("risk_level"),
+            "recommendation_grade": it.get("recommendation_grade"),
+            "bid_date": it.get("bid_date"),
+            "days_left": it.get("days_left"),
+            "reason": _priority_reason(it),
+        })
+    return out
+
+
+def _risk_points(items: list[dict]) -> dict[str, int]:
+    """오늘 주의할 위험 포인트 집계."""
+    def cnt(*kws):
+        return sum(1 for it in items if any(k in _item_kw_text(it) for k in kws))
+    return {
+        "lien": cnt("유치권"),
+        "superficies": cnt("법정지상권"),
+        "share": cnt("지분", "공유지분"),
+        "farmland": cnt("농지취득자격증명", "농지"),
+        "tenant": cnt("임차인", "전입세대", "대항력", "선순위임차인"),
+        "document_missing": sum(1 for it in items if it.get("documents_missing")
+                                or "미공개" in (it.get("document_status") or "")),
+    }
+
+
+def _build_briefing(items: list[dict], run_date: str | None = None) -> dict[str, Any]:
+    """연번 13 브리핑 강화: 요약 지표·문장·우선물건·법원/종류별·위험포인트 일괄 생성."""
+    total = len(items)
+    analyzed = sum(1 for it in items if it.get("market_price") or it.get("recommendation_score"))
+    recommended = sum(1 for it in items if _is_recommended(it))
+    grade_a = sum(1 for it in items if it.get("recommendation_grade") == "A")
+    urgent = sum(1 for it in items if _is_urgent(it))
+    high_risk = sum(1 for it in items if it.get("risk_level") == "high")
+    auction = sum(1 for it in items if it.get("source") == "auction")
+    public_sale = sum(1 for it in items if it.get("source") == "public_sale")
+    market_matched = sum(1 for it in items if (it.get("market_price") or 0) > 0)
+    doc_missing = sum(1 for it in items if it.get("documents_missing")
+                      or "미공개" in (it.get("document_status") or ""))
+    field_needed = sum(1 for it in items if it.get("field_survey_needed"))
+
+    top_courts = _group_summary(items, lambda it: it.get("court_name"), label_key="court")
+    top_types = _group_summary(items, lambda it: it.get("item_type"), label_key="item_type")
+    priority = _priority_items(items)
+    risk_points = _risk_points(items)
+
+    # 우선 확인 권장 라벨(법원·종류 조합 상위)
+    focus_labels = []
+    if top_courts:
+        c0 = top_courts[0]
+        if c0.get("top_item"):
+            focus_labels.append(f"{c0['court']} {c0['top_item'].get('item_type') or ''}".strip())
+    pub_shops = [it for it in items if it.get("source") == "public_sale" and "상가" in (it.get("item_type") or "")]
+    if pub_shops:
+        focus_labels.append("공매 상가")
+    if not focus_labels:
+        focus_labels.append("추천점수 상위 후보")
+
+    text = (
+        "오늘의 경매·공매 브리핑입니다.\n"
+        f"총 {total}건 중 분석 완료 물건은 {analyzed}건입니다.\n"
+        f"추천 후보는 {recommended}건이며, 그중 A등급은 {grade_a}건입니다.\n"
+        f"입찰기일 7일 이내 후보는 {urgent}건입니다.\n"
+        f"고위험 키워드가 있는 물건은 {high_risk}건입니다.\n"
+        f"오늘은 {', '.join(focus_labels)} 후보를 우선 확인하는 것이 좋습니다.\n"
+        "※ mock 데이터 기반 참고용이며, 입찰 전 등기부·현장조사 확인이 필요합니다."
+    )
+
+    return {
+        "run_date": run_date or datetime.now().date().isoformat(),
+        "summary": text,
+        "briefing_text": text,
+        "total_items": total,
+        "analyzed_items": analyzed,
+        "recommended_items": recommended,
+        "high_risk_items": high_risk,
+        "grade_a_items": grade_a,
+        "urgent_items": urgent,
+        "auction_count": auction,
+        "public_sale_count": public_sale,
+        "market_matched_items": market_matched,
+        "document_missing_items": doc_missing,
+        "field_visit_needed_items": field_needed,
+        "top_courts": top_courts,
+        "top_types": top_types,
+        "priority_items": priority,
+        "risk_points": risk_points,
+        "matched_items": market_matched,
+        "candidate_items": recommended,
+        "data_timestamp": datetime.now().isoformat(timespec="seconds"),
+    }
+
+
+def _briefing_action_items(items: list[dict]) -> list[dict]:
+    """연번 13 작업10: 브리핑 우선물건/위험포인트를 '오늘 할 일'로 연결."""
+    actions: list[dict] = []
+    seen_ids: set = set()
+
+    def add(priority, title, detail, it):
+        iid = it.get("id")
+        actions.append({
+            "priority": priority, "title": title, "detail": detail,
+            "due_date": it.get("bid_date"), "address": it.get("address") or it.get("title"),
+            "item_id": iid, "item_type": it.get("item_type"),
+        })
+
+    # 입찰임박 A등급 → 상세 검토
+    for it in items:
+        if it.get("recommendation_grade") == "A" and _is_urgent(it) and it.get("id") not in seen_ids:
+            add("high", "입찰임박 A등급 — 상세 검토",
+                f"입찰 D-{it.get('days_left')} · 등기부·현장조사로 의사결정 근거 확인", it)
+            seen_ids.add(it.get("id"))
+    # 고위험 고수익 → 전문가 검토
+    for it in sorted(items, key=lambda x: -(x.get("expected_profit") or 0)):
+        if it.get("risk_level") == "high" and (it.get("expected_profit") or 0) > 10000 and it.get("id") not in seen_ids:
+            add("high", "고위험 고수익 — 전문가 검토 필요",
+                "수익은 크지만 권리위험이 높아 전문가 자문·현장조사가 필요합니다.", it)
+            seen_ids.add(it.get("id"))
+            if sum(1 for a in actions if "고위험 고수익" in a["title"]) >= 2:
+                break
+    # 임차인 관련 → 전입세대열람
+    for it in items:
+        if it.get("id") in seen_ids:
+            continue
+        if any(k in _item_kw_text(it) for k in ("임차인", "전입세대", "대항력", "선순위임차인")):
+            add("medium", "임차인 관련 — 전입세대열람 확인",
+                "전입세대 열람내역서·확정일자로 대항력 임차인 여부를 확인하세요.", it)
+            seen_ids.add(it.get("id"))
+            break
+    # 문서 미공개 → 문서 공개 추적
+    for it in items:
+        if it.get("id") in seen_ids:
+            continue
+        if it.get("documents_missing") or "미공개" in (it.get("document_status") or ""):
+            add("medium", "문서 미공개 — 공개 여부 추적",
+                "매각물건명세서·현황조사서 공개 시점을 확인하고 재검토하세요.", it)
+            seen_ids.add(it.get("id"))
+            break
+    return actions
+
+
 def _confidence_summary_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     try:
         row = conn.execute(
@@ -1557,17 +1804,23 @@ def _fallback_payload() -> dict[str, Any]:
         "item_id": items[0]["id"],
         "item_type": items[0]["item_type"],
     })
+    # 브리핑 우선물건/위험포인트 기반 '오늘 할 일' 연결 (작업10)
+    actions = _briefing_action_items(items) + actions
 
+    briefing = _build_briefing(items)
     summary = {
         "total_items": len(items),
-        "analyzed_items": len(items),
-        "recommended_items": len(recs),
+        "analyzed_items": briefing["analyzed_items"],
+        "recommended_items": briefing["recommended_items"],
         "high_risk_items": rs["high"],
+        "grade_a_items": briefing["grade_a_items"],
         "avg_confidence": round(sum(it["confidence_score"] for it in items) / len(items), 3),
         "auction_count": sum(1 for it in items if it["source"] == "auction"),
         "public_sale_count": sum(1 for it in items if it["source"] == "public_sale"),
-        "urgent_items": sum(1 for it in items
-                            if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0),
+        "urgent_items": briefing["urgent_items"],
+        "market_matched_items": briefing["market_matched_items"],
+        "document_missing_items": briefing["document_missing_items"],
+        "field_visit_needed_items": briefing["field_visit_needed_items"],
         "beginner_candidate_items": sum(1 for it in items if it.get("beginner_friendly")),
         "beginner_mode_default": False,
         "grade_distribution": {
@@ -1579,15 +1832,6 @@ def _fallback_payload() -> dict[str, Any]:
             for r in ("low", "medium", "high")
         },
         "data_timestamp": datetime.now().isoformat(timespec="seconds"),
-    }
-    briefing = {
-        "summary": (
-            f"오늘 mock 데이터 {len(items)}건을 분석했습니다.\n"
-            f"검토 후보(A·B·C) {sum(1 for r in recs if r['recommendation_grade'] in ('A','B','C'))}건, "
-            f"고위험 키워드 보유 물건은 {rs['high']}건입니다.\n"
-            f"입찰기일 임박(D-7 이내)은 {summary['urgent_items']}건이며, "
-            "등기부등본·전입세대열람·현장조사가 권장됩니다."
-        ),
     }
     confidence = {
         "price": round(sum(it["confidence_score"] for it in items if it["market_price"]) /
@@ -1621,15 +1865,18 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
     _ensure_agent_test_cases(items)
 
     recs = _recommendations_from_items(items, TOP_LIMIT)
-    actions = _action_items_from_db(conn) or _fallback_payload()["action_items"]
+    briefing = _build_briefing(items)
+    db_actions = _action_items_from_db(conn) or _fallback_payload()["action_items"]
+    actions = _briefing_action_items(items) + db_actions
     rs = _risk_summary_from_items(items)
     conf = _confidence_summary_from_db(conn)
 
-    summary["recommended_items"] = len(recs)
-    summary["urgent_items"] = sum(
-        1 for it in items
-        if (it.get("days_left") or 999) <= 7 and (it.get("days_left") or -1) >= 0
-    )
+    summary["recommended_items"] = briefing["recommended_items"]
+    summary["urgent_items"] = briefing["urgent_items"]
+    summary["grade_a_items"] = briefing["grade_a_items"]
+    summary["market_matched_items"] = briefing["market_matched_items"]
+    summary["document_missing_items"] = briefing["document_missing_items"]
+    summary["field_visit_needed_items"] = briefing["field_visit_needed_items"]
     summary["beginner_candidate_items"] = sum(1 for it in items if it.get("beginner_friendly"))
     summary["beginner_mode_default"] = False
     summary["grade_distribution"] = {
@@ -1645,9 +1892,7 @@ def _payload_from_db(conn: sqlite3.Connection) -> dict[str, Any]:
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "source": "db",
         "summary": summary,
-        "briefing": _briefing_from_db(conn) or {
-            "summary": "DB 에서 추출한 mock 분석 결과입니다.",
-        },
+        "briefing": briefing,
         "recommendations": recs,
         "action_items": actions,
         "risk_summary": rs,

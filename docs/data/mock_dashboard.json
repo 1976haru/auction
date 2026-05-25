@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T07:05:26",
+  "generated_at": "2026-05-26T07:15:57",
   "source": "db",
   "summary": {
     "total_items": 100,
@@ -8,8 +8,12 @@
     "avg_confidence": 0.768,
     "auction_count": 50,
     "public_sale_count": 50,
-    "recommended_items": 5,
-    "urgent_items": 13,
+    "recommended_items": 10,
+    "urgent_items": 15,
+    "grade_a_items": 2,
+    "market_matched_items": 100,
+    "document_missing_items": 14,
+    "field_visit_needed_items": 69,
     "beginner_candidate_items": 4,
     "beginner_mode_default": false,
     "grade_distribution": {
@@ -24,13 +28,278 @@
       "medium": 18,
       "high": 77
     },
-    "data_timestamp": "2026-05-26T07:05:26"
+    "data_timestamp": "2026-05-26T07:15:57"
   },
   "briefing": {
-    "run_date": "2026-05-08",
-    "summary": "오늘의 경매·공매 브리핑입니다.\n총 100건을 확인했고, 실거래가 매칭 가능 물건은 91건입니다.\n고위험 키워드 보유 물건은 77건이며, 검토 후보(A/B/C)는 2건, 주의(D/X)는 0건입니다.\n오늘 우선 볼 물건은 2건입니다.\n오늘 검토 후보(A/B/C 등급)가 3건 미만입니다 - 추천 후보 부족",
-    "matched_items": 91,
-    "candidate_items": 2
+    "run_date": "2026-05-26",
+    "summary": "오늘의 경매·공매 브리핑입니다.\n총 100건 중 분석 완료 물건은 100건입니다.\n추천 후보는 10건이며, 그중 A등급은 2건입니다.\n입찰기일 7일 이내 후보는 15건입니다.\n고위험 키워드가 있는 물건은 77건입니다.\n오늘은 서울중앙지방법원 상가, 공매 상가 후보를 우선 확인하는 것이 좋습니다.\n※ mock 데이터 기반 참고용이며, 입찰 전 등기부·현장조사 확인이 필요합니다.",
+    "briefing_text": "오늘의 경매·공매 브리핑입니다.\n총 100건 중 분석 완료 물건은 100건입니다.\n추천 후보는 10건이며, 그중 A등급은 2건입니다.\n입찰기일 7일 이내 후보는 15건입니다.\n고위험 키워드가 있는 물건은 77건입니다.\n오늘은 서울중앙지방법원 상가, 공매 상가 후보를 우선 확인하는 것이 좋습니다.\n※ mock 데이터 기반 참고용이며, 입찰 전 등기부·현장조사 확인이 필요합니다.",
+    "total_items": 100,
+    "analyzed_items": 100,
+    "recommended_items": 10,
+    "high_risk_items": 77,
+    "grade_a_items": 2,
+    "urgent_items": 15,
+    "auction_count": 50,
+    "public_sale_count": 50,
+    "market_matched_items": 100,
+    "document_missing_items": 14,
+    "field_visit_needed_items": 69,
+    "top_courts": [
+      {
+        "court": "서울중앙지방법원",
+        "count": 23,
+        "recommended": 2,
+        "grade_a": 0,
+        "high_risk": 21,
+        "avg_roi": 88.9,
+        "top_item": {
+          "id": 33,
+          "title": "서울특별시 마포구 망원동 2-34",
+          "item_type": "상가",
+          "recommendation_grade": "B",
+          "expected_profit": 35271,
+          "risk_level": "medium"
+        }
+      },
+      {
+        "court": "수원지방법원",
+        "count": 13,
+        "recommended": 0,
+        "grade_a": 0,
+        "high_risk": 11,
+        "avg_roi": 93.0,
+        "top_item": {
+          "id": 30,
+          "title": "경기도 수원시 매탄동 392-3",
+          "item_type": "상가",
+          "recommendation_grade": "C",
+          "expected_profit": 126859,
+          "risk_level": "high"
+        }
+      },
+      {
+        "court": "대전지방법원",
+        "count": 7,
+        "recommended": 2,
+        "grade_a": 0,
+        "high_risk": 5,
+        "avg_roi": 313.9,
+        "top_item": {
+          "id": 29,
+          "title": "대전광역시 유성구 관평동 768-10",
+          "item_type": "아파트",
+          "recommendation_grade": "B",
+          "expected_profit": 61420,
+          "risk_level": "medium"
+        }
+      },
+      {
+        "court": "인천지방법원",
+        "count": 4,
+        "recommended": 0,
+        "grade_a": 0,
+        "high_risk": 2,
+        "avg_roi": 170.6,
+        "top_item": {
+          "id": 9,
+          "title": "인천광역시 연수구 송도동 643-11",
+          "item_type": "상가",
+          "recommendation_grade": "C",
+          "expected_profit": 93242,
+          "risk_level": "high"
+        }
+      },
+      {
+        "court": "부산지방법원",
+        "count": 3,
+        "recommended": 1,
+        "grade_a": 0,
+        "high_risk": 2,
+        "avg_roi": 44.3,
+        "top_item": {
+          "id": 3,
+          "title": "부산광역시 해운대구 우동 349-18",
+          "item_type": "빌라",
+          "recommendation_grade": "B",
+          "expected_profit": 8558,
+          "risk_level": "medium"
+        }
+      }
+    ],
+    "top_types": [
+      {
+        "item_type": "아파트",
+        "count": 24,
+        "recommended": 4,
+        "grade_a": 2,
+        "high_risk": 17,
+        "avg_roi": 235.5,
+        "top_item": {
+          "id": 54,
+          "title": "부산광역시 남구 대연동 430",
+          "item_type": "아파트",
+          "recommendation_grade": "A",
+          "expected_profit": 116412,
+          "risk_level": "low"
+        }
+      },
+      {
+        "item_type": "상가",
+        "count": 19,
+        "recommended": 2,
+        "grade_a": 0,
+        "high_risk": 15,
+        "avg_roi": 278.6,
+        "top_item": {
+          "id": 81,
+          "title": "인천광역시 남동구 구월동 224",
+          "item_type": "상가",
+          "recommendation_grade": "B",
+          "expected_profit": 95126,
+          "risk_level": "medium"
+        }
+      },
+      {
+        "item_type": "토지",
+        "count": 19,
+        "recommended": 2,
+        "grade_a": 0,
+        "high_risk": 15,
+        "avg_roi": 50.6,
+        "top_item": {
+          "id": 85,
+          "title": "인천광역시 남동구 구월동 279",
+          "item_type": "토지",
+          "recommendation_grade": "B",
+          "expected_profit": 27494,
+          "risk_level": "medium"
+        }
+      },
+      {
+        "item_type": "빌라",
+        "count": 15,
+        "recommended": 1,
+        "grade_a": 0,
+        "high_risk": 13,
+        "avg_roi": -20.1,
+        "top_item": {
+          "id": 3,
+          "title": "부산광역시 해운대구 우동 349-18",
+          "item_type": "빌라",
+          "recommendation_grade": "B",
+          "expected_profit": 8558,
+          "risk_level": "medium"
+        }
+      },
+      {
+        "item_type": "오피스텔",
+        "count": 13,
+        "recommended": 1,
+        "grade_a": 0,
+        "high_risk": 9,
+        "avg_roi": 9.1,
+        "top_item": {
+          "id": 77,
+          "title": "대전광역시 서구 둔산동 170",
+          "item_type": "오피스텔",
+          "recommendation_grade": "B",
+          "expected_profit": 16111,
+          "risk_level": "low"
+        }
+      }
+    ],
+    "priority_items": [
+      {
+        "id": 59,
+        "title": "광주광역시 북구 운암동 377",
+        "court": "한국자산관리공사(캠코)",
+        "item_type": "아파트",
+        "expected_profit": 102159,
+        "expected_profit_rate": 462.7,
+        "risk_level": "low",
+        "recommendation_grade": "A",
+        "bid_date": "2026-05-22~2026-05-24",
+        "days_left": -4,
+        "reason": "A등급 검토 후보 · 예상차익 102,159만원"
+      },
+      {
+        "id": 54,
+        "title": "부산광역시 남구 대연동 430",
+        "court": "한국자산관리공사(캠코)",
+        "item_type": "아파트",
+        "expected_profit": 116412,
+        "expected_profit_rate": 1212.6,
+        "risk_level": "low",
+        "recommendation_grade": "A",
+        "bid_date": "2026-05-12~2026-05-14",
+        "days_left": -14,
+        "reason": "A등급 검토 후보 · 예상차익 116,412만원"
+      },
+      {
+        "id": 77,
+        "title": "대전광역시 서구 둔산동 170",
+        "court": "한국자산관리공사(캠코)",
+        "item_type": "오피스텔",
+        "expected_profit": 16111,
+        "expected_profit_rate": 73.0,
+        "risk_level": "low",
+        "recommendation_grade": "B",
+        "bid_date": "2026-05-17~2026-05-19",
+        "days_left": -9,
+        "reason": "예상차익 16,111만원"
+      },
+      {
+        "id": 29,
+        "title": "대전광역시 유성구 관평동 768-10",
+        "court": "대전지방법원",
+        "item_type": "아파트",
+        "expected_profit": 61420,
+        "expected_profit_rate": 112.9,
+        "risk_level": "medium",
+        "recommendation_grade": "B",
+        "bid_date": "2026-05-06",
+        "days_left": -20,
+        "reason": "예상차익 61,420만원"
+      },
+      {
+        "id": 1,
+        "title": "대전광역시 유성구 관평동 143-48",
+        "court": "대전지방법원",
+        "item_type": "아파트",
+        "expected_profit": 38094,
+        "expected_profit_rate": 396.8,
+        "risk_level": "medium",
+        "recommendation_grade": "B",
+        "bid_date": "2026-06-11",
+        "days_left": 16,
+        "reason": "예상차익 38,094만원"
+      },
+      {
+        "id": 33,
+        "title": "서울특별시 마포구 망원동 2-34",
+        "court": "서울중앙지방법원",
+        "item_type": "상가",
+        "expected_profit": 35271,
+        "expected_profit_rate": 87.1,
+        "risk_level": "medium",
+        "recommendation_grade": "B",
+        "bid_date": "2026-06-01",
+        "days_left": 6,
+        "reason": "입찰 D-6 · 예상차익 35,271만원"
+      }
+    ],
+    "risk_points": {
+      "lien": 19,
+      "superficies": 21,
+      "share": 10,
+      "farmland": 8,
+      "tenant": 30,
+      "document_missing": 14
+    },
+    "matched_items": 100,
+    "candidate_items": 10,
+    "data_timestamp": "2026-05-26T07:15:57"
   },
   "recommendations": [
     {
@@ -169,6 +438,42 @@
     }
   ],
   "action_items": [
+    {
+      "priority": "high",
+      "title": "고위험 고수익 — 전문가 검토 필요",
+      "detail": "수익은 크지만 권리위험이 높아 전문가 자문·현장조사가 필요합니다.",
+      "due_date": "2026-06-11",
+      "address": "대전광역시 유성구 관평동 594-48",
+      "item_id": 20,
+      "item_type": "상가"
+    },
+    {
+      "priority": "high",
+      "title": "고위험 고수익 — 전문가 검토 필요",
+      "detail": "수익은 크지만 권리위험이 높아 전문가 자문·현장조사가 필요합니다.",
+      "due_date": "2026-05-09~2026-05-11",
+      "address": "광주광역시 북구 운암동 204",
+      "item_id": 61,
+      "item_type": "상가"
+    },
+    {
+      "priority": "medium",
+      "title": "임차인 관련 — 전입세대열람 확인",
+      "detail": "전입세대 열람내역서·확정일자로 대항력 임차인 여부를 확인하세요.",
+      "due_date": "2026-05-13~2026-05-15",
+      "address": "경기도 용인시 수지구 164",
+      "item_id": 99,
+      "item_type": "다세대"
+    },
+    {
+      "priority": "medium",
+      "title": "문서 미공개 — 공개 여부 추적",
+      "detail": "매각물건명세서·현황조사서 공개 시점을 확인하고 재검토하세요.",
+      "due_date": "2026-05-20~2026-05-22",
+      "address": "부산광역시 남구 대연동 220",
+      "item_id": 98,
+      "item_type": "단독주택"
+    },
     {
       "priority": "high",
       "title": "등기부등본 원문 확인",

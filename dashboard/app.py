@@ -426,6 +426,62 @@ if tab_sel == "오늘의 브리핑":
                     f"사유: {reason}"
                 )
 
+        # ── 연번 13 브리핑 강화(보조 반영): 정적 대시보드와 동일 로직 재사용 ──
+        st.divider()
+        st.markdown("### 📊 브리핑 강화")
+        try:
+            from scripts import export_static_dashboard as _exp
+            _conn = get_connection()
+            _eitems = _exp._items_sample(_conn, picks_by_id=_exp._picks_by_id(_conn))
+            _conn.close()
+            _exp._ensure_agent_test_cases(_eitems)
+            eb = _exp._build_briefing(_eitems)
+
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("A등급 후보", eb["grade_a_items"])
+            m2.metric("입찰임박(D-7)", eb["urgent_items"])
+            m3.metric("문서 미공개", eb["document_missing_items"])
+            m4.metric("현장조사 필요", eb["field_visit_needed_items"])
+
+            cc, ct = st.columns(2)
+            with cc:
+                st.markdown("#### 🏛 법원별 주요 후보")
+                for g in eb["top_courts"]:
+                    ti = g.get("top_item") or {}
+                    st.write(
+                        f"**{g['court']}** · 물건 {g['count']} · 추천 {g['recommended']} · "
+                        f"A {g['grade_a']} · 고위험 {g['high_risk']} · 평균ROI {g['avg_roi']}%  \n"
+                        f"↳ 대표: [{ti.get('recommendation_grade', '-')}] {ti.get('title', '-')}"
+                    )
+            with ct:
+                st.markdown("#### 🏷 종류별 주요 후보")
+                for g in eb["top_types"]:
+                    ti = g.get("top_item") or {}
+                    st.write(
+                        f"**{g['item_type']}** · 물건 {g['count']} · 추천 {g['recommended']} · "
+                        f"A {g['grade_a']} · 고위험 {g['high_risk']} · 평균ROI {g['avg_roi']}%  \n"
+                        f"↳ 대표: [{ti.get('recommendation_grade', '-')}] {ti.get('title', '-')}"
+                    )
+
+            st.markdown("#### ⭐ 오늘 우선 확인할 물건")
+            for i, p in enumerate(eb["priority_items"], 1):
+                st.write(
+                    f"{i}. [{p.get('recommendation_grade', '-')}] {p.get('title', '-')} "
+                    f"({p.get('court', '-')} · {p.get('item_type', '-')}) | "
+                    f"차익 {(p.get('expected_profit') or 0):,}만원 | {p.get('reason', '')}"
+                )
+
+            st.markdown("#### ⚠ 오늘 주의할 위험 포인트")
+            rp = eb["risk_points"]
+            rpc = st.columns(6)
+            for col, (label, key) in zip(rpc, [
+                ("유치권", "lien"), ("법정지상권", "superficies"), ("지분매각", "share"),
+                ("농지자격", "farmland"), ("임차인", "tenant"), ("문서미공개", "document_missing"),
+            ]):
+                col.metric(label, rp.get(key, 0))
+        except Exception as e:  # noqa: BLE001
+            st.caption(f"브리핑 강화 정보를 불러오지 못했습니다: {e}")
+
 # 2. 오늘 할 일 ----------------------------------------------------
 elif tab_sel == "오늘 할 일":
     st.header("오늘 할 일")
