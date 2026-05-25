@@ -585,9 +585,16 @@ elif tab_sel == "전체 물건":
         agencies = sorted({it.get("agency_name") for it in eitems if it.get("agency_name")})
         groups = ["서울권", "수도권", "충청권", "강원권", "영남권", "호남권", "제주권"]
         groups = [g for g in groups if any(it.get("court_group") == g for it in eitems)]
+        a_types = [t for t in ["한국자산관리공사", "지자체", "공공기관", "금융기관", "기타기관"]
+                   if any(it.get("agency_type") == t for it in eitems)]
+        s_types = [t for t in ["압류재산", "국유재산", "공유재산", "수탁재산", "금융기관 매각", "기타 공매"]
+                   if any(it.get("public_sale_type") == t for it in eitems)]
         fc1, fc2 = st.columns(2)
         sel_court = fc1.selectbox("법원/기관 필터", ["전체"] + courts + agencies)
         sel_group = fc2.selectbox("법원 권역 필터", ["전체"] + groups)
+        fc3, fc4 = st.columns(2)
+        sel_atype = fc3.selectbox("공매 기관유형 필터", ["전체"] + a_types)
+        sel_stype = fc4.selectbox("공매유형 필터", ["전체"] + s_types)
 
         view = eitems
         if sel_court != "전체":
@@ -595,6 +602,10 @@ elif tab_sel == "전체 물건":
                     or it.get("agency_name") == sel_court]
         if sel_group != "전체":
             view = [it for it in view if it.get("court_group") == sel_group]
+        if sel_atype != "전체":
+            view = [it for it in view if it.get("agency_type") == sel_atype]
+        if sel_stype != "전체":
+            view = [it for it in view if it.get("public_sale_type") == sel_stype]
 
         rec = sum(1 for it in view if (it.get("recommendation_grade") in ("A", "B")
                                        or (it.get("recommendation_score") or 0) >= 60))
@@ -617,8 +628,24 @@ elif tab_sel == "전체 물건":
         cdf = pd.DataFrame(sorted(court_rows.values(), key=lambda x: -x["물건 수"]))
         st.dataframe(cdf, use_container_width=True, hide_index=True)
 
+        # 공매 기관유형별 물건 수 · 추천 후보 수 분포
+        st.markdown("##### 공매 기관유형별 물건 수 · 추천 후보 수")
+        atype_rows = {}
+        for it in eitems:
+            if it.get("source") != "public_sale":
+                continue
+            t = it.get("agency_type") or "기타기관"
+            r = atype_rows.setdefault(t, {"기관유형": t, "물건 수": 0, "추천 후보": 0})
+            r["물건 수"] += 1
+            if it.get("recommendation_grade") in ("A", "B") or (it.get("recommendation_score") or 0) >= 60:
+                r["추천 후보"] += 1
+        if atype_rows:
+            adf = pd.DataFrame(sorted(atype_rows.values(), key=lambda x: -x["물건 수"]))
+            st.dataframe(adf, use_container_width=True, hide_index=True)
+
         df = pd.DataFrame(view)
-        cols = [c for c in ["id", "source", "court_name", "agency_name", "court_group",
+        cols = [c for c in ["id", "source", "court_name", "agency_name", "agency_type",
+                            "court_group", "public_sale_type", "onbid_category",
                             "item_type", "address", "appraisal_price", "min_bid_price",
                             "expected_profit", "risk_level", "recommendation_grade",
                             "fail_count", "bid_date"] if c in df.columns]

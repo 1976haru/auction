@@ -275,15 +275,50 @@ SIDO_TO_COURTS = {
     "경상남도": ["창원지방법원"],
     "제주특별자치도": ["제주지방법원"],
 }
-# 공매 기관(데모) — 대부분 캠코, 일부 지자체/금융기관
+# ── 연번 16: 공매 기관 데이터 ─────────────────────────────────────
+# 기관 카탈로그: name·type(대분류)·region·group(공공/지자체/금융/기타)·sale_type(공매유형)
+# 캠코 비중을 높이고(가중치 반영용 중복) 지자체·공공·금융·기타를 고루 포함한다.
 PUBLIC_AGENCIES = [
-    {"name": "한국자산관리공사", "type": "공공기관", "region": "전국"},
-    {"name": "한국자산관리공사", "type": "공공기관", "region": "전국"},
-    {"name": "한국자산관리공사", "type": "공공기관", "region": "전국"},
-    {"name": "서울특별시청", "type": "지자체", "region": "서울"},
-    {"name": "경기도청", "type": "지자체", "region": "경기"},
-    {"name": "국민건강보험공단", "type": "공공기관", "region": "전국"},
+    {"name": "한국자산관리공사", "type": "한국자산관리공사", "region": "전국",
+     "group": "공공", "sale_type": "압류재산"},
+    {"name": "한국자산관리공사", "type": "한국자산관리공사", "region": "전국",
+     "group": "공공", "sale_type": "압류재산"},
+    {"name": "한국자산관리공사", "type": "한국자산관리공사", "region": "전국",
+     "group": "공공", "sale_type": "국유재산"},
+    {"name": "한국자산관리공사", "type": "한국자산관리공사", "region": "전국",
+     "group": "공공", "sale_type": "수탁재산"},
+    {"name": "서울특별시", "type": "지자체", "region": "서울",
+     "group": "지자체", "sale_type": "공유재산"},
+    {"name": "경기도", "type": "지자체", "region": "경기",
+     "group": "지자체", "sale_type": "공유재산"},
+    {"name": "인천광역시", "type": "지자체", "region": "인천",
+     "group": "지자체", "sale_type": "공유재산"},
+    {"name": "부산광역시", "type": "지자체", "region": "부산",
+     "group": "지자체", "sale_type": "공유재산"},
+    {"name": "대전광역시", "type": "지자체", "region": "대전",
+     "group": "지자체", "sale_type": "공유재산"},
+    {"name": "한국토지주택공사", "type": "공공기관", "region": "전국",
+     "group": "공공", "sale_type": "국유재산"},
+    {"name": "한국도로공사", "type": "공공기관", "region": "전국",
+     "group": "공공", "sale_type": "국유재산"},
+    {"name": "한국전력공사", "type": "공공기관", "region": "전국",
+     "group": "공공", "sale_type": "국유재산"},
+    {"name": "국민건강보험공단", "type": "공공기관", "region": "전국",
+     "group": "공공", "sale_type": "압류재산"},
+    {"name": "예금보험공사", "type": "금융기관", "region": "전국",
+     "group": "금융", "sale_type": "금융기관 매각"},
+    {"name": "금융기관", "type": "금융기관", "region": "전국",
+     "group": "금융", "sale_type": "금융기관 매각"},
+    {"name": "기타기관", "type": "기타기관", "region": "전국",
+     "group": "기타", "sale_type": "기타 공매"},
 ]
+# 온비드 카테고리(물건종류 → 카테고리)
+ONBID_CATEGORY_BY_TYPE = {
+    "차량": "차량",
+    "선박": "차량",
+    "기계": "기계/동산",
+    "회원권": "회원권",
+}
 COURT_REGION_GROUP = {
     "서울": "서울권", "경기": "수도권", "인천": "수도권", "강원": "강원권",
     "대전": "충청권", "충북": "충청권", "충남": "충청권", "세종": "충청권",
@@ -320,11 +355,15 @@ def _assign_courts(items: list[dict]) -> None:
             it["agency_name"] = ""
             it["agency_type"] = ""
             it["agency_region"] = ""
+            it["agency_group"] = ""
+            it["public_sale_type"] = ""
+            it["onbid_category"] = ""
         else:
             ag = PUBLIC_AGENCIES[seed % len(PUBLIC_AGENCIES)]
             it["agency_name"] = ag["name"]
             it["agency_type"] = ag["type"]
             it["agency_region"] = ag["region"]
+            it["agency_group"] = ag["group"]
             it["court_name"] = ""
             it["court_region"] = ""
             it["court_group"] = ""
@@ -332,6 +371,8 @@ def _assign_courts(items: list[dict]) -> None:
             it["court_branch"] = ""
             it["sale_type"] = "공매"
             it["source_site"] = "onbid"
+            it["public_sale_type"] = ag["sale_type"]
+            it["onbid_category"] = ONBID_CATEGORY_BY_TYPE.get(it.get("item_type"), "부동산")
 
 ITEM_GROUP_BY_TYPE = {
     "아파트": "주거용 건물",
@@ -889,6 +930,9 @@ def _set_court(it: dict, court: str) -> None:
     it["agency_name"] = ""
     it["agency_type"] = ""
     it["agency_region"] = ""
+    it["agency_group"] = ""
+    it["public_sale_type"] = ""
+    it["onbid_category"] = ""
 
 
 def _ensure_agent_test_cases(items: list[dict]) -> None:
@@ -933,6 +977,17 @@ def _ensure_agent_test_cases(items: list[dict]) -> None:
         if m > 0:
             busan["min_bid_price"] = int(m * 0.55)
             _recompute_for_minbid(busan)
+
+    # 5) 공매 차량 (온비드 카테고리=차량) 최소 1건
+    if not any(it.get("source") == "public_sale" and it.get("item_type") == "차량"
+               for it in items):
+        for it in items:
+            if it.get("source") == "public_sale" and id(it) not in used:
+                it["item_type"] = "차량"
+                it["item_group"] = "차량"
+                it["onbid_category"] = "차량"
+                used.add(id(it))
+                break
 
 
 def _change_tags_from_events(events: list[dict], is_new: bool) -> list[dict]:
@@ -1536,6 +1591,7 @@ def _build_briefing(items: list[dict], run_date: str | None = None) -> dict[str,
     field_needed = sum(1 for it in items if it.get("field_survey_needed"))
 
     top_courts = _group_summary(items, lambda it: it.get("court_name"), label_key="court")
+    top_agencies = _group_summary(items, lambda it: it.get("agency_name"), label_key="agency")
     top_types = _group_summary(items, lambda it: it.get("item_type"), label_key="item_type")
     priority = _priority_items(items)
     risk_points = _risk_points(items)
@@ -1578,6 +1634,7 @@ def _build_briefing(items: list[dict], run_date: str | None = None) -> dict[str,
         "document_missing_items": doc_missing,
         "field_visit_needed_items": field_needed,
         "top_courts": top_courts,
+        "top_agencies": top_agencies,
         "top_types": top_types,
         "priority_items": priority,
         "risk_points": risk_points,
@@ -1688,6 +1745,10 @@ def _build_distributions(items: list[dict]) -> dict[str, Any]:
         "court_region_distribution": count_by(lambda it: it.get("court_region")),
         "court_group_distribution": count_by(lambda it: it.get("court_group")),
         "agency_distribution": count_by(lambda it: it.get("agency_name")),
+        "agency_type_distribution": count_by(lambda it: it.get("agency_type")),
+        "agency_region_distribution": count_by(lambda it: it.get("agency_region")),
+        "public_sale_type_distribution": count_by(lambda it: it.get("public_sale_type")),
+        "onbid_category_distribution": count_by(lambda it: it.get("onbid_category")),
         "region_distribution": count_by(lambda it: it.get("sido") or it.get("region")),
         "type_distribution": count_by(lambda it: it.get("item_type")),
         "item_group_distribution": count_by(lambda it: it.get("item_group")),
