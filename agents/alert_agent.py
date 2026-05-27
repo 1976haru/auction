@@ -335,3 +335,335 @@ def list_recent_alerts(limit: int = 50) -> list[dict]:
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+# ════════════════════════════════════════════════════════════
+# 블록 14 — 알림 트리거 8종
+# ════════════════════════════════════════════════════════════
+def _profile():
+    try:
+        from core.user_profile import load_user_profile
+        return load_user_profile()
+    except Exception:
+        return {}
+
+
+def _trig_new_item_match(pref: dict) -> list[dict]:
+    """신규 물건 + 조건 매칭(어제 이후 추가, 자본 가능, 추천 점수 70+)."""
+    conn = get_connection()
+    rows = conn.execute(
+        """SELECT i.id, i.address_full, i.item_type, s.score, s.annualized_roe, s.scenario
+           FROM items i JOIN scenario_results s ON s.item_id=i.id
+           WHERE s.is_recommended=1 AND s.affordable=1 AND s.score>=70
+             AND (i.created_at >= datetime('now','-1 day') OR i.created_at IS NULL)
+           ORDER BY s.score DESC LIMIT 10"""
+    ).fetchall()
+    conn.close()
+    out = []
+    for r in rows:
+        out.append({
+            "alert_type": "new_item_match", "item_id": r["id"],
+            "title": f"🆕 신규 추천 {str(r['address_full'] or '')[:24]}",
+            "body": (f"[신규 추천] {r['address_full']}\n"
+                     f"추천 시나리오 {r['scenario']} / 연환산 {r['annualized_roe']:.0f}% / 점수 {r['score']:.0f}"),
+            "priority": "high", "payload": {"score": r["score"]},
+        })
+    return out
+
+
+def _trig_price_drop(pref: dict) -> list[dict]:
+    """관심 물건 최저가 5%+ 인하(change_events 기반)."""
+    conn = get_connection()
+    rows = conn.execute(
+        """SELECT c.item_id, c.old_value, c.new_value, i.address_full
+           FROM change_events c JOIN items i ON i.id=c.item_id
+           WHERE c.event_type LIKE '%price%' AND i.is_watched=1
+             AND c.created_at >= datetime('now','-2 day')"""
+    ).fetchall()
+    conn.close()
+    out = []
+    for r in rows:
+        try:
+            old = float(r["old_value"]); new = float(r["new_value"])
+        except (TypeError, ValueError):
+            continue
+        if old > 0 and (old - new) / old >= 0.05:
+            out.append({
+                "alert_type": "price_drop", "item_id": r["item_id"],
+                "title": f"📉 가격 인하 {str(r['address_full'] or '')[:24]}",
+                "body": f"[관심물건 인하] {r['address_full']}\n{old:,.0f} → {new:,.0f}만원",
+                "priority": "high", "payload": {"old": old, "new": new},
+            })
+    return out
+
+
+def _trig_deadline(pref: dict) -> list[dict]:
+    """관심 물건 입찰 D-3."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT id, address_full, bid_date, min_bid_price FROM items WHERE is_watched=1"
+    ).fetchall()
+    conn.close()
+    out = []
+    for r in rows:
+        d = days_until(r["bid_date"])
+        if d == 3:
+            out.append({
+                "alert_type": "deadline_approaching", "item_id": r["id"],
+                "title": f"⏰ 입찰 D-3 {str(r['address_full'] or '')[:24]}",
+                "body": f"[입찰 D-3] {r['address_full']}\n매각기일 {r['bid_date']} / 최저가 {r['min_bid_price']:,}만원",
+                "priority": "high", "payload": {"bid_date": r["bid_date"]},
+            })
+    return out
+
+
+def _trig_bid_result(pref: dict) -> list[dict]:
+    """관심 물건 낙찰 결과(bid_results 테이블 있을 때만)."""
+    conn = get_connection()
+    has = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='bid_results'"
+    ).fetchone()
+    out = []
+    if has:
+        rows = conn.execute(
+            """SELECT b.item_id, b.winning_price, b.bidders, i.address_full
+               FROM bid_results b JOIN items i ON i.id=b.item_id
+               WHERE i.is_watched=1 AND b.created_at >= datetime('now','-2 day')"""
+        ).fetchall()
+        for r in rows:
+            out.append({
+                "alert_type": "bid_result", "item_id": r["item_id"],
+                "title": f"🏆 낙찰결과 {str(r['address_full'] or '')[:24]}",
+                "body": f"[낙찰결과] {r['address_full']}\n낙찰가 {r['winning_price']:,}만원 / 응찰 {r['bidders']}명",
+                "priority": "medium", "payload": {},
+            })
+    conn.close()
+    return out
+
+
+def _trig_weekly_calendar(pref: dict) -> list[dict]:
+    """다음 주 입찰 일정 캘린더."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT id, address_full, bid_date FROM items "
+        "WHERE status='active' AND bid_date IS NOT NULL"
+    ).fetchall()
+    conn.close()
+    upcoming = []
+    for r in rows:
+        d = days_until(r["bid_date"])
+        if d is not None and 0 <= d <= 7:
+            upcoming.append((d, r["bid_date"], r["address_full"]))
+    if not upcoming:
+        return []
+    upcoming.sort()
+    lines = "\n".join(f"D-{d} {bd} {str(a or '')[:24]}" for d, bd, a in upcoming[:15])
+    return [{
+        "alert_type": "weekly_calendar", "item_id": None,
+        "title": f"📅 다음 주 입찰 일정 {len(upcoming)}건",
+        "body": f"[다음 주 입찰 일정]\n{lines}",
+        "priority": "low", "payload": {"count": len(upcoming)},
+    }]
+
+
+def _trig_monthly_report(pref: dict) -> list[dict]:
+    """월간 리포트(지난 30일 추천 통계)."""
+    conn = get_connection()
+    n_rec = conn.execute(
+        "SELECT COUNT(*) FROM scenario_results WHERE is_recommended=1"
+    ).fetchone()[0]
+    n_afford = conn.execute(
+        "SELECT COUNT(DISTINCT item_id) FROM scenario_results WHERE affordable=1"
+    ).fetchone()[0]
+    conn.close()
+    return [{
+        "alert_type": "monthly_report", "item_id": None,
+        "title": "📊 월간 리포트",
+        "body": (f"[월간 리포트]\n추천 시나리오 {n_rec}건 / 자본 가능 물건 {n_afford}건"),
+        "priority": "low", "payload": {"recommended": n_rec},
+    }]
+
+
+def _trig_market_signal(pref: dict) -> list[dict]:
+    """관심 지역 시장 시그널(중립이 아닐 때)."""
+    prof = _profile()
+    regions = prof.get("interest_regions") or []
+    out = []
+    try:
+        from modules.market import detect_signals
+    except Exception:
+        return out
+    seen = set()
+    for region in regions[:5]:
+        parts = region.split()
+        sido = parts[0] if parts else region
+        sigungu = parts[1] if len(parts) > 1 else None
+        key = (sido, sigungu)
+        if key in seen:
+            continue
+        seen.add(key)
+        sig = detect_signals(sido, sigungu)
+        if sig["overall_signal"] != "neutral":
+            out.append({
+                "alert_type": "market_signal", "item_id": None,
+                "title": f"📡 시장 시그널 [{region}] {sig['overall_signal']}",
+                "body": f"[시장 시그널] {region}\n{sig['recommendation']}",
+                "priority": "medium",
+                "payload": {"signal": sig["overall_signal"], "region": region},
+            })
+    return out
+
+
+def _trig_scenario_opportunity(pref: dict) -> list[dict]:
+    """선호 시나리오(가중치 0.4+) 매칭 + 연환산 ROE 20%+."""
+    prof = _profile()
+    weights = prof.get("scenario_weights") or {}
+    preferred = [s for s, w in weights.items() if w >= 0.4]
+    if not preferred:
+        return []
+    placeholders = ",".join("?" for _ in preferred)
+    conn = get_connection()
+    rows = conn.execute(
+        f"""SELECT s.item_id, s.scenario, s.annualized_roe, i.address_full
+            FROM scenario_results s JOIN items i ON i.id=s.item_id
+            WHERE s.scenario IN ({placeholders}) AND s.annualized_roe>=20
+              AND s.affordable=1
+            ORDER BY s.annualized_roe DESC LIMIT 10""",
+        preferred,
+    ).fetchall()
+    conn.close()
+    label = {"short_sale": "단타", "rental": "임대", "residence": "실거주"}
+    out = []
+    for r in rows:
+        out.append({
+            "alert_type": "scenario_opportunity", "item_id": r["item_id"],
+            "title": f"💡 [{label.get(r['scenario'], r['scenario'])}] 기회 {str(r['address_full'] or '')[:20]}",
+            "body": (f"[{label.get(r['scenario'], r['scenario'])} 기회] {r['address_full']}\n"
+                     f"연환산 ROE {r['annualized_roe']:.0f}%"),
+            "priority": "high", "payload": {"scenario": r["scenario"]},
+        })
+    return out
+
+
+TRIGGERS = {
+    "new_item_match": _trig_new_item_match,
+    "price_drop": _trig_price_drop,
+    "deadline_approaching": _trig_deadline,
+    "bid_result": _trig_bid_result,
+    "weekly_calendar": _trig_weekly_calendar,
+    "monthly_report": _trig_monthly_report,
+    "market_signal": _trig_market_signal,
+    "scenario_opportunity": _trig_scenario_opportunity,
+}
+# 매일 실행: 1,2,3,4,7,8 / 주간: 5 / 월간: 6
+DAILY_TRIGGERS = ["new_item_match", "price_drop", "deadline_approaching",
+                  "bid_result", "market_signal", "scenario_opportunity"]
+
+
+def check_triggers(triggers: list[str] | None = None, pref: dict | None = None) -> list[dict]:
+    """지정 트리거(기본 8종 전부) 조건 검사 -> 알림 dict 리스트(dedupe_key 포함)."""
+    init_db()
+    pref = pref or get_preferences()
+    names = triggers or list(TRIGGERS.keys())
+    alerts: list[dict] = []
+    for name in names:
+        fn = TRIGGERS.get(name)
+        if not fn:
+            continue
+        try:
+            for a in fn(pref):
+                a["dedupe_key"] = _dedupe_key(a["alert_type"], a.get("item_id"),
+                                              a.get("payload"))
+                alerts.append(a)
+        except Exception as e:
+            log.warning(f"[alert] 트리거 {name} 검사 실패: {e}")
+    return alerts
+
+
+def send_trigger(trigger_type: str, data: dict, dry_run: bool = False) -> dict:
+    """단일 트리거 알림 발송(중복 방지). backtest_report 등 ad-hoc 포함."""
+    init_db()
+    if trigger_type == "backtest_report":
+        m = data or {}
+        alert = {
+            "alert_type": "backtest_report", "item_id": None,
+            "title": "📊 주간 백테스트 리포트",
+            "body": (f"[백테스트] 정확도 {m.get('accuracy', 0)*100:.1f}% / "
+                     f"F1 {m.get('f1_score', 0)*100:.1f}%\n"
+                     f"추천 평균 ROE {m.get('avg_roe_recommended', 0):.1f}%"),
+            "priority": "low", "payload": {"accuracy": m.get("accuracy")},
+        }
+    else:
+        alert = {
+            "alert_type": trigger_type, "item_id": data.get("item_id"),
+            "title": data.get("title", f"[{trigger_type}]"),
+            "body": data.get("body", ""),
+            "priority": data.get("priority", "medium"),
+            "payload": data.get("payload", {}),
+        }
+    pref = get_preferences()
+    channels = pref.get("alert_channels") or [pref.get("alert_channel", "telegram")]
+    text = f"<b>{alert['title']}</b>\n{alert['body']}"
+    result = {"trigger": trigger_type, "sent": 0, "skipped": 0, "failed": 0}
+    for ch in channels:
+        key = _dedupe_key(alert["alert_type"], alert.get("item_id"), alert.get("payload"), channel=ch)
+        entry = {**alert, "dedupe_key": key, "channel": ch}
+        if _is_already_sent(key):
+            result["skipped"] += 1
+            continue
+        if dry_run:
+            continue
+        ok = send_to_channels(text, channels=[ch]).get(ch, False)
+        _record_alert(entry, "sent" if ok else "failed",
+                      None if ok else f"send[{ch}]=False")
+        result["sent" if ok else "failed"] += 1
+    return result
+
+
+def run_triggers(triggers: list[str] | None = None, pref: dict | None = None,
+                 dry_run: bool = False) -> dict:
+    """트리거 검사 + 채널 발송(중복 방지)."""
+    pref = pref or get_preferences()
+    channels = pref.get("alert_channels") or [pref.get("alert_channel", "telegram")]
+    alerts = check_triggers(triggers, pref)
+    sent = skipped = failed = 0
+    for a in alerts:
+        text = f"<b>{a['title']}</b>\n{a['body']}"
+        for ch in channels:
+            key = _dedupe_key(a["alert_type"], a.get("item_id"), a.get("payload"), channel=ch)
+            entry = {**a, "dedupe_key": key, "channel": ch}
+            if _is_already_sent(key):
+                skipped += 1
+                continue
+            if dry_run:
+                continue
+            ok = send_to_channels(text, channels=[ch]).get(ch, False)
+            _record_alert(entry, "sent" if ok else "failed",
+                          None if ok else f"send[{ch}]=False")
+            if ok:
+                sent += 1
+            else:
+                failed += 1
+    return {"collected": len(alerts), "sent": sent, "skipped": skipped,
+            "failed": failed, "channels": channels}
+
+
+if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser(description="알림 트리거 실행")
+    p.add_argument("--trigger", default=None,
+                   help="단일 트리거 이름(없으면 일일 트리거 전체)")
+    p.add_argument("--dry-run", action="store_true")
+    args = p.parse_args()
+
+    if args.trigger == "backtest_report":
+        try:
+            from modules.backtest import run_backtest
+            metrics = run_backtest("2024-01-01", "2024-07-01", save=False)
+        except Exception:
+            metrics = {}
+        print(send_trigger("backtest_report", metrics, dry_run=args.dry_run))
+    elif args.trigger:
+        print(run_triggers([args.trigger], dry_run=args.dry_run))
+    else:
+        print(run_triggers(DAILY_TRIGGERS, dry_run=args.dry_run))

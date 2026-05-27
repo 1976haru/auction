@@ -35,6 +35,11 @@ USE_AI             = _to_bool(_get("USE_AI", "false"), default=False)
 PUBLIC_DATA_KEY    = _get("PUBLIC_DATA_SERVICE_KEY")
 ONBID_API_KEY      = _get("ONBID_API_KEY")
 
+# 입지 분석 API (블록 4) --------------------------------------------
+KAKAO_REST_API_KEY = _get("KAKAO_REST_API_KEY")
+NAVER_CLIENT_ID    = _get("NAVER_CLIENT_ID")
+NAVER_CLIENT_SECRET = _get("NAVER_CLIENT_SECRET")
+
 # 텔레그램 ----------------------------------------------------------
 TELEGRAM_BOT_TOKEN = _get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID   = _get("TELEGRAM_CHAT_ID")

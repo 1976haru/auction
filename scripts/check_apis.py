@@ -211,7 +211,16 @@ def run_all() -> dict:
             "email": check_email(),
             "turso": check_turso(),
         },
+        "cache": _cache_stats_safe(),
     }
+
+
+def _cache_stats_safe() -> dict:
+    try:
+        from core.cache import cache_stats
+        return cache_stats()
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def main():
@@ -243,6 +252,14 @@ def main():
         mark = "OK  " if c.get("ok") else "FAIL"
         print(f"  [{mark}] {name:<10} {c['status']:<14} {c.get('note', '')}")
     print()
+
+    cache = result.get("cache") or {}
+    if "error" not in cache:
+        print(f"[API 캐시]")
+        print(f"  총 {cache.get('total', 0)}건 (유효 {cache.get('valid', 0)} / 만료 {cache.get('expired', 0)})")
+        for api, st in (cache.get("by_api") or {}).items():
+            print(f"  - {api:<16} {st['entries']}건, 누적 hit {st['hits']}")
+        print()
 
     if cfg["use_mock_apis"]:
         print("주의: USE_MOCK_APIS=true 상태이므로 실제 API 키가 있어도 mock으로 동작합니다.")

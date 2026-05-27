@@ -57,6 +57,18 @@ def fetch_trades(address: str, item_type: str, area_m2: float = 0,
         log.warning(f"[molit_real] 주소 파싱 실패: {address}")
         return []
 
+    # 캐시 조회 (TTL 1일)
+    try:
+        from core.cache import cache_get, cache_set, make_key
+        _ck = make_key("molit", si=si, gu=gu, item_type=item_type,
+                       area=round(area_m2 or 0), months=months_back)
+        _cached = cache_get("molit", _ck)
+        if _cached is not None:
+            log.info(f"[molit_real] 캐시 hit: {address}")
+            return _cached
+    except Exception:
+        cache_set = _ck = None
+
     try:
         from modules.price.molit_api import (
             APT_URL,
@@ -90,4 +102,6 @@ def fetch_trades(address: str, item_type: str, area_m2: float = 0,
             out.append(t)
 
     log.info(f"[molit_real] {address} -> {len(out)}건 (real API)")
+    if cache_set and _ck:
+        cache_set("molit", _ck, out, ttl_hours=24)
     return out

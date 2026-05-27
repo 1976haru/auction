@@ -51,6 +51,10 @@ jobs:
         run: python -m agents.daily_recommendation_agent
         continue-on-error: true
 
+      - name: Run daily alert triggers (신규/인하/기일/낙찰/시그널/기회)
+        run: python -m agents.alert_agent
+        continue-on-error: true
+
       - name: Refresh static dashboard JSON
         run: python scripts/export_static_dashboard.py
 

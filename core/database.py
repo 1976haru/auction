@@ -108,6 +108,14 @@ def init_db() -> None:
         updated_at      TEXT DEFAULT (datetime('now','localtime'))
     )""")
     _migrate_items_table(conn)
+    # v2.0 명도 분석 결과 컬럼 (블록 3)
+    _ensure_column(conn, "items", "eviction_difficulty", "eviction_difficulty INTEGER")
+    _ensure_column(conn, "items", "eviction_cost_estimate", "eviction_cost_estimate INTEGER")
+    _ensure_column(conn, "items", "eviction_duration_months", "eviction_duration_months INTEGER")
+    # v2.0 리스크/몬테카를로 결과 컬럼 (블록 8)
+    _ensure_column(conn, "items", "expected_roe", "expected_roe REAL")
+    _ensure_column(conn, "items", "loss_probability", "loss_probability REAL")
+    _ensure_column(conn, "items", "worst_case_loss", "worst_case_loss INTEGER")
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS documents (
@@ -417,6 +425,145 @@ def init_db() -> None:
         ordering_json         TEXT,
         created_at            TEXT DEFAULT (datetime('now','localtime'))
     )""")
+
+    # ════════════════════════════════════════════════════════════
+    # v2.0 신규 테이블 (시나리오 의사결정 시스템)
+    # ════════════════════════════════════════════════════════════
+
+    # 1. rights_timeline — 등기부 권리 시계열 (블록 2 권리분석)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS rights_timeline (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id         INTEGER REFERENCES items(id) ON DELETE CASCADE,
+        seq             INTEGER,                       -- 등기 순위
+        section         TEXT,                          -- 갑구/을구
+        register_date   TEXT,                          -- 등기일자 (YYYY-MM-DD)
+        right_type      TEXT,                          -- 근저당권/가압류/압류/임차권/전세권/지상권/소유권 등
+        holder          TEXT,                          -- 채권자/권리자
+        amount          INTEGER,                       -- 채권/설정 금액 (원)
+        is_senior       INTEGER DEFAULT 0,             -- 말소기준권리 여부
+        is_extinguished INTEGER DEFAULT 0,             -- 말소 예상 여부
+        raw_text        TEXT,
+        created_at      TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_rights_item ON rights_timeline(item_id)")
+
+    # 2. scenario_results — 시나리오 시뮬레이션 결과 (블록 7 핵심)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS scenario_results (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id         INTEGER REFERENCES items(id) ON DELETE CASCADE,
+        scenario        TEXT,                          -- short_sale/rental/residence
+        bid_price       INTEGER,                       -- 적정 입찰가 (원)
+        capital_needed  INTEGER,                       -- 필요 자기자본 (원)
+        holding_months  INTEGER,                       -- 보유 기간
+        net_return      INTEGER,                       -- 순수익 (원)
+        roe             REAL,                          -- 총 자기자본수익률 (%)
+        annualized_roe  REAL,                          -- 연환산 ROE (%)
+        score           REAL,                          -- 시나리오 점수 (0~100)
+        is_recommended  INTEGER DEFAULT 0,             -- 추천 시나리오 여부
+        affordable      INTEGER DEFAULT 1,             -- 자본 적정성
+        result_json     TEXT,                          -- 상세 결과
+        created_at      TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_scenario_item ON scenario_results(item_id)")
+
+    # 3. api_cache — 외부 API 응답 캐시 (블록 15)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS api_cache (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        api_name        TEXT NOT NULL,                 -- kakao_geocode/kakao_keyword/naver_news/molit/onbid
+        cache_key       TEXT NOT NULL UNIQUE,          -- api_name + 정규화 파라미터 md5
+        payload_json    TEXT,                          -- 캐시된 응답 (JSON)
+        hit_count       INTEGER DEFAULT 0,
+        created_at      TEXT DEFAULT (datetime('now','localtime')),
+        expires_at      TEXT                           -- 만료 시각 (datetime)
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_cache_key ON api_cache(cache_key)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_cache_expires ON api_cache(expires_at)")
+
+    # 4. location_scores — 입지 5축 스코어 (블록 4)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS location_scores (
+        id                INTEGER PRIMARY KEY AUTOINCREMENT,
+        item_id           INTEGER UNIQUE REFERENCES items(id) ON DELETE CASCADE,
+        latitude          REAL,
+        longitude         REAL,
+        transit           REAL,                        -- 교통 (30)
+        school            REAL,                        -- 학군 (25)
+        amenity           REAL,                        -- 생활 (20)
+        development       REAL,                        -- 개발 (15)
+        environment       REAL,                        -- 환경 (10)
+        total             REAL,                        -- 합계 (100)
+        grade             TEXT,                        -- 우량/양호/보통/주의
+        nearest_subway    TEXT,
+        school_district   TEXT,
+        development_news  TEXT,
+        detail_json       TEXT,
+        created_at        TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_location_item ON location_scores(item_id)")
+
+    # 5. metrics — 관측성/운영 메트릭 (블록 16)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS metrics (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        name            TEXT NOT NULL,                 -- pipeline_duration_seconds 등
+        value           REAL,
+        tags            TEXT,                          -- JSON (api_name 등)
+        timestamp       TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_metrics_name ON metrics(name)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_metrics_ts ON metrics(timestamp)")
+
+    # 6. backtest_results — 추천 알고리즘 정확도 (블록 13, backtest_runs와 별개)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS backtest_results (
+        id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+        run_date             TEXT,
+        start_date           TEXT,
+        end_date             TEXT,
+        total_recommended    INTEGER,
+        true_positive        INTEGER,
+        false_positive       INTEGER,
+        true_negative        INTEGER,
+        false_negative       INTEGER,
+        precision_score      REAL,
+        recall_score         REAL,
+        f1_score             REAL,
+        accuracy             REAL,
+        avg_roe_recommended  REAL,
+        avg_roe_excluded     REAL,
+        report_json          TEXT,
+        created_at           TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+
+    # 7. law_codes — 법정동코드 매핑 (블록 11 seed)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS law_codes (
+        id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+        sido                  TEXT,
+        sigungu               TEXT,
+        code                  TEXT NOT NULL UNIQUE,    -- 5자리 법정동코드
+        avg_apt_price_per_m2  INTEGER,                 -- ㎡당 평균가 (원)
+        avg_rent_yield        REAL,                    -- 평균 임대수익률
+        created_at            TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_law_codes_code ON law_codes(code)")
+
+    # 8. school_districts — 학군 보너스 매핑 (블록 11 seed)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS school_districts (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        sido            TEXT,
+        sigungu         TEXT,
+        dong            TEXT,
+        district_name   TEXT,                          -- 강남 8학군/목동/중계동 등
+        bonus_points    INTEGER DEFAULT 4,             -- 학군 보너스 점수
+        note            TEXT,
+        created_at      TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_school_sigungu ON school_districts(sigungu)")
 
     conn.commit()
     conn.close()

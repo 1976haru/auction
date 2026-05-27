@@ -27,6 +27,34 @@ from agents.backtest_agent import (  # noqa: E402
 from core.utils import ensure_dir, export_path  # noqa: E402
 
 
+def _run_accuracy(start: str, end: str):
+    """블록 13: precision/recall/F1 정확도 백테스트."""
+    from modules.backtest import run_backtest as run_acc, auto_adjust_weights
+    rep = run_acc(start, end)
+    bar = "=" * 45
+    print(bar)
+    print("백테스트 결과 (정확도)")
+    print(bar)
+    print(f"기간: {start} ~ {end}")
+    print(f"전체 평가: {rep['sample']}건")
+    print("─" * 45)
+    print(f"True Positive:  {rep['true_positive']}건")
+    print(f"False Positive: {rep['false_positive']}건")
+    print(f"True Negative:  {rep['true_negative']}건")
+    print(f"False Negative: {rep['false_negative']}건")
+    print("─" * 45)
+    print(f"Precision:  {rep['precision']*100:.1f}%")
+    print(f"Recall:     {rep['recall']*100:.1f}%")
+    print(f"F1 Score:   {rep['f1_score']*100:.1f}%")
+    print(f"Accuracy:   {rep['accuracy']*100:.1f}%")
+    print("─" * 45)
+    print(f"추천 물건 평균 ROE: {rep['avg_roe_recommended']:.1f}%")
+    print(f"추천 안 한 평균 ROE: {rep['avg_roe_excluded']:.1f}%")
+    adj = auto_adjust_weights(rep)
+    print(f"권장 가중치 조정({adj['direction']}): {adj['weights']}")
+    print(bar)
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--scenario", default="standard",
@@ -35,7 +63,15 @@ def main():
                    help="all=전체 매물 평가 (기본) / recommended=과거 추천 매물만")
     p.add_argument("--grades", default=None,
                    help="콤마 구분 (예: A,B). recommended 모드에서만 적용.")
+    p.add_argument("--accuracy", action="store_true",
+                   help="precision/recall/F1 정확도 백테스트 (블록 13)")
+    p.add_argument("--start", default="2024-01-01")
+    p.add_argument("--end", default="2024-07-01")
     args = p.parse_args()
+
+    if args.accuracy:
+        _run_accuracy(args.start, args.end)
+        return
 
     if args.mode == "all":
         report = backtest_all_items(scenario=args.scenario)

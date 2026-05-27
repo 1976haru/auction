@@ -4194,8 +4194,12 @@ function openDetailById(id) {
   const body = $("detail-body");
   body.classList.remove("only-actions", "only-risk");
   body.innerHTML = detailBodyHtml(it);
+  // 시나리오 비교 섹션(블록 12) — 데이터 있을 때만 상단에 주입
+  const scenHtml = renderScenarioSection(it);
+  if (scenHtml) body.insertAdjacentHTML("afterbegin", scenHtml);
   $("detail-modal").hidden = false;
   document.body.style.overflow = "hidden";
+  if (scenHtml) wireScenarioSection(it);
   wireDetailExtras(it);
   wireBidSimulator();
   wireNoteSection();
@@ -4276,6 +4280,166 @@ function refreshNoteBadgeForItem(itemId) {
   if (STATE.filters.chip === "notes") applyFilters();
   // 시그널 변화 → 맞춤 추천 갱신
   renderPersonalRecs();
+}
+
+// ── 시나리오 비교 섹션 렌더링 (블록 12) ──────────────
+const SCEN_META = {
+  short_sale: { ko: "단타", icon: "⚡" },
+  rental: { ko: "임대", icon: "🏠" },
+  residence: { ko: "실거주", icon: "🛏️" },
+};
+
+function _won2man(won) { return Math.round((won || 0) / 10000); }
+
+function renderScenarioSection(it) {
+  const data = SCENARIO_DATA[String(it.id)];
+  if (!data || !data.scenarios) return "";
+  const scen = data.scenarios;
+  const order = ["short_sale", "rental", "residence"];
+  const best = data.best_scenario;
+
+  const cards = order.filter((k) => scen[k]).map((k) => {
+    const v = scen[k];
+    const m = SCEN_META[k];
+    const cap = _won2man(v.capital_needed);
+    const aff = v.affordable;
+    const rec = (k === best);
+    return `
+      <div class="scenario-card ${k} ${rec ? "recommended" : ""}"
+           data-scenario="${k}" data-capital-won="${v.capital_needed}">
+        ${rec ? '<span class="scen-badge">추천</span>' : ""}
+        <h4>${m.icon} ${m.ko}</h4>
+        <div class="scen-roe">${fmtPct(v.annualized_roe, 0)}<span>연환산</span></div>
+        <div class="scen-roe-sub">총 ROE ${fmtPct(v.roe, 0)}</div>
+        <div class="scen-meta">보유 ${v.holding_months}개월 · 자기자본 ${cap.toLocaleString()}만</div>
+        <div class="scen-afford ${aff ? "ok" : "short"}" data-afford>
+          ${aff ? "✅ 자본 가능" : "⚠️ 자본 부족"}
+        </div>
+      </div>`;
+  }).join("");
+
+  // 비교 표 (모바일)
+  const rowsKo = [
+    ["자기자본", (v) => _won2man(v.capital_needed).toLocaleString() + "만"],
+    ["보유기간", (v) => v.holding_months + "개월"],
+    ["ROE", (v) => fmtPct(v.roe, 0)],
+    ["연환산", (v) => fmtPct(v.annualized_roe, 0)],
+  ];
+  const tableRows = rowsKo.map(([label, fn]) => `
+      <tr><th>${label}</th>${order.map((k) => scen[k] ? `<td>${fn(scen[k])}</td>` : "<td>-</td>").join("")}</tr>`
+  ).join("");
+
+  const radar = renderRadarSvg(data.location);
+  const riskSvg = renderRiskDist(data.risk);
+
+  return `
+  <section class="scenario-section" data-item-id="${escapeHtml(String(it.id))}">
+    <div class="scen-head">
+      <h3>🎯 시나리오 비교 <small>단타 / 임대 / 실거주</small></h3>
+      <div class="capital-slider-wrap">
+        <label>내 자본 <output class="cap-out">2.0억</output></label>
+        <input type="range" class="cap-slider" min="5000" max="30000" step="500" value="20000"
+               aria-label="자기자본 슬라이더(만원)">
+      </div>
+    </div>
+    <div class="scenario-cards">${cards}</div>
+    <div class="scen-extras">
+      <div class="scen-extra-box"><div class="scen-extra-title">입지 5축</div>${radar}</div>
+      <div class="scen-extra-box"><div class="scen-extra-title">ROE 분포(몬테카를로)</div>${riskSvg}</div>
+    </div>
+    <table class="scenario-compare-table">
+      <thead><tr><th></th><th>⚡단타</th><th>🏠임대</th><th>🛏️실거주</th></tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+  </section>`;
+}
+
+function renderRadarSvg(loc) {
+  if (!loc) return '<p class="muted-note">입지 데이터 없음</p>';
+  const axes = [
+    ["교통", loc.transit, 30], ["학군", loc.school, 25], ["생활", loc.amenity, 20],
+    ["개발", loc.development, 15], ["환경", loc.environment, 10],
+  ];
+  const cx = 110, cy = 105, R = 72, n = axes.length;
+  const pt = (i, r) => {
+    const ang = -Math.PI / 2 + (2 * Math.PI * i) / n;
+    return [cx + r * Math.cos(ang), cy + r * Math.sin(ang)];
+  };
+  const grid = [0.25, 0.5, 0.75, 1].map((f) =>
+    `<polygon class="radar-grid" points="${axes.map((_, i) => pt(i, R * f).map((x) => x.toFixed(1)).join(",")).join(" ")}"/>`
+  ).join("");
+  const valPts = axes.map(([, val, max], i) => {
+    const f = Math.max(0, Math.min(1, (val || 0) / max));
+    return pt(i, R * f).map((x) => x.toFixed(1)).join(",");
+  }).join(" ");
+  const labels = axes.map(([label, val, max], i) => {
+    const [x, y] = pt(i, R + 16);
+    return `<text class="radar-label" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${label} ${val ?? 0}</text>`;
+  }).join("");
+  return `<svg class="radar-svg" viewBox="0 0 220 220" role="img" aria-label="입지 5축 레이더">
+    ${grid}<polygon class="radar-value" points="${valPts}"/>${labels}
+    <text class="radar-total" x="${cx}" y="${cy + 4}">${loc.total || 0}</text>
+  </svg>`;
+}
+
+function renderRiskDist(risk) {
+  if (!risk || risk.expected_roe == null) return '<p class="muted-note">리스크 데이터 없음</p>';
+  const mean = risk.expected_roe;
+  const loss = (risk.loss_probability != null) ? risk.loss_probability : 0;
+  const worst = risk.worst_case_loss || 0;
+  // mean 중심 정규분포 형태(시각화). x: -30~60%
+  const W = 220, H = 110, lo = -30, hi = 60, sd = 14;
+  const xpix = (v) => ((v - lo) / (hi - lo)) * W;
+  const bins = 28;
+  let bars = "";
+  let maxh = 0;
+  const hs = [];
+  for (let i = 0; i < bins; i++) {
+    const x = lo + ((i + 0.5) / bins) * (hi - lo);
+    const h = Math.exp(-0.5 * Math.pow((x - mean) / sd, 2));
+    hs.push(h); if (h > maxh) maxh = h;
+  }
+  for (let i = 0; i < bins; i++) {
+    const x = lo + (i / bins) * (hi - lo);
+    const bw = W / bins;
+    const bh = (hs[i] / maxh) * (H - 24);
+    const neg = (x + (hi - lo) / bins / 2) < 0;
+    bars += `<rect class="rdist-bar ${neg ? "neg" : "pos"}" x="${xpix(x).toFixed(1)}" y="${(H - 16 - bh).toFixed(1)}" width="${(bw - 1).toFixed(1)}" height="${bh.toFixed(1)}"/>`;
+  }
+  const zero = xpix(0);
+  const meanX = xpix(Math.max(lo, Math.min(hi, mean)));
+  return `<svg class="rdist-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="ROE 분포">
+    ${bars}
+    <line class="rdist-zero" x1="${zero}" y1="6" x2="${zero}" y2="${H - 16}"/>
+    <line class="rdist-mean" x1="${meanX}" y1="2" x2="${meanX}" y2="${H - 16}"/>
+    <text class="rdist-cap" x="4" y="${H - 3}">기댓값 ${fmtPct(mean, 1)} · 손실확률 ${(loss * 100).toFixed(0)}% · 최악손실 ${_won2man(worst).toLocaleString()}만</text>
+  </svg>`;
+}
+
+function wireScenarioSection(it) {
+  const sec = document.querySelector(".scenario-section");
+  if (!sec) return;
+  const slider = sec.querySelector(".cap-slider");
+  const out = sec.querySelector(".cap-out");
+  if (!slider) return;
+  const apply = () => {
+    const man = parseInt(slider.value, 10);
+    const won = man * 10000;
+    out.textContent = (man / 10000).toFixed(1) + "억";
+    sec.querySelectorAll(".scenario-card").forEach((card) => {
+      const need = parseInt(card.dataset.capitalWon || "0", 10);
+      const ok = need <= won;
+      card.classList.toggle("unaffordable", !ok);
+      const tag = card.querySelector("[data-afford]");
+      if (tag) {
+        tag.classList.toggle("ok", ok);
+        tag.classList.toggle("short", !ok);
+        tag.textContent = ok ? "✅ 자본 가능" : "⚠️ 자본 부족";
+      }
+    });
+  };
+  slider.addEventListener("input", apply);
+  apply();
 }
 
 let CURRENT_DETAIL_ID = null;
@@ -5271,6 +5435,23 @@ async function load() {
     renderAppHome();  // 홈 화면 렌더링
   } catch (e) {
     showError(`mock_dashboard.json 을 불러오지 못했습니다: ${e && e.message ? e.message : e}`);
+  }
+  loadScenarioData();  // 시나리오 비교 데이터(선택) 비동기 로드
+}
+
+// ── 시나리오 비교 데이터 (블록 12) ───────────────────
+let SCENARIO_DATA = {};      // item_id -> {scenarios, location, risk, ...}
+let SCENARIO_SUMMARY = null;
+
+async function loadScenarioData() {
+  try {
+    const resp = await fetch("data/scenarios.json", { cache: "no-cache" });
+    if (!resp.ok) return;            // 없으면 조용히 무시
+    const data = await resp.json();
+    (data.items || []).forEach((it) => { SCENARIO_DATA[String(it.item_id)] = it; });
+    SCENARIO_SUMMARY = data.summary || null;
+  } catch (e) {
+    /* scenarios.json 선택적 — 실패 무시 */
   }
 }
 
