@@ -6,507 +6,507 @@
 <atom:link href="https://1976haru.github.io/auction/feed.xml" rel="self" type="application/rss+xml" />
 <description>법원경매·공매 mock 데이터 기반 추천 매물 (점수순). 실제 거래 대상이 아닌 데모 피드입니다.</description>
 <language>ko-KR</language>
-<lastBuildDate>Thu, 02 Jul 2026 23:03:14 +0900</lastBuildDate>
+<lastBuildDate>Fri, 03 Jul 2026 23:00:19 +0900</lastBuildDate>
 <generator>export_static_dashboard.py</generator>
+<item>
+<title>[A] 서울특별시 강북구 수유동 440 (점수 84.3)</title>
+<link>https://1976haru.github.io/auction/#item-91</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-91</guid>
+<pubDate>Fri, 03 Jul 2026 23:00:19 +0900</pubDate>
+<category>연립</category>
+<category>A</category>
+<description>공매 · 연립 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 119,421만원 / 차익 96,981만원 / ROI 439.2% / 위험 보통 / 신뢰도 0.81 / 입찰 2026-08-02~2026-08-04
+점수 84.3 (A등급) · 선호 매칭: 선호 유형 일치</description>
+</item>
 <item>
 <title>[A] 광주광역시 북구 운암동 377 (점수 79.0)</title>
 <link>https://1976haru.github.io/auction/#item-59</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-59</guid>
-<pubDate>Thu, 02 Jul 2026 23:03:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:59:19 +0900</pubDate>
 <category>아파트</category>
 <category>A</category>
-<description>공매 · 아파트 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 70,560만원 / 차익 48,240만원 / ROI 218.5% / 위험 낮음 / 신뢰도 0.77 / 입찰 2026-07-16~2026-07-18
-차익 48,240만원 추정 + 위험 낮음</description>
+<description>공매 · 아파트 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 103,334만원 / 차익 81,014만원 / ROI 366.9% / 위험 낮음 / 신뢰도 0.6 / 입찰 2026-07-17~2026-07-19
+차익 81,014만원 추정 + 위험 낮음</description>
 </item>
 <item>
 <title>[A] 부산광역시 남구 대연동 430 (점수 79.0)</title>
 <link>https://1976haru.github.io/auction/#item-54</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-54</guid>
-<pubDate>Thu, 02 Jul 2026 23:02:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:58:19 +0900</pubDate>
 <category>아파트</category>
 <category>A</category>
-<description>공매 · 아파트 / 감정가 12,000만원 / 최저가 9,600만원 / 시세 77,153만원 / 차익 67,433만원 / ROI 702.4% / 위험 낮음 / 신뢰도 0.44 / 입찰 2026-07-06~2026-07-08
-차익 67,433만원 추정 + 위험 낮음</description>
+<description>공매 · 아파트 / 감정가 12,000만원 / 최저가 9,600만원 / 시세 122,472만원 / 차익 112,752만원 / ROI 1174.5% / 위험 낮음 / 신뢰도 0.61 / 입찰 2026-07-07~2026-07-09
+차익 112,752만원 추정 + 위험 낮음</description>
 </item>
 <item>
-<title>[B] 서울특별시 강북구 수유동 440 (점수 71.0)</title>
-<link>https://1976haru.github.io/auction/#item-91</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-91</guid>
-<pubDate>Thu, 02 Jul 2026 23:01:14 +0900</pubDate>
-<category>연립</category>
+<title>[B] 인천광역시 남동구 구월동 279 (점수 69.0)</title>
+<link>https://1976haru.github.io/auction/#item-85</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-85</guid>
+<pubDate>Fri, 03 Jul 2026 22:57:19 +0900</pubDate>
+<category>토지</category>
 <category>B</category>
-<description>공매 · 연립 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 86,959만원 / 차익 64,519만원 / ROI 292.2% / 위험 보통 / 신뢰도 0.81 / 입찰 2026-08-01~2026-08-03
-점수 71.0 (B등급) · 선호 매칭: 선호 유형 일치</description>
+<description>공매 · 토지 / 감정가 36,000만원 / 최저가 33,120만원 / 시세 65,377만원 / 차익 31,717만원 / ROI 95.8% / 위험 보통 / 신뢰도 0.81 / 입찰 2026-07-01~2026-07-03
+차익 31,717만원 추정 (medium 위험)</description>
 </item>
 <item>
 <title>[B] 인천광역시 남동구 구월동 224 (점수 69.0)</title>
 <link>https://1976haru.github.io/auction/#item-81</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-81</guid>
-<pubDate>Thu, 02 Jul 2026 23:00:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:56:19 +0900</pubDate>
 <category>상가</category>
 <category>B</category>
-<description>공매 · 상가 / 감정가 36,000만원 / 최저가 28,800만원 / 시세 161,075만원 / 차익 131,735만원 / ROI 457.4% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-28~2026-07-30
-차익 131,735만원 추정 (medium 위험)</description>
+<description>공매 · 상가 / 감정가 36,000만원 / 최저가 28,800만원 / 시세 112,785만원 / 차익 83,445만원 / ROI 289.7% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-29~2026-07-31
+차익 83,445만원 추정 (medium 위험)</description>
+</item>
+<item>
+<title>[B] 경기도 용인시 수지구 458 (점수 69.0)</title>
+<link>https://1976haru.github.io/auction/#item-79</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-79</guid>
+<pubDate>Fri, 03 Jul 2026 22:55:19 +0900</pubDate>
+<category>토지</category>
+<category>B</category>
+<description>공매 · 토지 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 54,879만원 / 차익 32,439만원 / ROI 146.9% / 위험 보통 / 신뢰도 0.82 / 입찰 2026-08-02~2026-08-04
+차익 32,439만원 추정 (medium 위험)</description>
 </item>
 <item>
 <title>[B] 대구광역시 수성구 범어동 367 (점수 69.0)</title>
 <link>https://1976haru.github.io/auction/#item-57</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-57</guid>
-<pubDate>Thu, 02 Jul 2026 22:59:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:54:19 +0900</pubDate>
 <category>아파트</category>
 <category>B</category>
-<description>공매 · 아파트 / 감정가 36,000만원 / 최저가 33,120만원 / 시세 125,968만원 / 차익 92,308만원 / ROI 278.7% / 위험 보통 / 신뢰도 0.73 / 입찰 2026-07-05~2026-07-07
-차익 92,308만원 추정 (medium 위험)</description>
-</item>
-<item>
-<title>[B] 서울특별시 마포구 망원동 2-34 (점수 69.0)</title>
-<link>https://1976haru.github.io/auction/#item-33</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-33</guid>
-<pubDate>Thu, 02 Jul 2026 22:58:14 +0900</pubDate>
-<category>상가</category>
-<category>B</category>
-<description>경매 · 상가 / 감정가 45,000만원 / 최저가 40,500만원 / 시세 111,080만원 / 차익 69,905만원 / ROI 172.6% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-26
-차익 69,905만원 추정 (medium 위험)</description>
-</item>
-<item>
-<title>[B] 인천광역시 연수구 송도동 872-12 (점수 69.0)</title>
-<link>https://1976haru.github.io/auction/#item-21</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-21</guid>
-<pubDate>Thu, 02 Jul 2026 22:57:14 +0900</pubDate>
-<category>토지</category>
-<category>B</category>
-<description>경매 · 토지 / 감정가 30,000만원 / 최저가 27,000만원 / 시세 57,784만원 / 차익 30,334만원 / ROI 112.3% / 위험 보통 / 신뢰도 0.82 / 입찰 2026-07-06
-차익 30,334만원 추정 (medium 위험)</description>
+<description>공매 · 아파트 / 감정가 36,000만원 / 최저가 33,120만원 / 시세 117,639만원 / 차익 83,979만원 / ROI 253.6% / 위험 보통 / 신뢰도 0.81 / 입찰 2026-07-06~2026-07-08
+차익 83,979만원 추정 (medium 위험)</description>
 </item>
 <item>
 <title>[B] 서울특별시 성동구 성수동 907-35 (점수 69.0)</title>
 <link>https://1976haru.github.io/auction/#item-10</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-10</guid>
-<pubDate>Thu, 02 Jul 2026 22:56:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:53:19 +0900</pubDate>
 <category>토지</category>
 <category>B</category>
-<description>경매 · 토지 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 31,607만원 / 차익 19,832만원 / ROI 171.7% / 위험 보통 / 신뢰도 0.6 / 입찰 2026-07-26
-차익 19,832만원 추정 (medium 위험)</description>
+<description>경매 · 토지 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 56,826만원 / 차익 45,051만원 / ROI 390.1% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-27
+차익 45,051만원 추정 (medium 위험)</description>
 </item>
 <item>
 <title>[B] 부산광역시 해운대구 우동 349-18 (점수 69.0)</title>
 <link>https://1976haru.github.io/auction/#item-3</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-3</guid>
-<pubDate>Thu, 02 Jul 2026 22:55:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:52:19 +0900</pubDate>
 <category>빌라</category>
 <category>B</category>
-<description>경매 · 빌라 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 17,513만원 / 차익 7,688만원 / ROI 80.1% / 위험 보통 / 신뢰도 0.6 / 입찰 2026-07-04
-차익 7,688만원 추정 (medium 위험)</description>
+<description>경매 · 빌라 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 22,162만원 / 차익 12,337만원 / ROI 128.5% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-05
+차익 12,337만원 추정 (medium 위험)</description>
 </item>
 <item>
 <title>[B] 대전광역시 유성구 관평동 143-48 (점수 69.0)</title>
 <link>https://1976haru.github.io/auction/#item-1</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-1</guid>
-<pubDate>Thu, 02 Jul 2026 22:54:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:51:19 +0900</pubDate>
 <category>아파트</category>
 <category>B</category>
-<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 93,676만원 / 차익 83,851만원 / ROI 873.4% / 위험 보통 / 신뢰도 0.82 / 입찰 2026-08-05
-차익 83,851만원 추정 (medium 위험)</description>
+<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 129,182만원 / 차익 119,357만원 / ROI 1243.3% / 위험 보통 / 신뢰도 0.82 / 입찰 2026-08-06
+차익 119,357만원 추정 (medium 위험)</description>
 </item>
 <item>
-<title>[B] 인천광역시 남동구 구월동 279 (점수 68.5)</title>
-<link>https://1976haru.github.io/auction/#item-85</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-85</guid>
-<pubDate>Thu, 02 Jul 2026 22:53:14 +0900</pubDate>
-<category>토지</category>
-<category>B</category>
-<description>공매 · 토지 / 감정가 36,000만원 / 최저가 33,120만원 / 시세 59,942만원 / 차익 26,282만원 / ROI 79.4% / 위험 보통 / 신뢰도 0.81 / 입찰 2026-06-30~2026-07-02
-차익 26,282만원 추정 (medium 위험)</description>
-</item>
-<item>
-<title>[B] 대전광역시 서구 둔산동 170 (점수 61.1)</title>
+<title>[B] 대전광역시 서구 둔산동 170 (점수 66.0)</title>
 <link>https://1976haru.github.io/auction/#item-77</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-77</guid>
-<pubDate>Thu, 02 Jul 2026 22:52:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:50:19 +0900</pubDate>
 <category>오피스텔</category>
 <category>B</category>
-<description>공매 · 오피스텔 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 35,029만원 / 차익 12,709만원 / ROI 57.6% / 위험 낮음 / 신뢰도 0.63 / 입찰 2026-07-11~2026-07-13
-차익 12,709만원 추정 + 위험 낮음</description>
+<description>공매 · 오피스텔 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 36,387만원 / 차익 14,067만원 / ROI 63.7% / 위험 낮음 / 신뢰도 0.63 / 입찰 2026-07-12~2026-07-14
+차익 14,067만원 추정 + 위험 낮음</description>
 </item>
 <item>
-<title>[C] 부산광역시 남구 대연동 145 (점수 59.0)</title>
-<link>https://1976haru.github.io/auction/#item-100</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-100</guid>
-<pubDate>Thu, 02 Jul 2026 22:51:14 +0900</pubDate>
-<category>다세대</category>
+<title>[C] 서울특별시 관악구 봉천동 140 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-96</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-96</guid>
+<pubDate>Fri, 03 Jul 2026 22:49:19 +0900</pubDate>
+<category>공장</category>
 <category>C</category>
-<description>공매 · 다세대 / 감정가 12,000만원 / 최저가 11,040만원 / 시세 55,535만원 / 차익 44,315만원 / ROI 401.4% / 위험 높음 / 신뢰도 0.69 / 입찰 2026-07-20~2026-07-22
-차익 44,315만원 추정 (high 위험)</description>
-</item>
-<item>
-<title>[C] 인천광역시 남동구 구월동 459 (점수 59.0)</title>
-<link>https://1976haru.github.io/auction/#item-97</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-97</guid>
-<pubDate>Thu, 02 Jul 2026 22:50:14 +0900</pubDate>
-<category>다가구주택</category>
-<category>C</category>
-<description>공매 · 다가구주택 / 감정가 12,000만원 / 최저가 11,040만원 / 시세 29,924만원 / 차익 18,704만원 / ROI 169.4% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-06-30~2026-07-02
-차익 18,704만원 추정 (high 위험)</description>
+<description>공매 · 공장 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 45,322만원 / 차익 22,882만원 / ROI 103.6% / 위험 높음 / 신뢰도 0.87 / 입찰 2026-07-23~2026-07-25
+차익 22,882만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 영등포구 여의도동 232 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-93</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-93</guid>
-<pubDate>Thu, 02 Jul 2026 22:49:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:48:19 +0900</pubDate>
 <category>차량</category>
 <category>C</category>
-<description>공매 · 차량 / 감정가 36,000만원 / 최저가 28,800만원 / 시세 83,675만원 / 차익 54,335만원 / ROI 188.7% / 위험 높음 / 신뢰도 0.74 / 입찰 2026-07-01~2026-07-03
-차익 54,335만원 추정 (high 위험)</description>
+<description>공매 · 차량 / 감정가 36,000만원 / 최저가 28,800만원 / 시세 121,102만원 / 차익 91,762만원 / ROI 318.6% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-02~2026-07-04
+차익 91,762만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 광주광역시 북구 운암동 258 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-88</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-88</guid>
-<pubDate>Thu, 02 Jul 2026 22:48:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:47:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>공매 · 상가 / 감정가 36,000만원 / 최저가 24,480만원 / 시세 101,559만원 / 차익 76,539만원 / ROI 312.7% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-07-11~2026-07-13
-차익 76,539만원 추정 (high 위험)</description>
+<description>공매 · 상가 / 감정가 36,000만원 / 최저가 24,480만원 / 시세 164,674만원 / 차익 139,654만원 / ROI 570.5% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-07-12~2026-07-14
+차익 139,654만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 관악구 봉천동 53 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-84</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-84</guid>
-<pubDate>Thu, 02 Jul 2026 22:47:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:46:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>공매 · 상가 / 감정가 12,000만원 / 최저가 9,600만원 / 시세 180,187만원 / 차익 170,407만원 / ROI 1775.1% / 위험 높음 / 신뢰도 0.76 / 입찰 2026-07-01~2026-07-03
-차익 170,407만원 추정 (high 위험)</description>
+<description>공매 · 상가 / 감정가 12,000만원 / 최저가 9,600만원 / 시세 113,458만원 / 차익 103,678만원 / ROI 1080.0% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-02~2026-07-04
+차익 103,678만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 서울특별시 강북구 수유동 228 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-82</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-82</guid>
+<pubDate>Fri, 03 Jul 2026 22:45:19 +0900</pubDate>
+<category>토지</category>
+<category>C</category>
+<description>공매 · 토지 / 감정가 24,000만원 / 최저가 19,200만원 / 시세 54,597만원 / 차익 35,037만원 / ROI 182.5% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-17~2026-07-19
+차익 35,037만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 강북구 수유동 342 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-76</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-76</guid>
-<pubDate>Thu, 02 Jul 2026 22:46:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:44:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>공매 · 상가 / 감정가 50,000만원 / 최저가 34,000만원 / 시세 81,409만원 / 차익 46,659만원 / ROI 137.2% / 위험 높음 / 신뢰도 0.79 / 입찰 2026-07-27~2026-07-29
-차익 46,659만원 추정 (high 위험)</description>
+<description>공매 · 상가 / 감정가 50,000만원 / 최저가 34,000만원 / 시세 115,367만원 / 차익 80,617만원 / ROI 237.1% / 위험 높음 / 신뢰도 0.87 / 입찰 2026-07-28~2026-07-30
+차익 80,617만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 서울특별시 영등포구 여의도동 302 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-73</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-73</guid>
+<pubDate>Fri, 03 Jul 2026 22:43:19 +0900</pubDate>
+<category>오피스텔</category>
+<category>C</category>
+<description>공매 · 오피스텔 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 46,575만원 / 차익 24,135만원 / ROI 109.3% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-12~2026-07-14
+차익 24,135만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 경기도 안양시 동안구 371 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-68</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-68</guid>
+<pubDate>Fri, 03 Jul 2026 22:42:19 +0900</pubDate>
+<category>토지</category>
+<category>C</category>
+<description>공매 · 토지 / 감정가 50,000만원 / 최저가 34,000만원 / 시세 62,519만원 / 차익 27,769만원 / ROI 81.7% / 위험 높음 / 신뢰도 0.77 / 입찰 2026-07-10~2026-07-12
+차익 27,769만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 경기도 용인시 수지구 429 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-66</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-66</guid>
-<pubDate>Thu, 02 Jul 2026 22:45:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:41:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>공매 · 아파트 / 감정가 12,000만원 / 최저가 11,040만원 / 시세 111,012만원 / 차익 99,792만원 / ROI 903.9% / 위험 높음 / 신뢰도 0.77 / 입찰 2026-07-20~2026-07-22
-차익 99,792만원 추정 (high 위험)</description>
+<description>공매 · 아파트 / 감정가 12,000만원 / 최저가 11,040만원 / 시세 93,554만원 / 차익 82,334만원 / ROI 745.8% / 위험 높음 / 신뢰도 0.77 / 입찰 2026-07-21~2026-07-23
+차익 82,334만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 대전광역시 서구 둔산동 64 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-64</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-64</guid>
-<pubDate>Thu, 02 Jul 2026 22:44:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:40:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>공매 · 상가 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 79,530만원 / 차익 57,090만원 / ROI 258.6% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-06~2026-07-08
-차익 57,090만원 추정 (high 위험)</description>
+<description>공매 · 상가 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 80,823만원 / 차익 58,383만원 / ROI 264.4% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-07~2026-07-09
+차익 58,383만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 광주광역시 북구 운암동 204 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-61</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-61</guid>
-<pubDate>Thu, 02 Jul 2026 22:43:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:39:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>공매 · 상가 / 감정가 36,000만원 / 최저가 28,800만원 / 시세 153,102만원 / 차익 123,762만원 / ROI 429.7% / 위험 높음 / 신뢰도 0.76 / 입찰 2026-07-03~2026-07-05
-차익 123,762만원 추정 (high 위험)</description>
+<description>공매 · 상가 / 감정가 36,000만원 / 최저가 28,800만원 / 시세 177,556만원 / 차익 148,216만원 / ROI 514.6% / 위험 높음 / 신뢰도 0.67 / 입찰 2026-07-04~2026-07-06
+차익 148,216만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 광주광역시 북구 운암동 461 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-55</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-55</guid>
-<pubDate>Thu, 02 Jul 2026 22:42:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:38:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>공매 · 아파트 / 감정가 12,000만원 / 최저가 8,160만원 / 시세 131,183만원 / 차익 122,843만원 / ROI 1505.4% / 위험 높음 / 신뢰도 0.65 / 입찰 2026-07-28~2026-07-30
-차익 122,843만원 추정 (high 위험)</description>
-</item>
-<item>
-<title>[C] 경기도 성남시 정자동 105-45 (점수 59.0)</title>
-<link>https://1976haru.github.io/auction/#item-49</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-49</guid>
-<pubDate>Thu, 02 Jul 2026 22:41:14 +0900</pubDate>
-<category>오피스텔</category>
-<category>C</category>
-<description>경매 · 오피스텔 / 감정가 22,000만원 / 최저가 16,940만원 / 시세 33,324만원 / 차익 16,054만원 / ROI 94.8% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-08-04
-차익 16,054만원 추정 (high 위험)</description>
+<description>공매 · 아파트 / 감정가 12,000만원 / 최저가 8,160만원 / 시세 119,038만원 / 차익 110,698만원 / ROI 1356.6% / 위험 높음 / 신뢰도 0.65 / 입찰 2026-07-29~2026-07-31
+차익 110,698만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 대전광역시 유성구 관평동 637-10 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-47</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-47</guid>
-<pubDate>Thu, 02 Jul 2026 22:40:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:37:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 8,250만원 / 시세 128,005만원 / 차익 119,530만원 / ROI 1448.8% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-12
-차익 119,530만원 추정 (high 위험)</description>
+<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 8,250만원 / 시세 48,462만원 / 차익 39,987만원 / ROI 484.7% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-13
+차익 39,987만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 경기도 수원시 매탄동 855-6 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-46</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-46</guid>
-<pubDate>Thu, 02 Jul 2026 22:39:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:36:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>경매 · 상가 / 감정가 65,000만원 / 최저가 41,600만원 / 시세 107,326만원 / 차익 64,751만원 / ROI 155.7% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-13
-차익 64,751만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 65,000만원 / 최저가 41,600만원 / 시세 82,630만원 / 차익 40,055만원 / ROI 96.3% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-14
+차익 40,055만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 강남구 역삼동 888-30 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-45</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-45</guid>
-<pubDate>Thu, 02 Jul 2026 22:38:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:35:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>경매 · 상가 / 감정가 15,000만원 / 최저가 13,500만원 / 시세 113,454만원 / 차익 99,729만원 / ROI 738.7% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-28
-차익 99,729만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 15,000만원 / 최저가 13,500만원 / 시세 157,034만원 / 차익 143,309만원 / ROI 1061.5% / 위험 높음 / 신뢰도 0.76 / 입찰 2026-07-29
+차익 143,309만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 경기도 성남시 정자동 410-16 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-38</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-38</guid>
-<pubDate>Thu, 02 Jul 2026 22:37:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:34:19 +0900</pubDate>
 <category>토지</category>
 <category>C</category>
-<description>경매 · 토지 / 감정가 45,000만원 / 최저가 28,800만원 / 시세 59,431만원 / 차익 29,956만원 / ROI 104.0% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-26
-차익 29,956만원 추정 (high 위험)</description>
+<description>경매 · 토지 / 감정가 45,000만원 / 최저가 28,800만원 / 시세 59,131만원 / 차익 29,656만원 / ROI 103.0% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-27
+차익 29,656만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 경기도 수원시 매탄동 151-2 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-37</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-37</guid>
-<pubDate>Thu, 02 Jul 2026 22:36:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:33:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>경매 · 아파트 / 감정가 45,000만원 / 최저가 34,650만원 / 시세 71,947만원 / 차익 36,622만원 / ROI 105.7% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-03
-차익 36,622만원 추정 (high 위험)</description>
+<description>경매 · 아파트 / 감정가 45,000만원 / 최저가 34,650만원 / 시세 66,054만원 / 차익 30,729만원 / ROI 88.7% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-04
+차익 30,729만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 경기도 성남시 정자동 562-1 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-35</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-35</guid>
-<pubDate>Thu, 02 Jul 2026 22:35:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:32:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>경매 · 상가 / 감정가 30,000만원 / 최저가 23,100만원 / 시세 114,991만원 / 차익 91,441만원 / ROI 395.8% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-08-09
-차익 91,441만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 30,000만원 / 최저가 23,100만원 / 시세 115,156만원 / 차익 91,606만원 / ROI 396.6% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-08-10
+차익 91,606만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 송파구 잠실동 991-50 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-31</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-31</guid>
-<pubDate>Thu, 02 Jul 2026 22:34:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:31:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>경매 · 아파트 / 감정가 45,000만원 / 최저가 34,650만원 / 시세 125,057만원 / 차익 89,732만원 / ROI 259.0% / 위험 높음 / 신뢰도 0.77 / 입찰 2026-08-02
-차익 89,732만원 추정 (high 위험)</description>
+<description>경매 · 아파트 / 감정가 45,000만원 / 최저가 34,650만원 / 시세 128,122만원 / 차익 92,797만원 / ROI 267.8% / 위험 높음 / 신뢰도 0.6 / 입찰 2026-08-03
+차익 92,797만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 경기도 수원시 매탄동 392-3 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-30</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-30</guid>
-<pubDate>Thu, 02 Jul 2026 22:33:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:30:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>경매 · 상가 / 감정가 45,000만원 / 최저가 40,500만원 / 시세 124,334만원 / 차익 83,159만원 / ROI 205.3% / 위험 높음 / 신뢰도 0.71 / 입찰 2026-07-18
-차익 83,159만원 추정 (high 위험)</description>
-</item>
-<item>
-<title>[C] 서울특별시 노원구 상계동 152-28 (점수 59.0)</title>
-<link>https://1976haru.github.io/auction/#item-28</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-28</guid>
-<pubDate>Thu, 02 Jul 2026 22:32:14 +0900</pubDate>
-<category>토지</category>
-<category>C</category>
-<description>경매 · 토지 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 28,988만원 / 차익 19,163만원 / ROI 199.6% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-12
-차익 19,163만원 추정 (high 위험)</description>
-</item>
-<item>
-<title>[C] 서울특별시 성동구 성수동 269-11 (점수 59.0)</title>
-<link>https://1976haru.github.io/auction/#item-27</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-27</guid>
-<pubDate>Thu, 02 Jul 2026 22:31:14 +0900</pubDate>
-<category>아파트</category>
-<category>C</category>
-<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 51,174만원 / 차익 39,399만원 / ROI 341.1% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-06
-차익 39,399만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 45,000만원 / 최저가 40,500만원 / 시세 156,797만원 / 차익 115,622만원 / ROI 285.5% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-19
+차익 115,622만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 대전광역시 유성구 관평동 955-43 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-25</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-25</guid>
-<pubDate>Thu, 02 Jul 2026 22:30:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:29:19 +0900</pubDate>
 <category>토지</category>
 <category>C</category>
-<description>경매 · 토지 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 29,829만원 / 차익 18,054만원 / ROI 156.3% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-08-03
-차익 18,054만원 추정 (high 위험)</description>
+<description>경매 · 토지 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 54,460만원 / 차익 42,685만원 / ROI 369.6% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-08-04
+차익 42,685만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 서울특별시 송파구 잠실동 598-37 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-22</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-22</guid>
+<pubDate>Fri, 03 Jul 2026 22:28:19 +0900</pubDate>
+<category>토지</category>
+<category>C</category>
+<description>경매 · 토지 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 60,047만원 / 차익 48,272만원 / ROI 417.9% / 위험 높음 / 신뢰도 0.85 / 입찰 2026-08-14
+차익 48,272만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 대전광역시 유성구 관평동 594-48 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-20</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-20</guid>
-<pubDate>Thu, 02 Jul 2026 22:29:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:27:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>경매 · 상가 / 감정가 30,000만원 / 최저가 27,000만원 / 시세 123,312만원 / 차익 95,862만원 / ROI 355.0% / 위험 높음 / 신뢰도 0.6 / 입찰 2026-08-05
-차익 95,862만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 30,000만원 / 최저가 27,000만원 / 시세 116,267만원 / 차익 88,817만원 / ROI 329.0% / 위험 높음 / 신뢰도 0.77 / 입찰 2026-08-06
+차익 88,817만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 대전광역시 유성구 관평동 255-13 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-17</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-17</guid>
-<pubDate>Thu, 02 Jul 2026 22:28:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:26:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 79,342만원 / 차익 67,567만원 / ROI 585.0% / 위험 높음 / 신뢰도 0.65 / 입찰 2026-07-16
-차익 67,567만원 추정 (high 위험)</description>
+<description>경매 · 아파트 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 119,268만원 / 차익 107,493만원 / ROI 930.7% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-17
+차익 107,493만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 송파구 잠실동 70-3 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-15</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-15</guid>
-<pubDate>Thu, 02 Jul 2026 22:27:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:25:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>경매 · 아파트 / 감정가 22,000만원 / 최저가 14,080만원 / 시세 53,031만원 / 차익 38,621만원 / ROI 274.3% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-30
-차익 38,621만원 추정 (high 위험)</description>
+<description>경매 · 아파트 / 감정가 22,000만원 / 최저가 14,080만원 / 시세 93,326만원 / 차익 78,916만원 / ROI 560.5% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-31
+차익 78,916만원 추정 (high 위험)</description>
 </item>
 <item>
-<title>[C] 인천광역시 연수구 송도동 115-24 (점수 59.0)</title>
-<link>https://1976haru.github.io/auction/#item-12</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-12</guid>
-<pubDate>Thu, 02 Jul 2026 22:26:14 +0900</pubDate>
-<category>토지</category>
+<title>[C] 서울특별시 성동구 성수동 124-16 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-14</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-14</guid>
+<pubDate>Fri, 03 Jul 2026 22:24:19 +0900</pubDate>
+<category>상가</category>
 <category>C</category>
-<description>경매 · 토지 / 감정가 15,000만원 / 최저가 11,550만원 / 시세 60,121만원 / 차익 48,346만원 / ROI 418.6% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-07-04
-차익 48,346만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 85,000만원 / 최저가 65,450만원 / 시세 157,069만원 / 차익 90,344만원 / ROI 138.0% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-14
+차익 90,344만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 경기도 고양시 행신동 935-7 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-11</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-11</guid>
+<pubDate>Fri, 03 Jul 2026 22:23:19 +0900</pubDate>
+<category>아파트</category>
+<category>C</category>
+<description>경매 · 아파트 / 감정가 65,000만원 / 최저가 35,750만원 / 시세 103,935만원 / 차익 67,210만원 / ROI 188.0% / 위험 높음 / 신뢰도 0.6 / 입찰 2026-07-23
+차익 67,210만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 인천광역시 연수구 송도동 643-11 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-9</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-9</guid>
-<pubDate>Thu, 02 Jul 2026 22:25:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:22:19 +0900</pubDate>
 <category>상가</category>
 <category>C</category>
-<description>경매 · 상가 / 감정가 22,000만원 / 최저가 14,080만원 / 시세 70,698만원 / 차익 56,288만원 / ROI 399.8% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-07-28
-차익 56,288만원 추정 (high 위험)</description>
+<description>경매 · 상가 / 감정가 22,000만원 / 최저가 14,080만원 / 시세 108,302만원 / 차익 93,892만원 / ROI 666.8% / 위험 높음 / 신뢰도 0.81 / 입찰 2026-07-29
+차익 93,892만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 강남구 역삼동 68-14 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-7</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-7</guid>
-<pubDate>Thu, 02 Jul 2026 22:24:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:21:19 +0900</pubDate>
 <category>오피스텔</category>
 <category>C</category>
-<description>경매 · 오피스텔 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 23,910만원 / 차익 14,085만원 / ROI 146.7% / 위험 높음 / 신뢰도 0.85 / 입찰 2026-08-09
-차익 14,085만원 추정 (high 위험)</description>
+<description>경매 · 오피스텔 / 감정가 15,000만원 / 최저가 9,600만원 / 시세 42,019만원 / 차익 32,194만원 / ROI 335.4% / 위험 높음 / 신뢰도 0.85 / 입찰 2026-08-10
+차익 32,194만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 서울특별시 송파구 잠실동 747-16 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-6</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-6</guid>
+<pubDate>Fri, 03 Jul 2026 22:20:19 +0900</pubDate>
+<category>빌라</category>
+<category>C</category>
+<description>경매 · 빌라 / 감정가 22,000만원 / 최저가 16,940만원 / 시세 34,375만원 / 차익 17,105만원 / ROI 101.0% / 위험 높음 / 신뢰도 0.69 / 입찰 2026-08-12
+차익 17,105만원 추정 (high 위험)</description>
+</item>
+<item>
+<title>[C] 서울특별시 마포구 망원동 888-7 (점수 59.0)</title>
+<link>https://1976haru.github.io/auction/#item-5</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-5</guid>
+<pubDate>Fri, 03 Jul 2026 22:19:19 +0900</pubDate>
+<category>아파트</category>
+<category>C</category>
+<description>경매 · 아파트 / 감정가 45,000만원 / 최저가 28,800만원 / 시세 91,222만원 / 차익 61,747만원 / ROI 214.4% / 위험 높음 / 신뢰도 0.83 / 입찰 2026-07-23
+차익 61,747만원 추정 (high 위험)</description>
 </item>
 <item>
 <title>[C] 서울특별시 강남구 역삼동 28-36 (점수 59.0)</title>
 <link>https://1976haru.github.io/auction/#item-2</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-2</guid>
-<pubDate>Thu, 02 Jul 2026 22:23:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:18:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>경매 · 아파트 / 감정가 22,000만원 / 최저가 19,800만원 / 시세 47,367만원 / 차익 27,237만원 / ROI 137.6% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-13
-차익 27,237만원 추정 (high 위험)</description>
+<description>경매 · 아파트 / 감정가 22,000만원 / 최저가 19,800만원 / 시세 117,641만원 / 차익 97,511만원 / ROI 492.5% / 위험 높음 / 신뢰도 0.74 / 입찰 2026-07-14
+차익 97,511만원 추정 (high 위험)</description>
 </item>
 <item>
-<title>[C] 서울특별시 영등포구 여의도동 396 (점수 52.3)</title>
-<link>https://1976haru.github.io/auction/#item-53</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-53</guid>
-<pubDate>Thu, 02 Jul 2026 22:22:14 +0900</pubDate>
+<title>[C] 서울특별시 강북구 수유동 14 (점수 47.0)</title>
+<link>https://1976haru.github.io/auction/#item-86</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-86</guid>
+<pubDate>Fri, 03 Jul 2026 22:17:19 +0900</pubDate>
 <category>아파트</category>
 <category>C</category>
-<description>공매 · 아파트 / 감정가 24,000만원 / 최저가 19,200만원 / 시세 44,031만원 / 차익 24,471만원 / ROI 127.5% / 위험 보통 / 신뢰도 0.83 / 입찰 2026-07-11~2026-07-13
-점수 52.3 (C등급) · 선호 매칭: 선호 유형 일치</description>
+<description>공매 · 아파트 / 감정가 50,000만원 / 최저가 46,000만원 / 시세 76,662만원 / 차익 29,912만원 / ROI 65.0% / 위험 높음 / 신뢰도 0.73 / 입찰 2026-07-26~2026-07-28
+차익 29,912만원 추정 (high 위험)</description>
 </item>
 <item>
-<title>[C] 경기도 고양시 행신동 935-7 (점수 51.0)</title>
-<link>https://1976haru.github.io/auction/#item-11</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-11</guid>
-<pubDate>Thu, 02 Jul 2026 22:21:14 +0900</pubDate>
-<category>아파트</category>
-<category>C</category>
-<description>경매 · 아파트 / 감정가 65,000만원 / 최저가 35,750만원 / 시세 61,750만원 / 차익 25,025만원 / ROI 70.0% / 위험 높음 / 신뢰도 0.54 / 입찰 2026-07-22
-차익 25,025만원 추정 (high 위험)</description>
-</item>
-<item>
-<title>[C] 대전광역시 유성구 관평동 768-10 (점수 48.6)</title>
-<link>https://1976haru.github.io/auction/#item-29</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-29</guid>
-<pubDate>Thu, 02 Jul 2026 22:20:14 +0900</pubDate>
-<category>아파트</category>
-<category>C</category>
-<description>경매 · 아파트 / 감정가 85,000만원 / 최저가 54,400만원 / 시세 85,350만원 / 차익 29,675만원 / ROI 54.5% / 위험 보통 / 신뢰도 0.83 / 입찰 2026-06-30
-차익 29,675만원 추정 (medium 위험)</description>
-</item>
-<item>
-<title>[C] 서울특별시 마포구 망원동 888-7 (점수 47.8)</title>
-<link>https://1976haru.github.io/auction/#item-5</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-5</guid>
-<pubDate>Thu, 02 Jul 2026 22:19:14 +0900</pubDate>
-<category>아파트</category>
-<category>C</category>
-<description>경매 · 아파트 / 감정가 45,000만원 / 최저가 28,800만원 / 시세 48,472만원 / 차익 18,997만원 / ROI 66.0% / 위험 높음 / 신뢰도 0.76 / 입찰 2026-07-22
-차익 18,997만원 추정 (high 위험)</description>
-</item>
-<item>
-<title>[C] 경기도 안양시 동안구 33 (점수 47.2)</title>
+<title>[C] 경기도 안양시 동안구 33 (점수 46.8)</title>
 <link>https://1976haru.github.io/auction/#item-70</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-70</guid>
-<pubDate>Thu, 02 Jul 2026 22:18:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:16:19 +0900</pubDate>
 <category>오피스텔</category>
 <category>C</category>
-<description>공매 · 오피스텔 / 감정가 50,000만원 / 최저가 34,000만원 / 시세 47,389만원 / 차익 12,639만원 / ROI 37.2% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-08~2026-07-10
-점수 47.2 (C등급) · 선호 매칭: 선호 유형 일치</description>
+<description>공매 · 오피스텔 / 감정가 50,000만원 / 최저가 34,000만원 / 시세 46,490만원 / 차익 11,740만원 / ROI 34.5% / 위험 보통 / 신뢰도 0.77 / 입찰 2026-07-09~2026-07-11
+점수 46.8 (C등급) · 선호 매칭: 선호 유형 일치</description>
 </item>
 <item>
-<title>[D] 대구광역시 수성구 범어동 202 (점수 43.6)</title>
+<title>[D] 서울특별시 강북구 수유동 441 (점수 35.0)</title>
+<link>https://1976haru.github.io/auction/#item-63</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-63</guid>
+<pubDate>Fri, 03 Jul 2026 22:15:19 +0900</pubDate>
+<category>아파트</category>
+<category>D</category>
+<description>공매 · 아파트 / 감정가 80,000만원 / 최저가 54,400만원 / 시세 76,000만원 / 차익 20,400만원 / ROI 37.5% / 위험 보통 / 신뢰도 0.59 / 입찰 2026-07-09~2026-07-11
+차익 20,400만원 추정 (medium 위험)</description>
+</item>
+<item>
+<title>[D] 대구광역시 수성구 범어동 202 (점수 34.1)</title>
 <link>https://1976haru.github.io/auction/#item-52</link>
 <guid isPermaLink="true">https://1976haru.github.io/auction/#item-52</guid>
-<pubDate>Thu, 02 Jul 2026 22:17:14 +0900</pubDate>
+<pubDate>Fri, 03 Jul 2026 22:14:19 +0900</pubDate>
 <category>상가</category>
 <category>D</category>
-<description>공매 · 상가 / 감정가 80,000만원 / 최저가 73,600만원 / 시세 119,549만원 / 차익 44,749만원 / ROI 60.8% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-24~2026-07-26
-차익 44,749만원 추정 (high 위험)</description>
+<description>공매 · 상가 / 감정가 80,000만원 / 최저가 73,600만원 / 시세 110,778만원 / 차익 35,978만원 / ROI 48.9% / 위험 높음 / 신뢰도 0.82 / 입찰 2026-07-25~2026-07-27
+차익 35,978만원 추정 (high 위험)</description>
 </item>
 <item>
-<title>[D] 대전광역시 서구 둔산동 285 (점수 41.8)</title>
-<link>https://1976haru.github.io/auction/#item-92</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-92</guid>
-<pubDate>Thu, 02 Jul 2026 22:16:14 +0900</pubDate>
-<category>단독주택</category>
-<category>D</category>
-<description>공매 · 단독주택 / 감정가 80,000만원 / 최저가 73,600만원 / 시세 117,883만원 / 차익 43,083만원 / ROI 58.5% / 위험 높음 / 신뢰도 0.88 / 입찰 2026-08-01~2026-08-03
-차익 43,083만원 추정 (high 위험)</description>
+<title>[X] 서울특별시 강남구 역삼동 112-39 (점수 20.9)</title>
+<link>https://1976haru.github.io/auction/#item-32</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-32</guid>
+<pubDate>Fri, 03 Jul 2026 22:13:19 +0900</pubDate>
+<category>아파트</category>
+<category>X</category>
+<description>경매 · 아파트 / 감정가 65,000만원 / 최저가 58,500만원 / 시세 78,406만원 / 차익 18,931만원 / ROI 32.4% / 위험 높음 / 신뢰도 0.67 / 입찰 2026-08-07
+차익 18,931만원 추정 (high 위험)</description>
 </item>
 <item>
-<title>[D] 서울특별시 성동구 성수동 124-16 (점수 41.7)</title>
-<link>https://1976haru.github.io/auction/#item-14</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-14</guid>
-<pubDate>Thu, 02 Jul 2026 22:15:14 +0900</pubDate>
-<category>상가</category>
-<category>D</category>
-<description>경매 · 상가 / 감정가 85,000만원 / 최저가 65,450만원 / 시세 104,938만원 / 차익 38,213만원 / ROI 58.4% / 위험 높음 / 신뢰도 0.74 / 입찰 2026-07-13
-차익 38,213만원 추정 (high 위험)</description>
+<title>[X] 서울특별시 영등포구 여의도동 396 (점수 18.5)</title>
+<link>https://1976haru.github.io/auction/#item-53</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-53</guid>
+<pubDate>Fri, 03 Jul 2026 22:12:19 +0900</pubDate>
+<category>아파트</category>
+<category>X</category>
+<description>공매 · 아파트 / 감정가 24,000만원 / 최저가 19,200만원 / 시세 22,800만원 / 차익 3,240만원 / ROI 16.9% / 위험 보통 / 신뢰도 0.6 / 입찰 2026-07-12~2026-07-14
+차익 3,240만원 추정 (medium 위험)</description>
 </item>
 <item>
-<title>[D] 서울특별시 관악구 봉천동 140 (점수 33.4)</title>
-<link>https://1976haru.github.io/auction/#item-96</link>
-<guid isPermaLink="true">https://1976haru.github.io/auction/#item-96</guid>
-<pubDate>Thu, 02 Jul 2026 22:14:14 +0900</pubDate>
-<category>공장</category>
-<category>D</category>
-<description>공매 · 공장 / 감정가 24,000만원 / 최저가 22,080만원 / 시세 33,029만원 / 차익 10,589만원 / ROI 48.0% / 위험 높음 / 신뢰도 0.7 / 입찰 2026-07-22~2026-07-24
-차익 10,589만원 추정 (high 위험)</description>
+<title>[X] 인천광역시 연수구 송도동 195-7 (점수 18.5)</title>
+<link>https://1976haru.github.io/auction/#item-16</link>
+<guid isPermaLink="true">https://1976haru.github.io/auction/#item-16</guid>
+<pubDate>Fri, 03 Jul 2026 22:11:19 +0900</pubDate>
+<category>오피스텔</category>
+<category>X</category>
+<description>경매 · 오피스텔 / 감정가 180,000만원 / 최저가 162,000만원 / 시세 171,000만원 / 차익 7,200만원 / ROI 4.4% / 위험 낮음 / 신뢰도 0.38 / 입찰 2026-07-29
+차익 7,200만원 추정 + 위험 낮음</description>
 </item>
 </channel>
 </rss>
